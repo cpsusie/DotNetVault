@@ -1,0 +1,237 @@
+[2019-11-09T10:02:46.3554117-05:00]: System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126
+[2019-11-09T10:02:46.3554117-05:00]: System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126
+[2019-11-09T10:02:46.3554117-05:00]: System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126
+[2019-11-09T10:02:46.3634074-05:00]: Error when trying to save white list to path: [./Resources/vaultsafewhitelist.txt].  Error: [System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126]
+[2019-11-09T10:02:46.3634074-05:00]: Error when trying to save white list to path: [./Resources/vaultsafewhitelist.txt].  Error: [System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126]
+[2019-11-09T10:02:46.3634074-05:00]: Error when trying to save white list to path: [./Resources/vaultsafewhitelist.txt].  Error: [System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126]
+[2019-11-09T10:02:46.3634074-05:00]: System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126
+[2019-11-09T10:02:46.3634074-05:00]: Error when trying to save white list to path: [./Resources/vaultsafewhitelist.txt].  Error: [System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126]
+[2019-11-09T10:02:46.3684043-05:00]: Found type argument TaskResult
+[2019-11-09T10:05:36.7013097-05:00]: System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126
+[2019-11-09T10:05:36.7013097-05:00]: System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126
+[2019-11-09T10:05:36.7013097-05:00]: System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126
+[2019-11-09T10:05:36.7013097-05:00]: System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\condit_generic_whitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass40_0.<InitImmutableCollectionsConditionalWhiteList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1028
+[2019-11-09T10:05:36.7083058-05:00]: Error when trying to save white list to path: [./Resources/vaultsafewhitelist.txt].  Error: [System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126]
+[2019-11-09T10:05:36.7083058-05:00]: Error when trying to save white list to path: [./Resources/vaultsafewhitelist.txt].  Error: [System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126]
+[2019-11-09T10:05:36.7093051-05:00]: Error when trying to save white list to path: [./Resources/condit_generic_whitelist.txt].  Error: [System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\condit_generic_whitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass40_0.<InitImmutableCollectionsConditionalWhiteList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1028]
+[2019-11-09T10:05:36.7093051-05:00]: System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126
+[2019-11-09T10:05:36.7093051-05:00]: Error when trying to save white list to path: [./Resources/vaultsafewhitelist.txt].  Error: [System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126]
+[2019-11-09T10:05:36.7143021-05:00]: Error when trying to save white list to path: [./Resources/vaultsafewhitelist.txt].  Error: [System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126]
+[2019-11-09T10:05:36.7143021-05:00]: Found type argument TaskResult
+[2019-11-09T10:08:30.0486928-05:00]: System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126
+[2019-11-09T10:08:30.0486928-05:00]: System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126
+[2019-11-09T10:08:30.0486928-05:00]: System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\condit_generic_whitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass40_0.<InitImmutableCollectionsConditionalWhiteList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1028
+[2019-11-09T10:08:30.0566884-05:00]: Error when trying to save white list to path: [./Resources/vaultsafewhitelist.txt].  Error: [System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126]
+[2019-11-09T10:08:30.0566884-05:00]: Error when trying to save white list to path: [./Resources/condit_generic_whitelist.txt].  Error: [System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\condit_generic_whitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass40_0.<InitImmutableCollectionsConditionalWhiteList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1028]
+[2019-11-09T10:08:30.0566884-05:00]: Error when trying to save white list to path: [./Resources/vaultsafewhitelist.txt].  Error: [System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126]
+[2019-11-09T10:08:30.0696808-05:00]: System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126
+[2019-11-09T10:08:30.0696808-05:00]: Error when trying to save white list to path: [./Resources/vaultsafewhitelist.txt].  Error: [System.IO.DirectoryNotFoundException: Could not find a part of the path 'G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\ExampleLaundryMachine\LaundryMachine\Resources\vaultsafewhitelist.txt'.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   at System.IO.StreamWriter.CreateFile(String path, Boolean append, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append, Encoding encoding, Int32 bufferSize, Boolean checkHost)
+   at System.IO.StreamWriter..ctor(String path, Boolean append)
+   at System.IO.FileInfo.CreateText()
+   at DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource.VaultSafeTypeAnalyzerV2.<>c__DisplayClass41_0.<InitWhiteListAndFieldScanExemptionList>b__3() in G:\CjmScrews\Source\VaultAnalyzer\CPSDev_Task38(Story37)\DotNetVault\UtilitySources\VaultSafeAnalyzerSource.cs:line 1126]
+[2019-11-09T10:08:30.0726822-05:00]: Found type argument TaskResult

@@ -1,0 +1,170 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <LangVersion>8.0</LangVersion>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <GenerateProgramFile>false</GenerateProgramFile>
+    <StartupObject />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="TestCases\ConditionallyImmutableClassNonRoImmutF.cs" />
+    <Compile Remove="TestCases\ConditionallyImmutStructWithNonROImmutF.cs" />
+    <Compile Remove="TestCases\DataFlowTestCases.cs" />
+    <Compile Remove="TestCases\DelegateCreationOpsAndDynamic.cs" />
+    <Compile Remove="TestCases\DiagnosticALittleMoreComplex.cs" />
+    <Compile Remove="TestCases\EventArgsOkTest.cs" />
+    <Compile Remove="TestCases\ImmutableCollectionIsVaultSafe.cs" />
+    <Compile Remove="TestCases\ImmutableStructIsVaultSafe.cs" />
+    <Compile Remove="TestCases\ImmutableStructIsVsUnmanaged.cs" />
+    <Compile Remove="TestCases\MethodInvokeSyntaxTests.cs" />
+    <Compile Remove="TestCases\MethodInvokeSyntaxTests_2.cs" />
+    <Compile Remove="TestCases\NoDiagnosticALittleMoreComplex.cs" />
+    <Compile Remove="TestCases\NoDiagnosticAttributeButAllUpper.cs" />
+    <Compile Remove="TestCases\NoDiagnosticBecauseOnFaith.cs" />
+    <Compile Remove="TestCases\NoDiagnosticNoAttribute.cs" />
+    <Compile Remove="TestCases\NoDiagnosticPartOfUsingStatement.cs" />
+    <Compile Remove="TestCases\NonVsCaptureTestCases.cs" />
+    <Compile Remove="TestCases\NullableNotHeldAgainstTest.cs" />
+    <Compile Remove="TestCases\QueryTestCases.cs" />
+    <Compile Remove="TestCases\SbAndUriBNotVaultSafe.cs" />
+    <Compile Remove="TestCases\ShouldTriggerDiagnosticBecauseNoUsing.cs" />
+    <Compile Remove="TestCases\ShouldTriggerDiagnosticLowercaseAndVsAttribute.cs" />
+    <Compile Remove="TestCases\ShouldTriggerDiagnosticLowercaseAndVsAttributeV2.cs" />
+    <Compile Remove="TestCases\ShouldTriggerDiagnosticLowercaseAndVsAttributeV3.cs" />
+    <Compile Remove="TestCases\TestDynamicNeverConsideredVaultSafe.cs" />
+    <Compile Remove="TestCases\TestIdentifyVaultSymbolDeclaration.cs" />
+    <Compile Remove="TestCases\TestUriWhiteListedVaultSafety.cs" />
+    <Compile Remove="TestCases\TestWhiteListedVaultSafety.cs" />
+    <Compile Remove="TestCases\VaultSafeAnalysisTestCases.cs" />
+    <Compile Remove="TestCases\VaultSafeGenericShouldBeOkExamples.cs" />
+    <Compile Remove="TestCases\VsTpObjectCreationExpDiag.cs" />
+    <Compile Remove="TestCases\VsTpTypeHaver.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="2.9.6">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.3.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.0.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.0.0" />
+    <PackageReference Include="System.Collections.Immutable" Version="1.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="ResourceFiles\ConditionallyVsImmutableTypes.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ConditionallyVsImmutableTypes.resx</DependentUpon>
+    </Compile>
+    <Compile Update="ResourceFiles\NullableNotHeldAgainstTests.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>NullableNotHeldAgainstTests.resx</DependentUpon>
+    </Compile>
+    <Compile Update="ResourceFiles\UsingMandatoryTestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>UsingMandatoryTestCases.resx</DependentUpon>
+    </Compile>
+    <Compile Update="ResourceFiles\VaultDelegates.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>VaultDelegates.resx</DependentUpon>
+    </Compile>
+    <Compile Update="ResourceFiles\VaultSafeAnalysisTestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>VaultSafeAnalysisTestCases.resx</DependentUpon>
+    </Compile>
+    <Compile Update="ResourceFiles\VaultSafeGenericTypesTestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>VaultSafeGenericTypesTestCases.resx</DependentUpon>
+    </Compile>
+    <Compile Update="ResourceFiles\VaultSafeTestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>VaultSafeTestCases.resx</DependentUpon>
+    </Compile>
+    <Compile Update="ResourceFiles\VaultSafeTypeParamTypeTestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>VaultSafeTypeParamTypeTestCases.resx</DependentUpon>
+    </Compile>
+    <Compile Update="ResourceFiles\VaultSymbolIdentificationTest.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>VaultSymbolIdentificationTest.resx</DependentUpon>
+    </Compile>
+    <Compile Update="ResourceFiles\WhiteListTests.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>WhiteListTests.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="ResourceFiles\ConditionallyVsImmutableTypes.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ConditionallyVsImmutableTypes.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ResourceFiles\NullableNotHeldAgainstTests.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>NullableNotHeldAgainstTests.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ResourceFiles\UsingMandatoryTestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>UsingMandatoryTestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ResourceFiles\VaultDelegates.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>VaultDelegates.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ResourceFiles\VaultSafeAnalysisTestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>VaultSafeAnalysisTestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ResourceFiles\VaultSafeGenericTypesTestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>VaultSafeGenericTypesTestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ResourceFiles\VaultSafeTestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>VaultSafeTestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ResourceFiles\VaultSafeTypeParamTypeTestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>VaultSafeTypeParamTypeTestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ResourceFiles\VaultSymbolIdentificationTest.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>VaultSymbolIdentificationTest.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ResourceFiles\WhiteListTests.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>WhiteListTests.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DotNetVault\DotNetVault.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="TestCases\" />
+  </ItemGroup>
+
+</Project>

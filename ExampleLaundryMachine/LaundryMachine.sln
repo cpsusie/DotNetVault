@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29503.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LaundryMachine", "LaundryMachine\LaundryMachine.csproj", "{73497107-1A38-4E1A-B248-FD39D362E7A0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LaundryMachineUi", "LaundryMachineUi\LaundryMachineUi.csproj", "{9A5945FF-A22C-43EA-B0DB-B6D15093522F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LaundryStressTest", "LaundryStressTest\LaundryStressTest.csproj", "{0D2F49BF-035E-4279-A9EE-DD91527604A6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{73497107-1A38-4E1A-B248-FD39D362E7A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73497107-1A38-4E1A-B248-FD39D362E7A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73497107-1A38-4E1A-B248-FD39D362E7A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73497107-1A38-4E1A-B248-FD39D362E7A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A5945FF-A22C-43EA-B0DB-B6D15093522F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A5945FF-A22C-43EA-B0DB-B6D15093522F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A5945FF-A22C-43EA-B0DB-B6D15093522F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A5945FF-A22C-43EA-B0DB-B6D15093522F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D2F49BF-035E-4279-A9EE-DD91527604A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D2F49BF-035E-4279-A9EE-DD91527604A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D2F49BF-035E-4279-A9EE-DD91527604A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D2F49BF-035E-4279-A9EE-DD91527604A6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CD8EB923-07B5-4F4B-8939-9E715F7E626A}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 4
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://cjmscrews.visualstudio.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = LaundryMachine\\LaundryMachine.csproj
+		SccProjectName1 = LaundryMachine
+		SccLocalPath1 = LaundryMachine
+		SccProjectUniqueName2 = LaundryMachineUi\\LaundryMachineUi.csproj
+		SccProjectName2 = LaundryMachineUi
+		SccLocalPath2 = LaundryMachineUi
+		SccProjectUniqueName3 = LaundryStressTest\\LaundryStressTest.csproj
+		SccProjectName3 = LaundryStressTest
+		SccLocalPath3 = LaundryStressTest
+	EndGlobalSection
+EndGlobal

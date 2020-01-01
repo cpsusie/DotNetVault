@@ -1,0 +1,90 @@
+﻿<Window x:Class="LaundryStressTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LaundryStressTest"
+        xmlns:laundryMachineUi="clr-namespace:LaundryMachineUi;assembly=LaundryMachineUi"
+        mc:Ignorable="d"
+        Title="Laundry Machine Stress Test.  DotNetVault.  Copyright © 2019 CJM Screws, LLC.  All rights reserved." Width="1600">
+    <StackPanel Orientation="Horizontal">
+        <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Horizontal">
+                <GroupBox x:Name="gpbxControlParams" Header="Simulation Parameters">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
+                            <Label x:Name="lblWetTimeMilliseconds" Margin="2, 2,2,2" Width="150" Content="Dampening Time Per Unit:"/>
+                            <TextBox x:Name="txbxWetTimeMilliseconds" VerticalContentAlignment ="Center" TextAlignment="Center" Width="50" Text="50" Margin="2,2,2,2"/>
+                            <Label x:Name="lblMilliseconds" Margin="2, 2, 2, 2" Content="milliseconds"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
+                            <Label x:Name="lblCleanseTime" Margin="2,2,2,2" Width="150" Content="Cleanse Time Per Unit:"/>
+                            <TextBox x:Name="txbxCleansePerUnit" Margin="2,2,2,2" VerticalContentAlignment ="Center" TextAlignment="Center" Width="50" Text="100"/>
+                            <Label x:Name="lblMilliseconds2" Margin="2, 2, 2, 2" Content="milliseconds"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
+                            <Label x:Name="lblDryTime" Margin="2,2,2,2" Width="150" Content="Dry Time Per Unit:"/>
+                            <TextBox x:Name="txbxDryPerUnit" Margin="2,2,2,2" VerticalContentAlignment ="Center" TextAlignment="Center" Width="50" Text="150"/>
+                            <Label x:Name="lblMilliseconds3" Margin="2, 2, 2, 2" Content="milliseconds"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
+                            <Label x:Name="lblDirty" Margin="2,2,2,2" Width="150" Content="Dirty articles: "/>
+                            <TextBox x:Name="txbxStartDirty" Margin="2,2,2,2" VerticalContentAlignment ="Center" TextAlignment="Center" Width="50" Text="200"/>
+                            <Label x:Name="lblRange" Margin="2, 2, 2, 2" Content="(1-200)"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
+                            <Button x:Name="btnInitialize" Margin="2,2,2,2" IsEnabledChanged ="btnInitialize_IsEnabledChanged" Content="Create Simulation" IsEnabled="False" Click="btnInitialize_Click"/>
+                            <Button x:Name="btnStart" Margin="2,2,2,2" Content="Start Simulation" IsEnabled="False" Click="btnStart_Click"/>
+                            <!--<Label Width="100"/>-->
+                            <Button x:Name="btnAbortSimulation" Content="Abort Simulation" Margin="2, 2, 2, 2" IsEnabled="False" Click="btnAbortSimulation_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox x:Name="gpbxLoaderRobots" Header="Loader Robot Monitors:">
+                    <StackPanel Orientation="Horizontal">
+                        <GroupBox x:Name="gpbxLoaderOne" Header="Loader One Event Monitor" Width="400">
+                            <RichTextBox x:Name="rtbxLoaderOneLog" MaxHeight="131" VerticalScrollBarVisibility="Visible" IsEnabled="True" FlowDirection="LeftToRight"  IsReadOnlyCaretVisible="True" IsReadOnly="True"/>
+                        </GroupBox>
+                        <GroupBox x:Name="gpbxLoaderTwo" Header="Loader Two Event Monitor" Width="400">
+                            <RichTextBox x:Name="rtbxLoaderTwoLog" MaxHeight="131" VerticalScrollBarVisibility="Visible" IsEnabled="True" FlowDirection="LeftToRight"  IsReadOnlyCaretVisible="True" IsReadOnly="True"/>
+                        </GroupBox>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <laundryMachineUi:LaundryMachineControlPanelView x:Name="lmCtrlPnl1" ShowCommandButtons="False" Height="407"/>
+                <laundryMachineUi:LaundryMachineControlPanelView x:Name="lmCtrlPnl2" ShowCommandButtons="False" Height="407"/>
+                <laundryMachineUi:LaundryMachineControlPanelView x:Name="lmCtrlPnl3" ShowCommandButtons="False" Height="407"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <GroupBox x:Name="gpbxUnloaderOne" Header="Unloader One Event Monitor" Height ="250" Width="400">
+                    <RichTextBox x:Name="rtbxUnloaderOneLog" MaxHeight ="228" VerticalScrollBarVisibility="Visible" IsReadOnlyCaretVisible="True" IsReadOnly="True"/>
+                </GroupBox>
+                <GroupBox x:Name="gpbxUnloaderTwo" Header="Unloader Two Event Monitor" Height ="250" Width="400">
+                    <RichTextBox x:Name="rtbxUnloaderTwoLog" MaxHeight ="228" VerticalScrollBarVisibility="Visible" IsReadOnlyCaretVisible="True" IsReadOnly="True"/>
+                </GroupBox>
+                <GroupBox x:Name="gpbxBins" Margin ="5,5,5,5" Header="Laundry Bins" Height ="250" Width="785">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <Label x:Name="lblDirtyCount" Content="Dirty Articles:"/> 
+                            <TextBox x:Name="txbxDirtyCount" Margin="2,2,2,2" Width="50" TextAlignment="Center" VerticalContentAlignment="Center" IsReadOnlyCaretVisible="True" IsReadOnly="True" Text="200"/>
+                            <Label x:Name="lblDirtyRemaining" Content="articles remaining"/>
+                            <Label Width="295"/>
+                            <Label x:Name="lblCleanCount" Content="Clean Articles:"/>
+                            <TextBox x:Name="txbxCleanCount" Margin="2,2,2,2" Width="50" TextAlignment="Center" VerticalContentAlignment="Center" IsReadOnlyCaretVisible="True" IsReadOnly="True" Text="0"/>
+                            <Label x:Name="lblCleanRemaining" Content="articles cleaned"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <GroupBox x:Name="gpbxDirtyLog" Header="Dirty Log:" Width="391">
+                                <RichTextBox x:Name="rtxbxDirtyLog" Height ="180" MaxHeight="180" VerticalScrollBarVisibility="Visible" IsReadOnlyCaretVisible="True" IsReadOnly="True"/>
+                            </GroupBox>
+                            <GroupBox x:Name="gpbxCleanLog" Header="Clean Log:" Width="391">
+                                <RichTextBox x:Name="rtxbxCleanyLog" Height="180" MaxHeight="180" VerticalScrollBarVisibility="Visible" IsReadOnlyCaretVisible="True" IsReadOnly="True"/>
+                            </GroupBox>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </StackPanel>
+    </StackPanel>
+</Window>

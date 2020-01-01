@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29306.81
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetVault", "DotNetVault\DotNetVault.csproj", "{200B0CCA-F625-4E3F-9CC3-00AE5A2E7579}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetVault.Test", "DotNetVault.Test\DotNetVault.Test.csproj", "{C030D181-DD95-47CA-AEF5-49B8E2262343}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetVault.Vsix", "DotNetVault.Vsix\DotNetVault.Vsix.csproj", "{DDC79759-AD9A-4251-94DA-E72B2B5EE6AE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6273AC00-D6E4-4119-93DE-0F0EAE73D450}"
+	ProjectSection(SolutionItems) = preProject
+		DotNetVault Description.docx = DotNetVault Description.docx
+		DotNetVault Description.pdf = DotNetVault Description.pdf
+		DotNetVault.sln.DotSettings = DotNetVault.sln.DotSettings
+		license.txt = license.txt
+		readme.txt = readme.txt
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{200B0CCA-F625-4E3F-9CC3-00AE5A2E7579}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{200B0CCA-F625-4E3F-9CC3-00AE5A2E7579}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{200B0CCA-F625-4E3F-9CC3-00AE5A2E7579}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{200B0CCA-F625-4E3F-9CC3-00AE5A2E7579}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C030D181-DD95-47CA-AEF5-49B8E2262343}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C030D181-DD95-47CA-AEF5-49B8E2262343}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C030D181-DD95-47CA-AEF5-49B8E2262343}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C030D181-DD95-47CA-AEF5-49B8E2262343}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDC79759-AD9A-4251-94DA-E72B2B5EE6AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDC79759-AD9A-4251-94DA-E72B2B5EE6AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDC79759-AD9A-4251-94DA-E72B2B5EE6AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDC79759-AD9A-4251-94DA-E72B2B5EE6AE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {546FB336-1819-465C-B157-F33FC17E6577}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 4
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://cjmscrews.visualstudio.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = DotNetVault\\DotNetVault.csproj
+		SccProjectName1 = DotNetVault
+		SccLocalPath1 = DotNetVault
+		SccProjectUniqueName2 = DotNetVault.Vsix\\DotNetVault.Vsix.csproj
+		SccProjectName2 = DotNetVault.Vsix
+		SccLocalPath2 = DotNetVault.Vsix
+		SccProjectUniqueName3 = DotNetVault.Test\\DotNetVault.Test.csproj
+		SccProjectName3 = DotNetVault.Test
+		SccLocalPath3 = DotNetVault.Test
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="LaundryMachineUi.LaundryMachineControlPanelView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:LaundryMachineUi"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" IsEnabled="False" MinHeight="450" MinWidth="453" MaxWidth="453" >
+    <StackPanel Orientation="Horizontal">
+        <GroupBox x:Name="gpbxMonitor" Header="Laundry Machine Status Monitor" Width="450">
+            <StackPanel Orientation="Vertical" MinHeight="412">
+                <StackPanel Orientation="Horizontal">
+                    <Label x:Name="lblStateCode" Content="State Code: " Margin="5, 5, 5, 5"/>
+                    <TextBox x:Name="txbxStateCode" IsReadOnly="True" Margin ="5,5,5,5" Text="" MinWidth="190" TextAlignment="Center" VerticalContentAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label x:Name="lblContents" Content="Contents: " Margin="5, 5, 5, 5"/>
+                    <TextBox x:Name="txbxContents" IsReadOnly="True" Margin ="15,5,5,5" Text="" Width="300" TextAlignment="Justify" VerticalContentAlignment="Center"/>
+                </StackPanel>
+                <GroupBox x:Name="gpbxLaundryCommands" Header="Command Panel" >
+                    <StackPanel Orientation="Vertical" >
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="btnTurnOn" Content="Turn On" MinWidth="65" Margin="5,5,5,5" Click="btnTurnOn_Clicked"/>
+                            <Button x:Name="btnTurnOff" IsEnabled ="False" Content="Turn Off" MinWidth="65" Margin="5,5,5,5" Click="btnTurnOff_Clicked"/>
+                            <Button x:Name="btnWash" IsEnabled="False"  Content="Wash" MinWidth="65" Margin="5,5,5,5" Click="btnWash_Clicked"/>
+                            <Button x:Name="btnDry" IsEnabled ="False" Content="Dry" MinWidth="65" Margin="5,5,5,5" Click="btnDry_Clicked"/>
+                            <Button x:Name="btnAbort" IsEnabled ="False" Content="Abort" MinWidth="65" Margin="5,5,5,5" Click="btnAbort_Clicked"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+                <Label x:Name="lblEventLog" Content ="Event Log"/>
+                <RichTextBox x:Name="rtbxEventLog" FlowDirection="LeftToRight" Width="438" IsReadOnlyCaretVisible ="True" IsEnabled ="True" IsReadOnly="True" VerticalScrollBarVisibility="Visible" Height="274" />
+            </StackPanel>
+        </GroupBox>
+        
+    </StackPanel>
+</UserControl>

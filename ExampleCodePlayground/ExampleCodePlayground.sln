@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExampleCodePlayground", "ExampleCodePlayground.csproj", "{10876159-F45A-4140-A42D-0574094B9463}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{10876159-F45A-4140-A42D-0574094B9463}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10876159-F45A-4140-A42D-0574094B9463}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10876159-F45A-4140-A42D-0574094B9463}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10876159-F45A-4140-A42D-0574094B9463}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C4981C82-EA04-4514-AAB9-0175798CAF6A}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 1
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://cjmscrews.visualstudio.com/
+		SccProjectUniqueName0 = ExampleCodePlayground.csproj
+		SccProjectName0 = .
+		SccAuxPath0 = https://cjmscrews.visualstudio.com
+		SccLocalPath0 = .
+		SccProvider0 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+	EndGlobalSection
+EndGlobal
