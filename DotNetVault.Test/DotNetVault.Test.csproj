@@ -22,6 +22,7 @@
     <Compile Remove="TestCases\DataFlowTestCases.cs" />
     <Compile Remove="TestCases\DelegateCreationOpsAndDynamic.cs" />
     <Compile Remove="TestCases\DiagnosticALittleMoreComplex.cs" />
+    <Compile Remove="TestCases\EmitsDiagnosticUmRequiresInlineDecl.cs" />
     <Compile Remove="TestCases\EventArgsOkTest.cs" />
     <Compile Remove="TestCases\ImmutableCollectionIsVaultSafe.cs" />
     <Compile Remove="TestCases\ImmutableStructIsVaultSafe.cs" />

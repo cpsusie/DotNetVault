@@ -121,6 +121,9 @@
   <data name="DiagnosticALittleMoreComplex" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\testcases\diagnosticalittlemorecomplex.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="EmitsDiagnosticUmRequiresInlineDecl" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\testcases\emitsdiagnosticumrequiresinlinedecl.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="NoDiagnosticALittleMoreComplex" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\testcases\nodiagnosticalittlemorecomplex.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>

@@ -30,6 +30,7 @@ namespace DotNetVault
         // ReSharper disable InconsistentNaming
         internal const string DiagnosticId_VaultSafeTypes = "DotNetVault_VaultSafe";
         internal const string DiagnosticId_UsingMandatory = "DotNetVault_UsingMandatory";
+        internal const string DiagnosticId_UsingMandatory_Inline = "DotNetVault_UsingMandatory_DeclaredInline";
         internal const string DotNetVault_VsDelegateCapture = "DotNetVault_VsDelegateCapture";
         internal const string DotNetVault_VsTypeParams = "DotNetVault_VsTypeParams";
         internal const string DotNetVault_VsTypeParams_Method_Invoke = "DotNetVault_VsTypeParams_MethodInvoke";
@@ -253,8 +254,8 @@ namespace DotNetVault
             {
                 var node = context.Node;
                 InvocationExpressionSyntax syntax = node as InvocationExpressionSyntax;
-                if (syntax != null && !UsingStatementAnalyzerUtilitySource.CreateStatementAnalyzer()
-                        .IsPartOfUsingConstruct(syntax))
+                var usingStatementAnalyzer = UsingStatementAnalyzerUtilitySource.CreateStatementAnalyzer();
+                if (syntax != null && !usingStatementAnalyzer.IsPartOfUsingConstruct(syntax))
                 {
                     var semanticModel = context.SemanticModel;
                     var usingMandatoryAttributeFinder =
@@ -267,12 +268,30 @@ namespace DotNetVault
                         context.ReportDiagnostic(diagnostic);
                     }
                 }
-                else if (syntax != null
-                ) //&&UsingStatementAnalyzerUtilitySource.CreateStatementAnalyzer().IsPartOfUsingConstruct(syntax)
+                else if (syntax != null) //Is part of using construct 
+                    //&& usingStatement.IsPartOfUsingConstruct(syntax)
                 {
                     //TODO FIXIT BUG 50 -- Impose requirement that variable assigned to declared inline to bind access thereto to lexical scope.
+                    //Bug 50 Fix Algorithm
+                    // - If not annotated with using mandatory, quit
+                    // - Otherwise, determine if the using syntax is a declaration.  
+                    // - If a declaration, quit
+                    // - Otherwise emit diagnostic
 
-
+                    var semanticModel = context.SemanticModel;
+                    var usingMandatoryAttributeFinder = UsingMandatoryAttributeFinderSource.GetDefaultAttributeFinder();
+                    if (usingMandatoryAttributeFinder.HasUsingMandatoryReturnTypeSyntax(syntax, semanticModel)) 
+                    { //Case Has Um Attribute
+                        bool isInlineDeclaration = usingStatementAnalyzer.IsPartOfInlineDeclUsingConstruct(syntax);
+                        if (!isInlineDeclaration)
+                        {
+                            var diagnostic = Diagnostic.Create(UsingMandatoryAttributeAssignmentMustBeToVariableDeclaredInline,
+                                node.GetLocation(), syntax.Expression);
+                            //Generate diagnostic
+                            context.ReportDiagnostic(diagnostic);
+                        }
+                    }
+                    
                 }
 
 
@@ -286,6 +305,8 @@ namespace DotNetVault
                 TraceLog.Log(ex);
                 throw;
             }
+
+            
         }
 
         private void AnalyzeMethodInvokeForVsTpCompliance(SyntaxNodeAnalysisContext context)
@@ -948,7 +969,8 @@ namespace DotNetVault
                     .Add(GenericTypeArgumentMustBeVaultSafe)
                     .Add(GenericDelegateTypeArgumentsMustBeVaultSafe)
                     .Add(AnnotatedDelegatesMayNotReferenceNonVaultSafeSymbols)
-                    .Add(NotVsProtectableTypeCannotBeStoredInVault);
+                    .Add(NotVsProtectableTypeCannotBeStoredInVault)
+                    .Add(UsingMandatoryAttributeAssignmentMustBeToVariableDeclaredInline);
             }
             catch (Exception ex)
             {
@@ -965,13 +987,20 @@ namespace DotNetVault
         private static readonly LocalizableString Vst_Description = new LocalizableResourceString(nameof(Resources.AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
         private const string Category = "VaultSafety";
 
+        private const string Um_Inline_Title =
+            "Value returned from method invocation must be declared inline as part of using statement or declaration.";
         private const string Um_Title = "Value returned from method invocation must be a part of using statement.";
         private const string Um_MessageFormat = "Value returned by expression [{0}] is not guarded by using construct.";
+        private const string Um_Inline_Message_Format =
+            "Value returned by expression [{0}] is not assigned to a variable declared inline.";
         private const string UsingMandatoryAttribute = nameof(UsingMandatoryAttribute);
         private const string Um_Description = "Values returned by methods annotated with the " +
                                               UsingMandatoryAttribute +
                                               " must be subject to a using construct.";
 
+        private const string Um_Inline_Description = "Values returned by methods annotated with the " +
+                                                     UsingMandatoryAttribute +
+                                                     " if assigned, must be assigned to a variable declared inline.";
         private const string VsDelCapt_Title = "A delegate annotated with the " + nameof(NoNonVsCaptureAttribute) +
                                                " attribute cannot access certain non-vault safe symbols.";
         private const string VsDelCapt_MessageFormat = "The delegate is annotated with the " +
@@ -1010,6 +1039,9 @@ namespace DotNetVault
             "Generic delegates with type parameters annotated with the VaultSafeTypeParam attribute require that all arguments corresponding to those parameters be vault-safe.";
         // ReSharper restore InconsistentNaming
 
+        private static readonly DiagnosticDescriptor UsingMandatoryAttributeAssignmentMustBeToVariableDeclaredInline =
+            new DiagnosticDescriptor(DiagnosticId_UsingMandatory_Inline, Um_Inline_Title, Um_Inline_Message_Format,
+                Category, DiagnosticSeverity.Error, true, Um_Inline_Description);
         private static readonly DiagnosticDescriptor AnnotatedDelegatesMayNotReferenceNonVaultSafeSymbols =
             new DiagnosticDescriptor(DotNetVault_VsDelegateCapture, VsDelCapt_Title, VsDelCapt_MessageFormat, Category,
                 DiagnosticSeverity.Error, true, VsDelCapt_Description);

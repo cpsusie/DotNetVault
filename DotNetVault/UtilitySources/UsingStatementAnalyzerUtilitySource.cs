@@ -37,11 +37,41 @@ namespace DotNetVault.UtilitySources
                 return pnt.Ok ?? false;
             }
 
+            public bool IsPartOfInlineDeclUsingConstruct([NotNull] InvocationExpressionSyntax syntax)
+            {
+                if (syntax == null) throw new ArgumentNullException(nameof(syntax));
+                ParentNodeType pnt = ParentNodeType.FindTerminalParentNode(syntax);
+                bool ret;
+                if (true == pnt.Ok)
+                {
+                    switch (pnt.TerminalNode?.Kind())
+                    {
+                        default:
+                        case null:
+                            ret = false;
+                            break;
+                        case SyntaxKind.LocalDeclarationStatement:
+                            ret = true;
+                            break;
+                        case SyntaxKind.UsingStatement:
+                            ret = HasVariableDeclarationChildNode((UsingStatementSyntax) pnt.TerminalNode);
+                            break;
+                    }
+                }
+                else
+                {
+                    ret = false;
+                }
+                return ret;
+            }
+
             public Type ExpectedTypeOfSyntaxObject => typeof(InvocationExpressionSyntax);
 
             bool Interfaces.IUsingStatementSyntaxAnalyzer.IsPartOfUsingConstruct(object syntax) =>
                 IsPartOfUsingConstruct(
                     (InvocationExpressionSyntax) (syntax ?? throw new ArgumentNullException(nameof(syntax))));
+            bool Interfaces.IUsingStatementSyntaxAnalyzer.IsPArtOfInlineDeclUsingConstruct(object syntax) =>
+                IsPartOfInlineDeclUsingConstruct((InvocationExpressionSyntax) syntax);
 
             private struct ParentNodeType
             {
@@ -99,6 +129,8 @@ namespace DotNetVault.UtilitySources
                     return (isTerminal, isOk, parent);
                 }
             }
+
+            private bool HasVariableDeclarationChildNode(UsingStatementSyntax syntax) => syntax.ChildNodes().OfType<VariableDeclarationSyntax>().Any();
         }
 
         private static Func<IUsingStatementSyntaxAnalyzer> UsingStatementAnalyzerFactory

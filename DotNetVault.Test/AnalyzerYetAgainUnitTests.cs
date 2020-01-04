@@ -157,6 +157,14 @@ namespace DotNetVault.Test
         }
 
         [TestMethod]
+        public void TestOutOfLineDeclarationCausesDiagnostic()
+        {
+            var test = ResourceFiles.UsingMandatoryTestCases.EmitsDiagnosticUmRequiresInlineDecl;
+            VerifyCSharpDiagnostic(test, diag => diag.Any(),
+                diag => diag.Id == DotNetVaultAnalyzer.DiagnosticId_UsingMandatory_Inline);
+        }
+
+        [TestMethod]
         public void TestGetDiagnosticNoUsing()
         {
             var test = ResourceFiles.UsingMandatoryTestCases.ShouldTriggerDiagnosticBecauseNoUsing;
@@ -276,10 +284,7 @@ namespace DotNetVault.Test
         //    return new AnalyzerYetAgainCodeFixProvider();
         //}
 
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-        {
-            return new DotNetVaultAnalyzer();
-        }
+        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new DotNetVaultAnalyzer();
 
         /// <summary>
         /// Given an array of strings as sources and a language, turn them into a project and return the documents and spans of it.

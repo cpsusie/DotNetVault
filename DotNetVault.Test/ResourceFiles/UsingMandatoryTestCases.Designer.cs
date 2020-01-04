@@ -74,11 +74,36 @@ namespace DotNetVault.Test.ResourceFiles {
         ///            {
         ///                Console.WriteLine(disposable.IsValid);
         ///                var shouldBeHereToo = MethodsWithAndWithoutUsingMandatoryAttribute.CreateDisposableRefStruct();
-        ///                Console.WriteLine(shouldBeHereT [rest of string was truncated]&quot;;.
+        ///                Console.WriteLine(shouldBeHereToo.IsValid [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string DiagnosticALittleMoreComplex {
             get {
                 return ResourceManager.GetString("DiagnosticALittleMoreComplex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using DotNetVault.TestCaseHelpers;
+        ///
+        ///namespace DotNetVault.Test.TestCases
+        ///{
+        ///    class EmitsDiagnosticUmRequiresInlineDecl
+        ///    {
+        ///        public static void EmitsDiagnosticNotDeclaredInline()
+        ///        {
+        ///            RefStructsRoxor disposeMe;
+        ///            using (disposeMe =
+        ///                MethodsWithAndWithoutUsingMandatoryAttribute.CreateDisposableRefStruct())
+        ///            {
+        ///                Console.WriteLine(disposeMe.IsValid);
+        ///   [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string EmitsDiagnosticUmRequiresInlineDecl {
+            get {
+                return ResourceManager.GetString("EmitsDiagnosticUmRequiresInlineDecl", resourceCulture);
             }
         }
         
@@ -95,7 +120,7 @@ namespace DotNetVault.Test.ResourceFiles {
         ///            var disposable = new DisposableDooHickey();
         ///            Console.WriteLine(disposable.IsValid);
         ///            using var shouldBeHereToo = MethodsWithAndWithoutUsingMandatoryAttribute.CreateDisposableRefStruct();
-        ///            Console.WriteLine(shouldBeHereToo.IsValid &amp;&amp; !shouldBeHer [rest of string was truncated]&quot;;.
+        ///            Console.WriteLine(shouldBeHereToo.IsValid &amp;&amp; !shouldBeHereToo.IsDis [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string NoDiagnosticALittleMoreComplex {
             get {
