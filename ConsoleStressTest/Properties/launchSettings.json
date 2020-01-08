@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "ConsoleStressTest": {
+      "commandName": "Project"
+    }
+  }
+}

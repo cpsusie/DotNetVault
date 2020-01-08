@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExampleCodePlayground", "ExampleCodePlayground.csproj", "{146653AA-D10B-4CB0-AC0C-50968EC9ADEC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleStressTest", "ConsoleStressTest.csproj", "{152C2B65-FA7E-49A2-8536-60B4DFE1FB74}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,22 +11,22 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{146653AA-D10B-4CB0-AC0C-50968EC9ADEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{146653AA-D10B-4CB0-AC0C-50968EC9ADEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{146653AA-D10B-4CB0-AC0C-50968EC9ADEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{146653AA-D10B-4CB0-AC0C-50968EC9ADEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{152C2B65-FA7E-49A2-8536-60B4DFE1FB74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{152C2B65-FA7E-49A2-8536-60B4DFE1FB74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{152C2B65-FA7E-49A2-8536-60B4DFE1FB74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{152C2B65-FA7E-49A2-8536-60B4DFE1FB74}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {7DE5EEBD-6F8F-4806-A366-6D45EBC437FF}
+		SolutionGuid = {477130B4-1FC1-4067-ADE8-8173CC2345F0}
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
 		SccNumberOfProjects = 1
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://cjmscrews.visualstudio.com/
-		SccProjectUniqueName0 = ExampleCodePlayground.csproj
+		SccProjectUniqueName0 = ConsoleStressTest.csproj
 		SccProjectName0 = .
 		SccAuxPath0 = https://cjmscrews.visualstudio.com
 		SccLocalPath0 = .

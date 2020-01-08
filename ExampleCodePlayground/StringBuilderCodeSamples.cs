@@ -35,6 +35,10 @@ namespace ExampleCodePlayground
                               $"(current val: [{contents[1]}]) made upper " +
                               $"case: [{valOfCharSpecifiedIndexMadeUppercase}].");
             Console.WriteLine();
+
+            Console.WriteLine("Bug50Demo3 START");
+            Bug50Demo3();
+            Console.WriteLine("Bug50Demo3 END");
         }
 
         public static void DemonstrateActions()
@@ -123,7 +127,6 @@ namespace ExampleCodePlayground
             IndexAndVal res = lck.ExecuteMixedOperation(
                 (ref StringBuilder sb, in char ql) =>
             {
-                string newVal;
                 int idx = -1;
                 for (int i = 0; i < sb.Length; ++i)
                 {
@@ -147,34 +150,43 @@ namespace ExampleCodePlayground
             Console.WriteLine();
         }
 
-//BUG 50 Fix -- both of these now generate compiler errors
-//public static void Bug50Demonstration()
-//{
-//    var vault = CreateExampleVault();
-//    LockedVaultMutableResource<MutableResourceVault<StringBuilder>, StringBuilder> lck;
-//    using (lck = vault.SpinLock())
-//    {
-//        lck.SetCharAt(0, 'Q');
-//    }
-//    //BUG 50-- unsafe access to protected resource after disposal.  
-//    //BUG 50 workaround -- Always declare the locked resource inline;
-//    Console.WriteLine(lck.GetContents());
-//}
+        //BUG 50 Fix -- both of these now generate compiler errors
+        //public static void Bug50Demonstration()
+        //{
+        //    var vault = CreateExampleVault();
+        //    LockedVaultMutableResource<MutableResourceVault<StringBuilder>, StringBuilder> lck;
+        //    using (lck = vault.SpinLock())
+        //    {
+        //        lck.SetCharAt(0, 'Q');
+        //    }
+        //    //BUG 50-- unsafe access to protected resource after disposal.  
+        //    //BUG 50 workaround -- Always declare the locked resource inline;
+        //    Console.WriteLine(lck.GetContents());
+        //}
 
-//public static void Bug50Demonstration2()
-//{
-//    var vault = CreateExampleVault();
-//    LockedVaultMutableResource<MutableResourceVault<StringBuilder>, StringBuilder> lck;
-//    using (lck = vault.SpinLock())
-//    {
-//        //BUG 50-- protected resource will not be disposed post-assignment.  
-//        //BUG 50 workaround -- always declare and assign inline and do not attempt assignment;
-//        lck = default;
-//        lck.SetCharAt(0, 'Q');
-//    }
+        //public static void Bug50Demonstration2()
+        //{
+        //    var vault = CreateExampleVault();
+        //    LockedVaultMutableResource<MutableResourceVault<StringBuilder>, StringBuilder> lck;
+        //    using (lck = vault.SpinLock())
+        //    {
+        //        //BUG 50-- protected resource will not be disposed post-assignment.  
+        //        //BUG 50 workaround -- always declare and assign inline and do not attempt assignment;
+        //        lck = default;
+        //        lck.SetCharAt(0, 'Q');
+        //    }
 
-//    Console.WriteLine(lck.GetContents());
-//}
+        //    Console.WriteLine(lck.GetContents());
+        //}
+        public static void Bug50Demo3()
+        {
+            var vault = CreateExampleVault();
+            using var lck = vault.SpinLock();
+            Console.WriteLine(lck.GetContents());
+            //Compiler error ---
+            //lck = default;
+            //Console.WriteLine(lck.GetContents());
+        }
 
         private static MutableResourceVault<StringBuilder> CreateExampleVault() =>
             MutableResourceVault<StringBuilder>.CreateMutableResourceVault(() => new StringBuilder("Hello, world!"),
