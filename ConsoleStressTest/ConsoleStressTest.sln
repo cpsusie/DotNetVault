@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleStressTest", "ConsoleStressTest.csproj", "{152C2B65-FA7E-49A2-8536-60B4DFE1FB74}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleStressTest", "ConsoleStressTest.csproj", "{4B440692-8A45-4D60-BF36-2AF258D72655}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,16 +11,16 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{152C2B65-FA7E-49A2-8536-60B4DFE1FB74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{152C2B65-FA7E-49A2-8536-60B4DFE1FB74}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{152C2B65-FA7E-49A2-8536-60B4DFE1FB74}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{152C2B65-FA7E-49A2-8536-60B4DFE1FB74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B440692-8A45-4D60-BF36-2AF258D72655}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B440692-8A45-4D60-BF36-2AF258D72655}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B440692-8A45-4D60-BF36-2AF258D72655}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B440692-8A45-4D60-BF36-2AF258D72655}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {477130B4-1FC1-4067-ADE8-8173CC2345F0}
+		SolutionGuid = {9647B095-8B31-46EA-BC1F-FD8E55740F68}
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
 		SccNumberOfProjects = 1

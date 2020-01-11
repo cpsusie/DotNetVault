@@ -13,6 +13,9 @@ namespace ExampleCodePlayground
     {
         static void Main(string[] args)
         {
+            KnownIssuesDemonstration.DemonstrateDoubleDispose();
+            KnownIssuesDemonstration.DemonstrateBadExtensionMethod();
+            KnownIssuesDemonstration.DemonstrateBadArrayBecauseTypeItselfInherentlyLeaksOwnState();
             StringBuilderCodeSamples.DemonstrateQueries();
             StringBuilderCodeSamples.DemonstrateActions();
             StringBuilderCodeSamples.DemonstrateMixedOperations();

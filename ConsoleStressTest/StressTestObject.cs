@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -64,6 +65,12 @@ namespace ConsoleStressTest
                 let key = id
                 let value = actionsPerThread
                 select new KeyValuePair<int, int>(key, value)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value));
+            var setifiedRes = SetifyTextResultsAndValidateLength();
+            Console.WriteLine();
+            Console.WriteLine(
+                $"Setified ok: [{setifiedRes.Ok}], Entries ({setifiedRes.Set.Count}) matches product ({numThreads * actionsPerThread}): {setifiedRes.Set.Count == numThreads * actionsPerThread}; Text res length: [{TextResult.Length}]; Validated Length: [{setifiedRes.ValidatedSize}].");
+            Console.WriteLine($"Done writing setification info. {Environment.NewLine}");
+
             if (managedThreadIdAndExpectedEntries.Count != numThreads)
             {
                 success = false;
@@ -90,7 +97,7 @@ namespace ConsoleStressTest
                     {
                         if (managedThreadIdAndExpectedEntries.ContainsKey(entry.ManagedThreadId))
                         {
-                            if (FindMatchingText(in entry, sbLog))
+                            if (FindMatchingText(in entry, setifiedRes.Set, sbLog))
                             {
                                 managedThreadIdAndExpectedEntries[entry.ManagedThreadId] =
                                     managedThreadIdAndExpectedEntries[entry.ManagedThreadId] - 1;
@@ -192,6 +199,90 @@ namespace ConsoleStressTest
             return (success, report);
         }
 
+        (bool Ok, ImmutableSortedSet<string> Set, int ValidatedSize) SetifyTextResultsAndValidateLength()
+        {
+            bool ok;
+            var set = ImmutableSortedSet.CreateBuilder(StringComparer.Ordinal);
+            int lengthOfTextResult = TextResult.Length;
+            int sumOfTextFromEntries = Entries.Sum(entry => entry.Text.Length);
+            int runningSumOfLengths = 0;
+            ReadOnlySpan<char> charSpan = TextResult.AsSpan();
+            int currentStartingIdx = 0;
+            bool done = false;
+            bool anyDuplicated = false;
+            while (!done)
+            {
+                ReadOnlySpan<char> nextSpan = FindNextEntry(charSpan, currentStartingIdx, out int endIdx);
+                if (!nextSpan.IsEmpty)
+                {
+                    currentStartingIdx = endIdx + 1;
+                    bool failedToAdd = !set.Add(nextSpan.ToString());
+                    anyDuplicated = anyDuplicated || failedToAdd;
+                    if (!failedToAdd)
+                    {
+                        runningSumOfLengths += nextSpan.Length;
+                    }
+                    done = currentStartingIdx >= charSpan.Length;
+                }
+                else
+                {
+                    done = true;
+                }
+            }
+
+            ok = !anyDuplicated && (lengthOfTextResult == sumOfTextFromEntries &&
+                                    sumOfTextFromEntries == runningSumOfLengths);
+            return (ok, set.ToImmutable(), runningSumOfLengths);
+
+
+            static ReadOnlySpan<char> FindNextEntry(ReadOnlySpan<char> span, int startAtIdx, out int endsAtIndex)
+            {
+                endsAtIndex = -1;
+                if (span.IsEmpty || startAtIdx >= span.Length)
+                    return ReadOnlySpan<char>.Empty;
+
+                
+                int indexOfFirstStartingChar = NextIndexOf(span, '<', startAtIdx);
+                if (indexOfFirstStartingChar < 0)
+                {
+                    return ReadOnlySpan<char>.Empty;
+                }
+
+                int nextIdx = indexOfFirstStartingChar + 1;
+                int indexOfEndingChar = NextIndexOf(span, '>', nextIdx);
+                if (indexOfEndingChar < 0)
+                {
+                    return ReadOnlySpan<char>.Empty;
+                }
+
+                endsAtIndex = indexOfEndingChar;
+                return span.Slice(indexOfFirstStartingChar, (indexOfEndingChar - indexOfFirstStartingChar) + 1);
+
+
+            }
+
+            static int NextIndexOf(ReadOnlySpan<char> span, char val, int startAtIdx)
+            {
+                if (span.IsEmpty || startAtIdx >= span.Length)
+                    return -1;
+                int current = startAtIdx;
+                
+                do
+                {
+                    char c = span[current];
+                    if (c == val)
+                    {
+                        return current;
+                    }
+
+                    ++current;
+                } while (current < span.Length);
+
+                return -1;
+            }
+
+        }
+
         private string GetEntriesByOrderedOnlyByTimeStamp()
         {
             StringBuilder sb = new StringBuilder();
@@ -206,38 +297,28 @@ namespace ConsoleStressTest
             return sb.ToString();
         }
 
-        private bool FindMatchingText(in StressTestEntry entry, StringBuilder log)
+        private bool FindMatchingText(in StressTestEntry entry, ImmutableSortedSet<string> textSet, StringBuilder log)
         {
-            IEnumerable<int> indices = AllIndicesOf(TextResult, entry.Text).ToArray();
+            bool foundIt;
             try
             {
-                int singleIdx = AllIndicesOf(TextResult, entry.Text).Single();
-                return true;
+                foundIt = textSet.Contains(entry.Text);
             }
             catch (Exception)
             {
-                log.AppendLine(!indices.Any()
-                    ? $"Unable to find matching output in string for entry: [{entry.ToString()}]"
-                    : $"Multiple locations found in text for following entry: [{entry.ToString()}]");
-                return false;
+                foundIt = false;
             }
-            
+
+            if (!foundIt)
+            {
+                log.AppendLine(
+                    $"Unable to find matching output in string for entry: [{entry.ToString()}]");
+            }
+
+            return foundIt;
+
         }
 
-        private static IEnumerable<int> AllIndicesOf([NotNull] string str, [NotNull] string value)
-        {
-            if (str == null) throw new ArgumentNullException(nameof(str));
-            if (value == null) throw new ArgumentNullException(nameof(value));
-            if (string.IsNullOrEmpty(str) || string.IsNullOrEmpty(value))
-                yield break;
-            for (int index = 0;; index += value.Length)
-            {
-                index = str.IndexOf(value, index, StringComparison.Ordinal);
-                if (index == -1)
-                    break;
-                yield return index;
-            }
-        }
     }
 
     [VaultSafe]
@@ -285,32 +366,28 @@ namespace ConsoleStressTest
             $"Entry ts: [{TimeStamp:O}], ThreadId: [{ManagedThreadId.ToString()}], " +
             $"ActionNo: [{ActionCount.ToString()}]";
         
-
         private static int Compare(in StressTestEntry lhs, in StressTestEntry rhs)
         {
             int ret;
-            int tsCompare = lhs.TimeStamp.CompareTo(rhs.TimeStamp);
-            if (tsCompare != 0)
+            int threadCompare = lhs.ManagedThreadId.CompareTo(rhs.ManagedThreadId);
+            if (threadCompare == 0)
             {
-                int threadCompare = lhs.ManagedThreadId.CompareTo(rhs.ManagedThreadId);
-                if (threadCompare == 0)
+                int actionCompare = lhs.ActionCount.CompareTo(rhs.ActionCount);
+                if (actionCompare == 0)
                 {
-                    int actionCompare = lhs.ActionCount.CompareTo(rhs.ActionCount);
-                    ret = actionCompare == 0
-                        ? string.Compare(lhs.Text, rhs.Text, StringComparison.Ordinal)
-                        : actionCompare;
+                    int tsCompare = lhs.TimeStamp.CompareTo(rhs.TimeStamp);
+                    ret = tsCompare == 0 ? string.Compare(lhs.Text, rhs.Text, StringComparison.Ordinal) : tsCompare;
                 }
                 else
                 {
-                    ret = threadCompare;
+                    ret = actionCompare;
                 }
             }
             else
             {
-                ret = tsCompare;
+                ret = threadCompare;
             }
             return ret;
         }
-        
     }
 }

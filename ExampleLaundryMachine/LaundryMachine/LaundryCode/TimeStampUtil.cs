@@ -95,7 +95,7 @@ namespace LaundryMachine.LaundryCode
             return Convert.ToInt64(differences.Min());
         }
 
-        [Conditional("DEBUG")]
+        [Conditional("TRACE_TIMESTAMPS")]
         private static void LogDifferences(List<long> diffs)
         {
             Debug.Assert(diffs.Count > 1 && diffs.Count == NumberOfCalibrationSamples);
