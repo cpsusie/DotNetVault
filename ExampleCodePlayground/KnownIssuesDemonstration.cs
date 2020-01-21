@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using DotNetVault.LockedResources;
 using DotNetVault.Vaults;
 using JetBrains.Annotations;
 
@@ -10,6 +11,10 @@ namespace ExampleCodePlayground
 {
     public sealed class KnownIssuesDemonstration
     {
+        //BUG FIX 61 ... lck.Dispose used to cause potential race condition
+        //bug fix 61 ... now lck.Dispose causes compiler error thanks to NotDirectlyInvocableAttribute
+        //bug fix 61 ... which now annotates locked resource object's dispose method.  They must be disposed
+        //bug fix 61 ... via using, must be declared inline, must not be disposed manually.
         public static void DemonstrateDoubleDispose()
         {
             using (var bv = new BasicVault<DateTime>(DateTime.Now, TimeSpan.FromMilliseconds(250)))
@@ -19,37 +24,56 @@ namespace ExampleCodePlayground
                     Console.WriteLine(lck.Value.ToString("O"));
                     lck.Value = lck.Value + TimeSpan.FromDays(25);
                     //BUG 61 -- potential race condition / Known Flaw #1
-                    //POTENTIAL RACE CONDITION -- DO NOT DISPOSE MANUALLY IN THIS MANNER!
-                    lck.Dispose();
+                    //BUG 61 FIX -- POTENTIAL RACE CONDITION -- DO NOT DISPOSE MANUALLY IN THIS MANNER!
+                    //lck.Dispose();
+                    AnotherDemonstrationOfBug61Fix(in lck);
                     Console.WriteLine(lck.Value.ToString("O"));
                 }
+                //don't want this line but it will not trigger the NotDirectlyInvocable error because basic vault ctor not annotated with NotDirectlyInvocableAttribute
+                // bv.Dispose();
             }
+        }
+
+        public static void AnotherDemonstrationOfBug61Fix(in LockedVaultObject<BasicVault<DateTime>, DateTime> lvo)
+        {
+            //add another 25 days
+            lvo.Value = lvo.Value + TimeSpan.FromDays(25);
+            //UNCOMMENTING FOLLOWING LINE WILL CAUSE COMPILER ERROR -- BUG FIX 61
+            //lvo.Dispose();
         }
 
         public static void DemonstrateBadExtensionMethod()
         {
             using (var mrv =
-                MutableResourceVault<StringBuilder>.CreateMutableResourceVault(() => new StringBuilder(),
+                MutableResourceVault<StringBuilder>.CreateMutableResourceVault(() => new StringBuilder("AWESOME"),
                     TimeSpan.FromMilliseconds(250)))
             {
                 int lengthOfTheStringBuilder;
                 {
                     using var lck = mrv.Lock();
-                    lengthOfTheStringBuilder = lck.ExecuteQuery((in StringBuilder sb) => sb.GetStringBuilderLength());
+                    //BUG 62 FIX -- following line will not compile now given fix
+                    //lengthOfTheStringBuilder = lck.ExecuteQuery((in StringBuilder sb) => sb.GetStringBuilderLength());
+                    
+                    //get it this way now that the way we were demonstrating no longer compiles post fix bug 62
+                    lengthOfTheStringBuilder = lck.ExecuteQuery((in StringBuilder sb) => sb.Length);
                 }
 
                 Console.WriteLine($"The length of the string builder is: {lengthOfTheStringBuilder.ToString()}.");
                 //BUG# 62 Known Flaw# 2 BAD -- Potential Race Condition on Protected Resource
                 //BUG BAD -- if this were multithreaded defeats vault causing race condition -- I altered protected resource outside vault
-                Flaw2StringBuilderExtensions.LastEvaluatedStringBuilder.AppendLine("Hi mom!");
+                Flaw2StringBuilderExtensions.LastEvaluatedStringBuilder.AppendLine("\nHi mom!");
+
+                //Used to show how Flaw2StringBuilderExtension.Last...AppendL above affected
+                //the protected resource
 
                 //Show the protected resource has been effected without accessing lock:
                 {
                     using var lck = mrv.Lock();
                     string printMe = lck.ExecuteQuery((in StringBuilder sb) => sb.ToString());
-                    Console.WriteLine($"BAD -- look, we mutated the protected resource: [{printMe}].");
+                    Console.WriteLine($"After bug fix 62, no Hi mom! here!!!: [{printMe}].");
                 }
 
+                //The following wouldn't compile even before!
                 //N.B. the following code (static function rather than extension function syntax) is caught by the analyzer:
                 //{
                 //    using var lck = mrv.Lock();
@@ -95,7 +119,7 @@ namespace ExampleCodePlayground
 
     public static class Flaw2StringBuilderExtensions
     {
-        public static StringBuilder LastEvaluatedStringBuilder { get; set; }
+        public static StringBuilder LastEvaluatedStringBuilder { get; set; } = new StringBuilder();
 
         //BAD -- LEAKS SHARED MUTABLE STATE 
         public static int GetStringBuilderLength(this StringBuilder sb)

@@ -4,11 +4,14 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.Serialization;
 using DotNetVault.Attributes;
+using DotNetVault.LockedResources;
+using DotNetVault.TestCaseHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 
+// ReSharper disable once CheckNamespace
 namespace DotNetVault.Test.Verifiers
 {
     /// <summary>
@@ -19,7 +22,7 @@ namespace DotNetVault.Test.Verifiers
     {
         private static readonly MetadataReference CorlibReference = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
         private static readonly MetadataReference SystemCoreReference = MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location);
-        private static readonly MetadataReference AttributeReference = MetadataReference.CreateFromFile(typeof(System.Attribute).Assembly.Location);
+        private static readonly MetadataReference AttributeReference = MetadataReference.CreateFromFile(EarlyReleaseJustificationAttribute.AttributeAssemblyLocation);
         private static readonly MetadataReference CSharpSymbolsReference = MetadataReference.CreateFromFile(typeof(CSharpCompilation).Assembly.Location);
         private static readonly MetadataReference CodeAnalysisReference = MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location);
         private static readonly MetadataReference TestAnalyzerReference = MetadataReference.CreateFromFile(typeof(VaultSafeAttribute).Assembly.Location);
@@ -28,6 +31,16 @@ namespace DotNetVault.Test.Verifiers
         private static readonly MetadataReference UriReference = MetadataReference.CreateFromFile(typeof(Uri).Assembly.Location);
         private static readonly MetadataReference UriBuilderReference =
             MetadataReference.CreateFromFile(typeof(UriBuilder).Assembly.Location);
+        private static readonly MetadataReference VaultQueryReference =
+            MetadataReference.CreateFromFile(typeof(VaultQuery<,>).Assembly.Location);
+        private static readonly MetadataReference NameReference = MetadataReference.CreateFromFile(typeof(Name).Assembly.Location);
+        private static readonly MetadataReference NdiReference = MetadataReference.CreateFromFile(typeof(NoDirectInvokeAttribute).Assembly.Location);
+        private static readonly MetadataReference UmReference = MetadataReference.CreateFromFile(typeof(UsingMandatoryAttribute).Assembly.Location);
+        private static readonly MetadataReference NoNonVsCaptureReference = MetadataReference.CreateFromFile(typeof(NoNonVsCaptureAttribute).Assembly.Location);
+        private static readonly MetadataReference LockedVaultMutableResourceReference = MetadataReference.CreateFromFile(typeof(LockedVaultMutableResource<,>).Assembly.Location);
+        private static readonly MetadataReference EarlyReleaseReference = MetadataReference.CreateFromFile(typeof(EarlyReleaseAttribute).Assembly.Location);
+        private static readonly MetadataReference DotNetVault = MetadataReference.CreateFromFile(typeof(DotNetVaultAnalyzer).Assembly.Location);
+
 
         internal static string DefaultFilePathPrefix = "Test";
         internal static string CSharpDefaultFileExt = "cs";
@@ -43,10 +56,8 @@ namespace DotNetVault.Test.Verifiers
         /// <param name="language">The language the source classes are in</param>
         /// <param name="analyzer">The analyzer to be run on the sources</param>
         /// <returns>An IEnumerable of Diagnostics that surfaced in the source code, sorted by Location</returns>
-        private static Diagnostic[] GetSortedDiagnostics(string[] sources, string language, DiagnosticAnalyzer analyzer)
-        {
-            return GetSortedDiagnosticsFromDocuments(analyzer, GetDocuments(sources, language));
-        }
+        private static Diagnostic[] GetSortedDiagnostics(string[] sources, string language, DiagnosticAnalyzer analyzer) =>
+            GetSortedDiagnosticsFromDocuments(analyzer, GetDocuments(sources, language));
 
         /// <summary>
         /// Given an analyzer and a document to apply it to, run the analyzer and gather an array of diagnostics found in it.
@@ -157,7 +168,10 @@ namespace DotNetVault.Test.Verifiers
 
             var solution = new AdhocWorkspace()
                 .CurrentSolution
-                .AddProject(projectId, TestProjectName, TestProjectName, language).WithProjectCompilationOptions(projectId, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary).WithMetadataImportOptions(MetadataImportOptions.All))
+                .AddProject(projectId, TestProjectName, TestProjectName, language).WithProjectCompilationOptions(
+                    projectId,
+                    new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary).WithMetadataImportOptions(
+                        MetadataImportOptions.All))
                 .AddMetadataReference(projectId, CorlibReference)
                 .AddMetadataReference(projectId, SystemCoreReference)
                 .AddMetadataReference(projectId, CSharpSymbolsReference)
@@ -167,7 +181,16 @@ namespace DotNetVault.Test.Verifiers
                 .AddMetadataReference(projectId, TestAnalyzerReference)
                 .AddMetadataReference(projectId, ImmutableTypesReference)
                 .AddMetadataReference(projectId, UriBuilderReference)
-                .AddMetadataReference(projectId, UriReference);
+                .AddMetadataReference(projectId, UriReference)
+                .AddMetadataReference(projectId, VaultQueryReference)
+                .AddMetadataReference(projectId, NameReference)
+                .AddMetadataReference(projectId, UmReference)
+                .AddMetadataReference(projectId, NdiReference)
+                .AddMetadataReference(projectId, NoNonVsCaptureReference)
+                .AddMetadataReference(projectId, LockedVaultMutableResourceReference)
+                .AddMetadataReference(projectId, EarlyReleaseReference)
+                .AddMetadataReference(projectId, DotNetVault);
+                
 
             int count = 0;
             foreach (var source in sources)

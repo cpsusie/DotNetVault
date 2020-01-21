@@ -14,17 +14,17 @@
                     <StackPanel Orientation="Vertical">
                         <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
                             <Label x:Name="lblWetTimeMilliseconds" Margin="2, 2,2,2" Width="150" Content="Dampening Time Per Unit:"/>
-                            <TextBox x:Name="txbxWetTimeMilliseconds" VerticalContentAlignment ="Center" TextAlignment="Center" Width="50" Text="50" Margin="2,2,2,2"/>
+                            <TextBox x:Name="txbxWetTimeMilliseconds" VerticalContentAlignment ="Center" TextAlignment="Center" Width="50" Text="1" Margin="2,2,2,2"/>
                             <Label x:Name="lblMilliseconds" Margin="2, 2, 2, 2" Content="milliseconds"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
                             <Label x:Name="lblCleanseTime" Margin="2,2,2,2" Width="150" Content="Cleanse Time Per Unit:"/>
-                            <TextBox x:Name="txbxCleansePerUnit" Margin="2,2,2,2" VerticalContentAlignment ="Center" TextAlignment="Center" Width="50" Text="100"/>
+                            <TextBox x:Name="txbxCleansePerUnit" Margin="2,2,2,2" VerticalContentAlignment ="Center" TextAlignment="Center" Width="50" Text="2"/>
                             <Label x:Name="lblMilliseconds2" Margin="2, 2, 2, 2" Content="milliseconds"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
                             <Label x:Name="lblDryTime" Margin="2,2,2,2" Width="150" Content="Dry Time Per Unit:"/>
-                            <TextBox x:Name="txbxDryPerUnit" Margin="2,2,2,2" VerticalContentAlignment ="Center" TextAlignment="Center" Width="50" Text="150"/>
+                            <TextBox x:Name="txbxDryPerUnit" Margin="2,2,2,2" VerticalContentAlignment ="Center" TextAlignment="Center" Width="50" Text="3"/>
                             <Label x:Name="lblMilliseconds3" Margin="2, 2, 2, 2" Content="milliseconds"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="5,5,5,5">

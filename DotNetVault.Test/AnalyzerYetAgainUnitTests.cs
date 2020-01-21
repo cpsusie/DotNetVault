@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -6,6 +7,7 @@ using DotNetVault.Attributes;
 using DotNetVault.LockedResources;
 using DotNetVault.Logging;
 using DotNetVault.Test.Helpers;
+using DotNetVault.TestCaseHelpers;
 using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -51,6 +53,42 @@ namespace DotNetVault.Test
                 diag => diag.Id == DotNetVaultAnalyzer.DotNetVault_VsTypeParams_Object_Create &&
                         diag.Location.GetLineSpan().StartLinePosition.Line == 26);
         }
+        [TestMethod]
+        public void TestEarlyRelAttribOkCustomDisp()
+        {
+            var test = ResourceFiles.EarlyReleaseTestCases.TestFindEarlyReleaseAttribute;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 1,
+                dx => dx.Id == DotNetVaultAnalyzer.DotNetVault_EarlyDisposeJustification &&
+                      dx.Severity == DiagnosticSeverity.Info && dx.DefaultSeverity == DiagnosticSeverity.Info &&
+                      dx.GetMessage().Contains("CustomWrapperDispose"));
+        }
+
+        [TestMethod]
+        public void TestEarlyReleaseErrorCaseAttrib()
+        {
+            var test = ResourceFiles.EarlyReleaseTestCases.EarlyReleaseErrorCaseHaver;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 1, dx => dx.Id == DotNetVaultAnalyzer.DotNetVault_EarlyDisposeJustification &&
+                                                                        dx.Severity == DiagnosticSeverity.Info && dx.DefaultSeverity == DiagnosticSeverity.Info &&
+                                                                        dx.GetMessage().Contains("DisposingOnError"));
+        }
+
+        [TestMethod]
+        public void TestUnjustifiedEarlyRelease()
+        {
+            var test = ResourceFiles.EarlyReleaseTestCases.UnjustifiedEarlyRelease;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 1, dx =>
+                dx.Id == DotNetVaultAnalyzer.DotNetVault_UnjustifiedEarlyDispose &&
+                dx.Severity == DiagnosticSeverity.Error && dx.DefaultSeverity == DiagnosticSeverity.Error);
+        }
+
+        [TestMethod]
+        public void TestBadJustificationEarlyRelease()
+        {
+            var test = ResourceFiles.EarlyReleaseTestCases.TestEarlyReleaseBadJustification;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 1, dx =>
+                dx.Id == DotNetVaultAnalyzer.DotNetVault_UnjustifiedEarlyDispose &&
+                dx.Severity == DiagnosticSeverity.Error && dx.DefaultSeverity == DiagnosticSeverity.Error);
+        }
 
         [TestMethod]
         public void ValidateNoAttribute()
@@ -64,6 +102,85 @@ namespace DotNetVault.Test
         {
             var test = ResourceFiles.WhiteListTests.TestWhiteListedVaultSafety;
             VerifyCSharpDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void TestVsIfSealed()
+        {
+            var test = ResourceFiles.VsBaseClass.TestBaseClassWbVsIfSealed;
+            VerifyCSharpDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void TestNotVsBadBase()
+        {
+            var test = ResourceFiles.VsBaseClass.TestNotVsBadBase;
+            VerifyCSharpDiagnostic(test,
+                col => col.Single().Id 
+                       == DotNetVaultAnalyzer.DiagnosticId_VaultSafeTypes,
+                dx => true);
+        }
+
+        [TestMethod]
+        public void TestNdiOkCases()
+        {
+            var test = ResourceFiles.NdiTestCases.TestNdiOk;
+            VerifyCSharpDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void TestNdiNotOkCase1()
+        {
+            const int badDisposeAtLine = 11;
+            const int zeroIdxVersion = badDisposeAtLine - 1;
+            var test = ResourceFiles.NdiTestCases.NdiNotOkCaseOne;
+            VerifyCSharpDiagnostic(test, col => col.SingleOrDefault() != null,
+                dx => dx.Descriptor.Id == DotNetVaultAnalyzer.DotNetVault_NotDirectlyInvocable &&
+                      dx.Location.GetLineSpan().StartLinePosition.Line == zeroIdxVersion);
+        }
+
+        [TestMethod]
+        public void TestNdiNotOkCase2()
+        {
+            const int badDisposeAtLine = 13;
+            const int zeroIdxVersion = badDisposeAtLine - 1;
+            var test = ResourceFiles.NdiTestCases.NdiNotOkTestTwo;
+            VerifyCSharpDiagnostic(test, col => col.SingleOrDefault() != null,
+                dx => dx.Descriptor.Id == DotNetVaultAnalyzer.DotNetVault_NotDirectlyInvocable &&
+                      dx.Location.GetLineSpan().StartLinePosition.Line == zeroIdxVersion);
+        }
+
+        [TestMethod]
+        public void TestNdiNotOkTestCase3()
+        {
+            const int badDisposeAtLine = 15;
+            const int zeroIdxVersion = badDisposeAtLine - 1;
+            var test = ResourceFiles.NdiTestCases.NdiMixedWithNotInlineNotOkCaseThree;
+            VerifyCSharpDiagnostic(test, TestCollection, TestIndividuals);
+
+            static bool TestCollection(IEnumerable<Diagnostic> diagnostics)
+            {
+                SortedSet<string> expectedDiagnosticIds = new SortedSet<string>
+                {
+                    DotNetVaultAnalyzer.DiagnosticId_UsingMandatory_Inline,
+                    DotNetVaultAnalyzer.DotNetVault_NotDirectlyInvocable
+                };
+                ImmutableArray<string> arr = diagnostics.Select(dx => dx.Id).ToImmutableArray();
+                return arr.Length == expectedDiagnosticIds.Count && expectedDiagnosticIds.SetEquals(arr);
+            }
+
+            static bool TestIndividuals(Diagnostic dx) =>
+                dx.Id == DotNetVaultAnalyzer.DiagnosticId_UsingMandatory_Inline ||
+                (dx.Id == DotNetVaultAnalyzer.DotNetVault_NotDirectlyInvocable && dx.Location.GetLineSpan().StartLinePosition.Line == zeroIdxVersion);
+        }
+
+        [TestMethod]
+        public void TestNotVsEx()
+        {
+            var test = ResourceFiles.VsBaseClass.NotVsException;
+            VerifyCSharpDiagnostic(test,
+                col => col.Count() == 1,
+                dx => true);
         }
 
         [TestMethod]
@@ -229,6 +346,22 @@ namespace DotNetVault.Test
         }
 
         [TestMethod]
+        public void Bug62CurrentlyWorkingTest()
+        {
+            var test = ResourceFiles.Bug62TestCases.Bug62TestCaseOneCurrentlyWorks;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 1,
+                dx => dx.Id == DotNetVaultAnalyzer.DotNetVault_VsDelegateCapture);
+        }
+
+        [TestMethod]
+        public void Bug62NotWorkingTest()
+        {
+            var test = ResourceFiles.Bug62TestCases.Bug62NotWorkingTestCase;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 1,
+                dx => dx.Id == DotNetVaultAnalyzer.DotNetVault_VsDelegateCapture);
+        }
+
+        [TestMethod]
         public void IdentifyDelegateCreationTest()
         {
             var test = ResourceFiles.VaultDelegates.QueryTestCases;
@@ -339,7 +472,10 @@ namespace DotNetVault.Test
                 .AddMetadataReference(projectId, TestAnalyzerReference)
                 .AddMetadataReference(projectId, ImmutableTypesReference)
                 .AddMetadataReference(projectId, VaultQueryReference)
-                .AddMetadataReference(projectId, UriReference);
+                .AddMetadataReference(projectId, UriReference)
+                .AddMetadataReference(projectId, NameReference)
+                .AddMetadataReference(projectId, NdiReference)
+                .AddMetadataReference(projectId, UmReference);
 
 
             int count = 0;
@@ -363,5 +499,8 @@ namespace DotNetVault.Test
         private static readonly MetadataReference ImmutableTypesReference = MetadataReference.CreateFromFile(typeof(ImmutableArray<>).Assembly.Location);
         private static readonly MetadataReference VaultQueryReference =
             MetadataReference.CreateFromFile(typeof(VaultQuery<,>).Assembly.Location);
+        private static readonly MetadataReference NameReference = MetadataReference.CreateFromFile(typeof(Name).Assembly.Location);
+        private static readonly MetadataReference NdiReference = MetadataReference.CreateFromFile(typeof(NoDirectInvokeAttribute).Assembly.Location);
+        private static readonly MetadataReference UmReference = MetadataReference.CreateFromFile(typeof(UsingMandatoryAttribute).Assembly.Location);
     }
 }

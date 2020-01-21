@@ -184,18 +184,39 @@ namespace LaundryMachine.LaundryCode
             if (result.InProgress)
             {
                 return (false, 
-                    $"The simulation is still in progress and has been in progress for {result.TimeSinceStarted.Seconds:F6} seconds.  There are {result.LaundryItemsToGo} dirty laundry items remaining.");
+                    $"The simulation is still in progress and has been in progress for {GetConvenientTimeStampTextAndUnitLabel(result.TimeSinceStarted)}.  " +
+                    $"There are {result.LaundryItemsToGo} dirty laundry items remaining.");
             }
             if (result.Finished)
             {
                 var evalR = GetComparisonText(); 
                 return (evalR.Passed,
-                    $"The simulation was completed after {result.FinalElapsedTime.Seconds:F6} seconds.  There are {result.LaundryItemsToGo} dirty laundry items remaining. {Environment.NewLine} {evalR.Text}");
+                    $"The simulation was completed after {GetConvenientTimeStampTextAndUnitLabel(result.FinalElapsedTime)}. " +
+                    $" There are {result.LaundryItemsToGo} dirty laundry items remaining. {Environment.NewLine} {evalR.Text}");
             }
             return
                 (false ,
-                    $"The simulation was terminated early, after {result.FinalElapsedTime.Seconds:F6} seconds.  At termination time there were {result.LaundryItemsToGo} remaining.");
-            
+                    $"The simulation was terminated early, after {GetConvenientTimeStampTextAndUnitLabel(result.FinalElapsedTime)}." +
+                    $"  At termination time there were {result.LaundryItemsToGo} remaining.");
+
+            static string GetConvenientTimeStampTextAndUnitLabel(TimeSpan span)
+            {
+                string ret;
+                TimeSpan absV = span.Duration();
+                if (absV <= TimeSpan.FromSeconds(5))
+                {
+                    ret= $"{span.TotalMilliseconds:F3} milliseconds";
+                }
+                else if (absV <= TimeSpan.FromMinutes(3))
+                {
+                    ret = $"{span.TotalSeconds:F3} seconds";
+                }
+                else
+                {
+                    ret= $"{span.TotalMinutes:F3} minutes";
+                }
+                return ret;
+            }
         }
 
         private (bool Passed, string Text) GetComparisonText()

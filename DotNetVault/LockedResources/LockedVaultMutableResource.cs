@@ -133,7 +133,8 @@ namespace DotNetVault.LockedResources
         /// <param name="val">the ancillary value</param>
         /// <returns>the result of the delegate execution.</returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public TResult ExecuteQuery<[VaultSafeTypeParam] TAncillary, [VaultSafeTypeParam] TResult>([NotNull] VaultQuery<TResource, TAncillary, TResult> q, in TAncillary val)
+        public TResult ExecuteQuery<[VaultSafeTypeParam] TAncillary, [VaultSafeTypeParam] TResult>
+            ([NotNull] VaultQuery<TResource, TAncillary, TResult> q, in TAncillary val)
         {
             if (q == null) throw new ArgumentNullException(nameof(q));
             return q(in _box.Value, in val);
@@ -146,7 +147,8 @@ namespace DotNetVault.LockedResources
         /// <param name="q">the query delegate</param>
         /// <returns>the result of the delegate execution.</returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public TResult ExecuteQuery<[VaultSafeTypeParam] TResult>([NotNull] VaultQuery<TResource, TResult> q)
+        public TResult ExecuteQuery<[VaultSafeTypeParam] TResult>
+            ([NotNull] VaultQuery<TResource, TResult> q)
         {
             if (q == null) throw new ArgumentNullException(nameof(q));
             return q(in _box.Value);
@@ -170,7 +172,8 @@ namespace DotNetVault.LockedResources
         /// <param name="action">the mutation action</param>
         /// <param name="ancillaryValue">the ancillary value</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public void ExecuteAction<[VaultSafeTypeParam] TAncillary>([NotNull] VaultAction<TResource, TAncillary> action, in TAncillary ancillaryValue)
+        public void ExecuteAction<[VaultSafeTypeParam] TAncillary>
+            ([NotNull] VaultAction<TResource, TAncillary> action, in TAncillary ancillaryValue)
         {
             if (action == null) throw new ArgumentNullException(nameof(action));
             action(ref _box.Value, in ancillaryValue);
@@ -210,17 +213,30 @@ namespace DotNetVault.LockedResources
         /// Returns the locked resource back to the vault whence it came
         /// making it available to other threads
         /// </summary>
-        public void Dispose()
+        [NoDirectInvoke]
+        public void Dispose() => DoDispose();
+
+        /// <summary>
+        /// DO NOT CALL EXCEPT IN TWO CIRCUMSTANCES:
+        ///    1. Error case when building a custom locked resource
+        ///    2. Inside the custom locked resource's dispose method
+        /// NEVER CALL ON AN ASSIGNMENT TARGET OF USING MANDATORY
+        /// </summary>
+        [EarlyRelease]
+        public void ErrorCaseReleaseOrCustomWrapperDispose() => DoDispose();
+
+        private void DoDispose()
         {
             Debug.Assert((_disposeMethod == null) == (_box == null));
             Vault<TResource>.Box b = _box;
-            Func<Vault<TResource>, Vault<TResource>.Box, Vault<TResource>.Box> disposeMeth = _disposeMethod;
-            if (disposeMeth != null)
+            Func<Vault<TResource>, Vault<TResource>.Box, Vault<TResource>.Box> disposeMethod
+                = _disposeMethod;
+            if (disposeMethod != null)
             {
-                var temp = disposeMeth(_vault, b);
+                var temp = disposeMethod(_vault, b);
                 Debug.Assert(temp == null);
             }
-        } 
+        }
         #endregion
 
         #region Private CTOR

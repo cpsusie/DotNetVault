@@ -65,6 +65,7 @@ namespace LaundryMachine.LaundryCode
         /// </exception>
         /// <exception cref="OperationCanceledException">the operation was canceled</exception>
         [return: UsingMandatory]
+        [EarlyReleaseJustification(EarlyReleaseReason.DisposingOnError)]
         public LockedLsf Lock(TimeSpan timeout)
         {
             LockedVaultMutableResource<MutableResourceVault<LaundryStatusFlags>, LaundryStatusFlags> temp = default;
@@ -76,19 +77,19 @@ namespace LaundryMachine.LaundryCode
             }
             catch (ArgumentNullException e)
             {
-                temp.Dispose();
+                temp.ErrorCaseReleaseOrCustomWrapperDispose();
                 Console.Error.WriteLineAsync(e.ToString());
                 throw;
             }
             catch (ArgumentException inner)
             {
-                temp.Dispose();
+                temp.ErrorCaseReleaseOrCustomWrapperDispose();
                 Console.Error.WriteLineAsync(inner.ToString());
                 throw new InvalidOperationException("The vault is disposed or currently being disposed.");
             }
             catch (Exception e)
             {
-                temp.Dispose();
+                temp.ErrorCaseReleaseOrCustomWrapperDispose();
                 Console.Error.WriteLineAsync(e.ToString());
                 throw;
             }
@@ -118,6 +119,7 @@ namespace LaundryMachine.LaundryCode
         /// <remarks>NOTE this method and its <see cref="Lock(System.TimeSpan)"/> overload sleep for brief periods
         /// in between attempts to obtain the lock.  If you want a busy wait, call <seealso cref="SpinLock(System.TimeSpan)"/> or <seealso cref="SpinLock()"/> </remarks>
         [return: UsingMandatory]
+        [EarlyReleaseJustification(EarlyReleaseReason.DisposingOnError)]
         public LockedLsf Lock()
         {
             LockedVaultMutableResource<MutableResourceVault<LaundryStatusFlags>, LaundryStatusFlags> temp = default;
@@ -129,7 +131,7 @@ namespace LaundryMachine.LaundryCode
             }
             catch (Exception e)
             {
-                temp.Dispose();
+                temp.ErrorCaseReleaseOrCustomWrapperDispose();
                 Console.Error.WriteLineAsync(e.ToString());
                 throw;
             }
@@ -163,6 +165,7 @@ namespace LaundryMachine.LaundryCode
         /// a busy-wait, the operating System may pre-empt the thread, causing a longer wait than if you had yielded control to the OS periodically on failure.
         /// If you want to periodically sleep, call <seealso cref="Lock(System.TimeSpan)"/> or <seealso cref="Lock()"/> instead</remarks>
         [return: UsingMandatory]
+        [EarlyReleaseJustification(EarlyReleaseReason.DisposingOnError)]
         public LockedLsf Lock(CancellationToken token)
         {
             LockedVaultMutableResource<MutableResourceVault<LaundryStatusFlags>, LaundryStatusFlags> temp = default;
@@ -175,7 +178,7 @@ namespace LaundryMachine.LaundryCode
             catch (Exception e)
             {
                 Console.Error.WriteLineAsync(e.ToString());
-                temp.Dispose();
+                temp.ErrorCaseReleaseOrCustomWrapperDispose();
                 throw;
             }
         }
@@ -209,6 +212,7 @@ namespace LaundryMachine.LaundryCode
         /// a busy-wait, the operating System may pre-empt the thread, causing a longer wait than if you had yielded control to the OS periodically on failure.
         /// If you want to periodically sleep, call <seealso cref="Lock(System.TimeSpan)"/> or <seealso cref="Lock()"/> instead</remarks>
         [return: UsingMandatory]
+        [EarlyReleaseJustification(EarlyReleaseReason.DisposingOnError)]
         public LockedLsf Lock(CancellationToken token, TimeSpan timeout)
         {
             LockedVaultMutableResource<MutableResourceVault<LaundryStatusFlags>, LaundryStatusFlags> temp = default;
@@ -221,7 +225,7 @@ namespace LaundryMachine.LaundryCode
             catch (Exception e)
             {
                 Console.Error.WriteLineAsync(e.ToString());
-                temp.Dispose();
+                temp.ErrorCaseReleaseOrCustomWrapperDispose();
                 throw;
             }
         }
@@ -253,6 +257,7 @@ namespace LaundryMachine.LaundryCode
         /// a busy-wait, the operating System may pre-empt the thread, causing a longer wait than if you had yielded control to the OS periodically on failure.
         /// If you want to periodically sleep, call <seealso cref="Lock(System.TimeSpan)"/> or <seealso cref="Lock()"/> instead</remarks>
         [return: UsingMandatory]
+        [EarlyReleaseJustification(EarlyReleaseReason.DisposingOnError)]
         public LockedLsf SpinLock(TimeSpan timeout)
         {
 
@@ -265,7 +270,7 @@ namespace LaundryMachine.LaundryCode
             }
             catch (Exception e)
             {
-                temp.Dispose();
+                temp.ErrorCaseReleaseOrCustomWrapperDispose();
                 Console.Error.WriteLineAsync(e.ToString());
                 throw;
             }
@@ -297,6 +302,7 @@ namespace LaundryMachine.LaundryCode
         /// a busy-wait, the operating System may pre-empt the thread, causing a longer wait than if you had yielded control to the OS periodically on failure.
         /// If you want to periodically sleep, call <seealso cref="Lock(System.TimeSpan)"/> or <seealso cref="Lock()"/> instead</remarks>
         [return: UsingMandatory]
+        [EarlyReleaseJustification(EarlyReleaseReason.DisposingOnError)]
         public LockedLsf SpinLock()
         {
             LockedVaultMutableResource<MutableResourceVault<LaundryStatusFlags>, LaundryStatusFlags> temp = default;
@@ -309,7 +315,7 @@ namespace LaundryMachine.LaundryCode
             catch (Exception e)
             {
                 Console.Error.WriteLineAsync(e.ToString());
-                temp.Dispose();
+                temp.ErrorCaseReleaseOrCustomWrapperDispose();
                 throw;
             }
         }
@@ -341,6 +347,7 @@ namespace LaundryMachine.LaundryCode
         /// a busy-wait, the operating System may pre-empt the thread, causing a longer wait than if you had yielded control to the OS periodically on failure.
         /// If you want to periodically sleep, call <seealso cref="Lock(System.TimeSpan)"/> or <seealso cref="Lock()"/> instead</remarks>
         [return: UsingMandatory]
+        [EarlyReleaseJustification(EarlyReleaseReason.DisposingOnError)]
         public LockedLsf SpinLock(CancellationToken token)
         {
             LockedVaultMutableResource<MutableResourceVault<LaundryStatusFlags>, LaundryStatusFlags> temp = default;
@@ -353,7 +360,7 @@ namespace LaundryMachine.LaundryCode
             catch (Exception e)
             {
                 Console.Error.WriteLineAsync(e.ToString());
-                temp.Dispose();
+                temp.ErrorCaseReleaseOrCustomWrapperDispose();
                 throw;
             }
         }
@@ -387,6 +394,7 @@ namespace LaundryMachine.LaundryCode
         /// a busy-wait, the operating System may pre-empt the thread, causing a longer wait than if you had yielded control to the OS periodically on failure.
         /// If you want to periodically sleep, call <seealso cref="Lock(System.TimeSpan)"/> or <seealso cref="Lock()"/> instead</remarks>
         [return: UsingMandatory]
+        [EarlyReleaseJustification(EarlyReleaseReason.DisposingOnError)]
         public LockedLsf SpinLock(CancellationToken token, TimeSpan timeout)
         {
             LockedVaultMutableResource<MutableResourceVault<LaundryStatusFlags>, LaundryStatusFlags> temp = default;
@@ -399,7 +407,7 @@ namespace LaundryMachine.LaundryCode
             catch (Exception e)
             {
                 Console.Error.WriteLineAsync(e.ToString());
-                temp.Dispose();
+                temp.ErrorCaseReleaseOrCustomWrapperDispose();
                 throw;
             }
         }

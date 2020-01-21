@@ -338,9 +338,52 @@ namespace DotNetVault.UtilitySources
                 bool illegalParameterUsageDetected = false;
                 IdentifierNameSyntax identifierSyntax = null;
                 string explanation = string.Empty;
-                foreach (var n in 
+                
+                foreach (var n in
                     node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>())
                 {
+                    var model = con.Compilation.GetSemanticModel(node.SyntaxTree, true);
+                    var symbol = model.GetSymbolInfo(n);
+                    if (symbol.Symbol is IMethodSymbol m && m.IsExtensionMethod)
+                    {
+
+                        IParameterSymbol firstParam = m.ReducedFrom?.Parameters.FirstOrDefault();
+                        if (firstParam != null && SymbolEqualityComparer.Default.Equals(firstParam.Type, ts))
+                        {
+                            var invocationTarget = n.DescendantNodesAndSelf().OfType<MemberAccessExpressionSyntax>()
+                                .FirstOrDefault();
+                            identifierSyntax = invocationTarget?.Expression.DescendantNodesAndSelf()
+                                .OfType<IdentifierNameSyntax>()
+                                .FirstOrDefault();
+                            if (identifierSyntax?.Identifier.ValueText == protectedParameterName)
+                            {
+                                bool isVaultSafe = ExecuteVsAnalysis();
+                                if (isVaultSafe)
+                                {
+                                    if (firstParam.RefKind != RefKind.None && firstParam.RefKind != RefKind.In)
+                                    {
+                                        illegalParameterUsageDetected = true;
+                                        explanation =
+                                            $"The protected type parameter with name {identifierSyntax.Identifier.ValueText} " +
+                                            "is vault-safe, but even vault safe parameters may not be passed by reference.";
+                                    }
+                                    else
+                                    {
+                                        explanation = string.Empty;
+                                    }
+                                }
+                                else
+                                {
+                                    illegalParameterUsageDetected = true;
+                                    explanation =
+                                        $"The protected type parameter with name {identifierSyntax.Identifier.ValueText} " +
+                                        "may not be passed outside of the delegate.";
+                                }
+                            }
+                        }
+                    }
+                    if (illegalParameterUsageDetected)
+                        break;
                     foreach (ArgumentSyntax item in n.ArgumentList.Arguments)
                     {
                         IdentifierNameSyntax ins = item.NameColon != null
@@ -348,19 +391,7 @@ namespace DotNetVault.UtilitySources
                             : item.Expression as IdentifierNameSyntax;
                         if (ins?.Identifier.ValueText == protectedParameterName)
                         {
-                            bool isVaultSafe;
-                            var vaultSafetyAnalyzer = VaultSafeAnalyzerFactorySource.CreateAnalyzer();
-                            switch (ts)
-                            {
-                                case INamedTypeSymbol nts:
-                                    isVaultSafe = vaultSafetyAnalyzer.IsTypeVaultSafe(nts, con.Compilation,
-                                        con.CancellationToken);
-                                    break;
-                                default:
-                                    isVaultSafe = false;
-                                    break;
-                            }
-
+                            bool isVaultSafe = ExecuteVsAnalysis();
                             if (isVaultSafe)
                             {
                                 if (item.RefKindKeyword != default || item.RefOrOutKeyword != default)
@@ -368,7 +399,7 @@ namespace DotNetVault.UtilitySources
                                     illegalParameterUsageDetected = true;
                                     explanation =
                                         $"The protected type parameter with name {ins.Identifier.ValueText} " +
-                                         "is vault-safe, but even vault safe parameters may not be passed by reference.";
+                                        "is vault-safe, but even vault safe parameters may not be passed by reference.";
                                     identifierSyntax = ins;
                                 }
                                 else
@@ -381,19 +412,36 @@ namespace DotNetVault.UtilitySources
                                 illegalParameterUsageDetected = true;
                                 explanation =
                                     $"The protected type parameter with name {ins.Identifier.ValueText} " +
-                                     "may not be passed outside of the delegate.";
+                                    "may not be passed outside of the delegate.";
                                 identifierSyntax = ins;
                             }
                         }
-
                         if (illegalParameterUsageDetected)
+                            break;
+
+                    }
+
+                }
+                return (illegalParameterUsageDetected, identifierSyntax, explanation);
+                bool ExecuteVsAnalysis()
+                {
+                    bool isVaultSafe;
+                    var vaultSafetyAnalyzer = VaultSafeAnalyzerFactorySource.CreateAnalyzer();
+                    switch (ts)
+                    {
+                        case INamedTypeSymbol nts:
+                            isVaultSafe = vaultSafetyAnalyzer.IsTypeVaultSafe(nts, con.Compilation,
+                                con.CancellationToken);
+                            break;
+                        default:
+                            isVaultSafe = false;
                             break;
                     }
 
-                    if (illegalParameterUsageDetected)
-                        break;
+                    return isVaultSafe;
                 }
-                return (illegalParameterUsageDetected, identifierSyntax, explanation);
+
+             
             }
 
             private static (bool Success, DataFlowAnalysis Analysis, ImmutableHashSet<FindSymbolResult> IdentifiedStaticMembers)

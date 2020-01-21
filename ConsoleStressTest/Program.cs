@@ -25,6 +25,7 @@ namespace ConsoleStressTest
                 try
                 {
                     Console.WriteLine($"Executing simulation with the following arguments: [{arguments.ToString()}]:");
+                    LogPrecisionOfTimestampSource();
                     TimeSpan updateEvery = TimeSpan.FromSeconds(2);
                     int numThreads = arguments.NumberThreads;
                     int numActionsPerThread = arguments.ActionsPerThread;
@@ -56,6 +57,7 @@ namespace ConsoleStressTest
                                 Console.WriteLine("Writing results to file specified...");
                                 using (var sw = arguments.TargetFile.CreateText())
                                 {
+                                    sw.WriteLine(PrecisionStatusText);
                                     sw.WriteLine(TheResultText.Value);
                                 }
                                 arguments.TargetFile.Refresh();
@@ -114,6 +116,14 @@ namespace ConsoleStressTest
                 Console.Error.WriteLine();
             }
         }
+        private static void LogPrecisionOfTimestampSource()
+            =>  Console.WriteLine(PrecisionStatusText);
+        
+
+        private static string PrecisionStatusText =>
+            "Precision of timestamps in simulation: " +
+            $"[{(TimeStampSource.IsHighPrecision ? "HIGH PRECISION" : "LOW PRECISION")}].";
+        
 
         private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
         {

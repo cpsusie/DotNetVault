@@ -37,6 +37,9 @@ namespace DotNetVault
         internal const string DotNetVault_VsTypeParams_Object_Create = "DotNetVault_VsTypeParams_ObjectCreate";
         internal const string DotNetVault_VsTypeParams_DelegateCreate = "DotNetVault_VsTypeParams_DelegateCreate";
         internal const string DotNetVault_NotVsProtectable = "DotNetVault_NotVsProtectable";
+        internal const string DotNetVault_NotDirectlyInvocable = "DotNetVault_NotDirectlyInvocable";
+        internal const string DotNetVault_UnjustifiedEarlyDispose = "DotNetVault_UnjustifiedEarlyDispose";
+        internal const string DotNetVault_EarlyDisposeJustification = "DotNetVault_EarlyDisposeJustification";
         // ReSharper restore InconsistentNaming
         #endregion        
 
@@ -54,9 +57,6 @@ namespace DotNetVault
 #endif
             using var dummy =
                 EntryExitLog.CreateEntryExitLog(true, typeof(DotNetVaultAnalyzer), nameof(Initialize), context);
-            // TODO: Consider registering other actions that act on syntax instead of or in addition to symbols
-            // See https://github.com/dotnet/roslyn/blob/master/docs/analyzers/Analyzer%20Actions%20Semantics.md for more information
-
             try
             {
                 context.RegisterSymbolAction(AnalyzeTypeSymbolForVsTypeParams, SymbolKind.NamedType);
@@ -69,6 +69,8 @@ namespace DotNetVault
                 context.RegisterSyntaxNodeAction(AnalyzeObjectCreationForVsTpCompliance, SyntaxKind.LocalDeclarationStatement);
                 context.RegisterOperationAction(AnalyzeAssignmentsForDelegateCompliance, OperationKind.DelegateCreation);
                 context.RegisterOperationAction(AnalyzeDelegateCreationForBadNonVsCapture, OperationKind.DelegateCreation);
+                context.RegisterSyntaxNodeAction(AnalyzeMethodInvocationForNoDirectInvokeAttrib, SyntaxKind.InvocationExpression);
+                context.RegisterSyntaxNodeAction(AnalyzeMethodInvocationForEarlyReleaseWithoutJustification, SyntaxKind.InvocationExpression);
                 context.EnableConcurrentExecution();
                 context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
             }
@@ -82,10 +84,116 @@ namespace DotNetVault
         #endregion
 
         #region Primary Analysis Operations
+
+        private void AnalyzeMethodInvocationForEarlyReleaseWithoutJustification(SyntaxNodeAnalysisContext context)
+        {
+            const string methodName = nameof(AnalyzeMethodInvocationForEarlyReleaseWithoutJustification);
+            using var _ = EntryExitLog.CreateEntryExitLog(EnableEntryExitLogging, typeof(DotNetVaultAnalyzer),
+                methodName, context);
+            try
+            {
+                if (context.Node is InvocationExpressionSyntax ies)
+                {
+                    EarlyReleaseReason? justification;
+                    var earlyReleaseAnalyzer = EarlyReleaseAnalyzerFactorySource.Factory();
+                    bool hasEarlyReleaseAttribute =
+                        earlyReleaseAnalyzer.IsEarlyReleaseCall(context.Compilation, ies, context.CancellationToken);
+                    DebugLog.Log($"Invocation expression {ies.ToString()} " +
+                                 (hasEarlyReleaseAttribute ? "has" : "does not have") +
+                                 $" the {typeof(EarlyReleaseAttribute).Name} attribute.");
+                    if (hasEarlyReleaseAttribute)
+                    {
+                        context.CancellationToken.ThrowIfCancellationRequested();
+                        var justRes=
+                            earlyReleaseAnalyzer.GetEarlyReleaseJustification(context.Compilation, ies,
+                                context.CancellationToken);
+                        DebugLog.Log("Early release justification: " +
+                                     $"[{justRes.Reason?.ToString() ?? "NONE"}]");
+                        justification = justRes.Reason;
+                        if (justification.HasValue)
+                        {
+                            //information diagnostic documenting justification
+                            var documentJustification = Diagnostic.Create(JustificationOfEarlyDispose,
+                                justRes.InvocationLocation, ies.ToString(), justRes.EnclosingMethodSymbol,
+                                justRes.Reason.ToString());
+                            DebugLog.Log(documentJustification.GetMessage());
+                            context.ReportDiagnostic(documentJustification);
+                        }
+                        else
+                        {
+                            //ERROR -- early dispose REQUIRES justification
+                            var unjustifiedEarlyDisposeDx = Diagnostic.Create(UnjustifiedEarlyDisposeDiagnostic,
+                                justRes.InvocationLocation,   justRes.EnclosingMethodLocation.AsEnumerable(), ies.ToString(),
+                                justRes.EnclosingMethodSymbol);
+                            DebugLog.Log(unjustifiedEarlyDisposeDx.GetMessage());
+                            context.ReportDiagnostic(unjustifiedEarlyDisposeDx);
+                        }
+                    }
+                    
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                DebugLog.Log($"{methodName} operation was cancelled.");
+            }
+            catch (Exception ex)
+            {
+                TraceLog.Log(ex);
+                throw;
+            }
+        }
+
+        private void AnalyzeMethodInvocationForNoDirectInvokeAttrib(SyntaxNodeAnalysisContext context)
+        {
+            const string methodName = nameof(AnalyzeMethodInvocationForNoDirectInvokeAttrib);
+            using var _ = EntryExitLog.CreateEntryExitLog(EnableEntryExitLogging, typeof(DotNetVaultAnalyzer),
+                methodName, context);
+            try
+            {
+                CancellationToken token = context.CancellationToken;
+                token.ThrowIfCancellationRequested();
+
+                var noInvAttrib = context.Compilation.FindNoDirectInvokeAttribute();
+                Debug.Assert(noInvAttrib != null, "noInvAttrib != null");
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalse -- DEBUG vs RELEASE
+                if (noInvAttrib != null)
+                {
+                    if (context.Node.Kind() == SyntaxKind.InvocationExpression && 
+                        context.Node is InvocationExpressionSyntax ies)
+                    {
+                        var model = context.SemanticModel;
+                        var symbol = model.GetSymbolInfo(ies);
+                        if (symbol.Symbol is IMethodSymbol ms)
+                        {
+                            var attribList = ms.GetAttributes();
+                            bool hasNoDirectInvokeAttrib = attribList.Any(atd =>
+                                atd.AttributeClass?.Equals(noInvAttrib, SymbolEqualityComparer.Default) == true);
+                            if (hasNoDirectInvokeAttrib)
+                            {
+                                var reportMe = Diagnostic.Create(NotDirectlyInvocableDiagnosticDescriptor,
+                                    ies.GetLocation(), ms.Name);
+                                context.ReportDiagnostic(reportMe);
+                            }
+                        }
+
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                DebugLog.Log($"{methodName} operation was cancelled.");
+            }
+            catch (Exception ex)
+            {
+                TraceLog.Log(ex);
+                throw;
+            }
+        }
+
         private void AnalyzeDelegateCreationForBadNonVsCapture(OperationAnalysisContext context)
         {
             const string methodName = nameof(AnalyzeDelegateCreationForBadNonVsCapture);
-            using var unused = EntryExitLog.CreateEntryExitLog(EnableEntryExitLogging, typeof(DotNetVaultAnalyzer), methodName, context);
+            using var _ = EntryExitLog.CreateEntryExitLog(EnableEntryExitLogging, typeof(DotNetVaultAnalyzer), methodName, context);
             var analyzer = DelegateNoNonVsCaptureAnalyzerSource.DefaultFactoryInstance();
             try
             {
@@ -970,7 +1078,10 @@ namespace DotNetVault
                     .Add(GenericDelegateTypeArgumentsMustBeVaultSafe)
                     .Add(AnnotatedDelegatesMayNotReferenceNonVaultSafeSymbols)
                     .Add(NotVsProtectableTypeCannotBeStoredInVault)
-                    .Add(UsingMandatoryAttributeAssignmentMustBeToVariableDeclaredInline);
+                    .Add(UsingMandatoryAttributeAssignmentMustBeToVariableDeclaredInline)
+                    .Add(NotDirectlyInvocableDiagnosticDescriptor)
+                    .Add(UnjustifiedEarlyDisposeDiagnostic)
+                    .Add(JustificationOfEarlyDispose);
             }
             catch (Exception ex)
             {
@@ -979,13 +1090,41 @@ namespace DotNetVault
             }
         }
 
-        // You can change these strings in the Resources.resx file. If you do not want your analyzer to be localize-able, you can use regular strings for Title and MessageFormat.
-        // See https://github.com/dotnet/roslyn/blob/master/docs/analyzers/Localizing%20Analyzers.md for more on localization
+       
         // ReSharper disable InconsistentNaming
         private static readonly LocalizableString Vst_Title = new LocalizableResourceString(nameof(Resources.AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Vst_MessageFormat = new LocalizableResourceString(nameof(Resources.AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Vst_Description = new LocalizableResourceString(nameof(Resources.AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
         private const string Category = "VaultSafety";
+
+        private const string UED_Title = "Invocation of early dispose method requires justification.";
+        private const string UED_MessageFormat =
+            "The method [{0}] is an early disposal method on a LockedResourceObject.  The enclosing method in which it is called [{1}]" +
+            " does not provide any justification for the call.  There are two acceptable reasons for early dispose: " +
+            "1-a custom LockedResource Object is disposing the object it wraps in its own method, or 2-a disposal on exception from a " +
+            "Lock, Spinlock or similar method. Every method that makes such a call must be annotated with the " +
+            nameof(EarlyReleaseJustificationAttribute) +
+            " constructed with the justification for the early dispose.  " +
+            "In no event should an early-disposed object ever be available for further access by client code.";
+        private const string UED_Description =
+            "Calls to a locked resource object's early dispose method is only correct under very limited circumstances.  " +
+            "Accordingly, any method which calls a LockedResourceObject's early dispose method must document " +
+            "the justification for it with the " + nameof(EarlyReleaseJustificationAttribute) + "attribute.";
+
+        private const string EDJ_Title = "Justification for early dispose of LockedResourceObject.";
+        private const string EDJ_MessageFormat =
+            "The method call [{0}] is an early dispose method of a LockedResourceObject.  " +
+            "It is called in method [{1}], which documents the justifcation for the call as: [{2}].  " +
+            "Periodic review of this justification during code review is recommended and also" +
+            "should establish that no further access to the LockedResourceObject is made in " +
+            "the enclosing method after the early dispose and that further access from client code is IMPOSSIBLE.";
+        private const string EDJ_Description =
+            "Documentation of Justification for Early Dispose of LockedResource Object";
+        
+        private const string Ndi_Title = "This method must not be invoked directly.";
+        private const string Ndi_Message_Format =
+            "The method [{0}] is annotated with the " + nameof(NoDirectInvokeAttribute) + " attribute and may not be invoked directly." ;
+        private const string Ndi_Description = "Methods annotated with the " + nameof(NoDirectInvokeAttribute) + " attribute may not be invoked directly.";
 
         private const string Um_Inline_Title =
             "Value returned from method invocation must be declared inline as part of using statement or declaration.";
@@ -1066,6 +1205,15 @@ namespace DotNetVault
         private static readonly DiagnosticDescriptor NotVsProtectableTypeCannotBeStoredInVault =
             new DiagnosticDescriptor(DotNetVault_NotVsProtectable, VsNotVsProtect_Title, VsNotVsProtect_MessageFormat,
                 Category, DiagnosticSeverity.Error, true, VsNotVsProtect_Description);
+        private static readonly DiagnosticDescriptor NotDirectlyInvocableDiagnosticDescriptor =
+            new DiagnosticDescriptor(DotNetVault_NotDirectlyInvocable, Ndi_Title, Ndi_Message_Format, Category,
+                DiagnosticSeverity.Error, true, Ndi_Description);
+        private static readonly DiagnosticDescriptor UnjustifiedEarlyDisposeDiagnostic =
+            new DiagnosticDescriptor(DotNetVault_UnjustifiedEarlyDispose, UED_Title, UED_MessageFormat, Category,
+                DiagnosticSeverity.Error, true, UED_Description);
+        private static readonly DiagnosticDescriptor JustificationOfEarlyDispose =
+            new DiagnosticDescriptor(DotNetVault_EarlyDisposeJustification, EDJ_Title, EDJ_MessageFormat, Category,
+                DiagnosticSeverity.Info, true, EDJ_Description);
         private static readonly WriteOnce<ImmutableArray<DiagnosticDescriptor>> TheDiagnosticDescriptors = new WriteOnce<ImmutableArray<DiagnosticDescriptor>>(CreateDiagnosticDescriptors);
         private volatile VaultSafeTypeAnalyzer _analyzer;
         private const bool EnableEntryExitLogging = false;
@@ -1108,6 +1256,14 @@ namespace DotNetVault
                 if (predicate(item))
                     hsBuilder.Remove(item);
             }
+        }
+    }
+
+    internal static class MiscellaneousExtensions
+    {
+        public static IEnumerable<T> AsEnumerable<T>(this T val)
+        {
+            yield return val;
         }
     }
 }

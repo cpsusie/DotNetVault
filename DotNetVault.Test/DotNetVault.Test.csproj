@@ -17,11 +17,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="TestCases\Bug62NotWorkingTestCase.cs" />
+    <Compile Remove="TestCases\Bug62TestCaseOneCurrentlyWorks.cs" />
     <Compile Remove="TestCases\ConditionallyImmutableClassNonRoImmutF.cs" />
     <Compile Remove="TestCases\ConditionallyImmutStructWithNonROImmutF.cs" />
     <Compile Remove="TestCases\DataFlowTestCases.cs" />
     <Compile Remove="TestCases\DelegateCreationOpsAndDynamic.cs" />
     <Compile Remove="TestCases\DiagnosticALittleMoreComplex.cs" />
+    <Compile Remove="TestCases\EarlyReleaseErrorCaseHaver.cs" />
     <Compile Remove="TestCases\EmitsDiagnosticUmRequiresInlineDecl.cs" />
     <Compile Remove="TestCases\EventArgsOkTest.cs" />
     <Compile Remove="TestCases\ImmutableCollectionIsVaultSafe.cs" />
@@ -29,12 +32,16 @@
     <Compile Remove="TestCases\ImmutableStructIsVsUnmanaged.cs" />
     <Compile Remove="TestCases\MethodInvokeSyntaxTests.cs" />
     <Compile Remove="TestCases\MethodInvokeSyntaxTests_2.cs" />
+    <Compile Remove="TestCases\NdiMixedWithNotInlineNotOkCaseThree.cs" />
+    <Compile Remove="TestCases\NdiNotOkCaseOne.cs" />
+    <Compile Remove="TestCases\NdiNotOkTestTwo.cs" />
     <Compile Remove="TestCases\NoDiagnosticALittleMoreComplex.cs" />
     <Compile Remove="TestCases\NoDiagnosticAttributeButAllUpper.cs" />
     <Compile Remove="TestCases\NoDiagnosticBecauseOnFaith.cs" />
     <Compile Remove="TestCases\NoDiagnosticNoAttribute.cs" />
     <Compile Remove="TestCases\NoDiagnosticPartOfUsingStatement.cs" />
     <Compile Remove="TestCases\NonVsCaptureTestCases.cs" />
+    <Compile Remove="TestCases\NotVsException.cs" />
     <Compile Remove="TestCases\NullableNotHeldAgainstTest.cs" />
     <Compile Remove="TestCases\QueryTestCases.cs" />
     <Compile Remove="TestCases\SbAndUriBNotVaultSafe.cs" />
@@ -42,10 +49,16 @@
     <Compile Remove="TestCases\ShouldTriggerDiagnosticLowercaseAndVsAttribute.cs" />
     <Compile Remove="TestCases\ShouldTriggerDiagnosticLowercaseAndVsAttributeV2.cs" />
     <Compile Remove="TestCases\ShouldTriggerDiagnosticLowercaseAndVsAttributeV3.cs" />
+    <Compile Remove="TestCases\TestBaseClassWbVsIfSealed.cs" />
     <Compile Remove="TestCases\TestDynamicNeverConsideredVaultSafe.cs" />
+    <Compile Remove="TestCases\TestEarlyReleaseBadJustification.cs" />
+    <Compile Remove="TestCases\TestFindEarlyReleaseAttribute.cs" />
     <Compile Remove="TestCases\TestIdentifyVaultSymbolDeclaration.cs" />
+    <Compile Remove="TestCases\TestNdiOk.cs" />
+    <Compile Remove="TestCases\TestNotVsBadBase.cs" />
     <Compile Remove="TestCases\TestUriWhiteListedVaultSafety.cs" />
     <Compile Remove="TestCases\TestWhiteListedVaultSafety.cs" />
+    <Compile Remove="TestCases\UnjustifiedEarlyRelease.cs" />
     <Compile Remove="TestCases\VaultSafeAnalysisTestCases.cs" />
     <Compile Remove="TestCases\VaultSafeGenericShouldBeOkExamples.cs" />
     <Compile Remove="TestCases\VsTpObjectCreationExpDiag.cs" />
@@ -65,10 +78,25 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="ResourceFiles\Bug62TestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Bug62TestCases.resx</DependentUpon>
+    </Compile>
     <Compile Update="ResourceFiles\ConditionallyVsImmutableTypes.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>ConditionallyVsImmutableTypes.resx</DependentUpon>
+    </Compile>
+    <Compile Update="ResourceFiles\EarlyReleaseTestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>EarlyReleaseTestCases.resx</DependentUpon>
+    </Compile>
+    <Compile Update="ResourceFiles\NdiTestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>NdiTestCases.resx</DependentUpon>
     </Compile>
     <Compile Update="ResourceFiles\NullableNotHeldAgainstTests.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -110,6 +138,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>VaultSymbolIdentificationTest.resx</DependentUpon>
     </Compile>
+    <Compile Update="ResourceFiles\VsBaseClass.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>VsBaseClass.resx</DependentUpon>
+    </Compile>
     <Compile Update="ResourceFiles\WhiteListTests.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -118,9 +151,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="ResourceFiles\Bug62TestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Bug62TestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="ResourceFiles\ConditionallyVsImmutableTypes.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ConditionallyVsImmutableTypes.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ResourceFiles\EarlyReleaseTestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>EarlyReleaseTestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ResourceFiles\NdiTestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>NdiTestCases.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="ResourceFiles\NullableNotHeldAgainstTests.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -153,6 +198,10 @@
     <EmbeddedResource Update="ResourceFiles\VaultSymbolIdentificationTest.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>VaultSymbolIdentificationTest.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ResourceFiles\VsBaseClass.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>VsBaseClass.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="ResourceFiles\WhiteListTests.resx">
       <Generator>ResXFileCodeGenerator</Generator>

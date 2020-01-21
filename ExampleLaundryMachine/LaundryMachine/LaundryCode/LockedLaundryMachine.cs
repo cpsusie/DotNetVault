@@ -51,7 +51,9 @@ namespace LaundryMachine.LaundryCode
             _resource = wrappedLockedResource;
         #endregion
 
-        public void Dispose() => _resource.Dispose();
+        [EarlyReleaseJustification(EarlyReleaseReason.CustomWrapperDispose)]
+        [NoDirectInvoke]
+        public void Dispose() => _resource.ErrorCaseReleaseOrCustomWrapperDispose();
 
         #region Wrapped Accessors for access via delegates
         /// <summary>

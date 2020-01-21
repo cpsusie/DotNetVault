@@ -373,16 +373,37 @@ namespace LaundryMachine.LaundryCode
             LogMessageIfNotNull(beginMessage);
             try
             {
+                TimeSpan sleepInterval = GetSleepInterval(howLong);
+                Debug.Assert(sleepInterval < howLong && sleepInterval >= TimeSpan.Zero);
                 DateTime quitAfter = TimeStampSource.Now + howLong;
                 while (TimeStampSource.Now <= quitAfter)
                 {
                     pair.ThrowIfCancellationRequested();
-                    Thread.Sleep(TimeSpan.FromMilliseconds(100));
+                    Thread.Sleep(sleepInterval);
                 }
             }
             finally
             {
                 LogMessageIfNotNull(endMessage);
+            }
+
+            static TimeSpan GetSleepInterval(TimeSpan basis)
+            {
+                TimeSpan ret;
+                Debug.Assert(basis > TimeSpan.Zero);
+                if (basis >= TimeSpan.FromMilliseconds(250))
+                {
+                    ret = TimeSpan.FromMilliseconds(100);
+                }
+                else if (basis >= TimeSpan.FromMilliseconds(50))
+                {
+                    ret = TimeSpan.FromMilliseconds(10);
+                }
+                else
+                {
+                    ret = TimeSpan.Zero;
+                }
+                return ret;
             }
         }
 

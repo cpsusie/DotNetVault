@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using DotNetVault.Attributes;
+using DotNetVault.ExtensionMethods;
 using DotNetVault.Interfaces;
 using DotNetVault.Logging;
 using JetBrains.Annotations;
@@ -220,7 +221,7 @@ namespace DotNetVault.UtilitySources
                         {
                             case INamedTypeSymbol nts:
                                 parents.Add(nts);
-                                foreach (var child in nts.GetMembers().OfType<IFieldSymbol>().Where(fs => !fs.IsStatic))
+                                foreach (var child in nts.GetFieldSymbolMembersIncludingBaseTypesExclObject().Where(fs => !fs.IsStatic))
                                 {
                                     bool isThisChildReadOnly = child.IsReadOnly || child.IsConst;
                                     anyReferenceParents = isThisTypeAReferenceType || anyReferenceParents;
@@ -587,11 +588,10 @@ namespace DotNetVault.UtilitySources
                 }
             }
 
-            static VaultSafeTypeAnalyzerV2()
-            {
+            static VaultSafeTypeAnalyzerV2() =>
                 TheImmutableCollectionsConditionalWhiteList =
                     InitImmutableCollectionsConditionalWhiteList().ToImmutableArray();
-            }
+
             private VaultSafeTypeAnalyzerV2()
             {
             }
@@ -731,12 +731,11 @@ namespace DotNetVault.UtilitySources
                                         }
                                         else if (hasAttribute)
                                         {
-
                                             token.ThrowIfCancellationRequested();
                                             parents = parents.Add(symbol);
 
                                             bool allChildrenOk = true;
-                                            foreach (var child in symbol.GetMembers().OfType<IFieldSymbol>())
+                                            foreach (var child in symbol.GetFieldSymbolMembersIncludingBaseTypesExclObject())
                                             {
                                                 token.ThrowIfCancellationRequested();
                                                 ITypeSymbol childSymbol = child.Type;
@@ -1108,7 +1107,7 @@ namespace DotNetVault.UtilitySources
             private static ImmutableHashSet<string> InitImmutableCollectionsConditionalWhiteList()
             {
                 bool fileIsMissing;
-                string contents = string.Empty;
+                string contents=string.Empty;
                 ImmutableHashSet<string> ret = ImmutableHashSet<string>.Empty;
                 try
                 {
@@ -1185,7 +1184,7 @@ namespace DotNetVault.UtilitySources
             private static ImmutableHashSet<string> InitWhiteListAndFieldScanExemptionList()
             {
                 bool fileIsMissing;
-                string contents = string.Empty;
+                string contents=string.Empty;
                 ImmutableHashSet<string> ret = ImmutableHashSet<string>.Empty;
                 try
                 {

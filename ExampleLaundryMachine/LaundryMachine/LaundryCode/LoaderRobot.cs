@@ -40,6 +40,8 @@ namespace LaundryMachine.LaundryCode
             {
                 using (var lLock = _heldLaundryItem.SpinLock(token))
                 {
+                    //bug 61 fix: following line if uncommented, now rightly causes compilation error:
+                    //lLock.Dispose();
                     heldItem = lLock.Value;
                     if (heldItem.HasValue)
                     {
@@ -105,6 +107,8 @@ namespace LaundryMachine.LaundryCode
                 try
                 {
                     using var laundryMachine = laundryMachineVault.Lock( token, TimeSpan.FromMilliseconds(250));
+                    //bug 61 fix -- following line, if uncommented, now rightly causes compilation error
+                    //laundryMachine.Dispose();
                     Debug.WriteLine($"At [{TimeStampSource.Now:O}], Unloader robot [{RobotId}] just got a lock on machine {laundryMachine.MachineId}.");
                     Guid? itemId;
                     string descr;

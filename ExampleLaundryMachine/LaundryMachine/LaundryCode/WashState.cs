@@ -59,7 +59,7 @@ namespace LaundryMachine.LaundryCode
             }
         }
 
-        protected override WashTask CreateLaundryTask() => new WashTask(_context, FlagVault, EventRaiser);
+        protected override WashTask CreateLaundryTask() => new WashTask(_context, FlagVault, EventRaiser, TimeToAddOneUnitDampness, TimeToRemoveOneUnitDirt);
         protected override void ValidateOtherEntryInvariants(in LockedLaundryStatus lls) => lls.SetCurrentCommandToSpecified(CommandId);
 
         protected override

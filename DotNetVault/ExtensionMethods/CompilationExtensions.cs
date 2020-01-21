@@ -21,7 +21,8 @@ namespace DotNetVault.ExtensionMethods
         [CanBeNull]
         public static INamedTypeSymbol FindNotVsProtectableAttributeSymbol(this Compilation compilation) =>
             compilation?.GetTypeByMetadataName(typeof(NotVsProtectableAttribute).FullName);
-
-
+        [CanBeNull]
+        public static INamedTypeSymbol FindNoDirectInvokeAttribute(this Compilation compilation) =>
+            compilation?.GetTypeByMetadataName(typeof(NoDirectInvokeAttribute).FullName);
     }
 }

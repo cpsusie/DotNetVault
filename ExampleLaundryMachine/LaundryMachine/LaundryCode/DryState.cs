@@ -51,7 +51,7 @@ namespace LaundryMachine.LaundryCode
             
         }
 
-        protected override DryTask CreateLaundryTask() => new DryTask(_context, FlagVault, EventRaiser);
+        protected override DryTask CreateLaundryTask() => new DryTask(_context, FlagVault, EventRaiser, TimeToRemoveOneUnitDampness);
 
         protected override
             StateMachineStateBase<LaundryStatusFlags, LaundryMachineStateCode, TaskResultCode, TaskResult,

@@ -98,11 +98,15 @@ namespace DotNetVault.CustomVaultExamples.CustomLockedResources
         /// you wish to determine</param>
         /// <returns>true if found, false otherwise</returns>
         public bool Contains(char c) => IndexOf(c) > -1;
+        
         /// <summary>
         /// Release the lock on the <see cref="StringBuilder"/>, returning it to the vault
         /// for use on other threads
         /// </summary>
-        public void Dispose() => _resource.Dispose();
+        [NoDirectInvoke]
+        [EarlyReleaseJustification(EarlyReleaseReason.CustomWrapperDispose)]
+        public void Dispose() => _resource.ErrorCaseReleaseOrCustomWrapperDispose();
+
         /// <summary>
         /// Append the specified text to the end of the <see cref="StringBuilder"/>
         /// </summary>

@@ -9,10 +9,7 @@ namespace DotNetVault.ToggleFlags
 
         public ToggleFlag() : this(false) { }
 
-        public ToggleFlag(bool beginSet)
-        {
-            _state = beginSet ? Set : Clear;
-        }
+        public ToggleFlag(bool beginSet) => _state = beginSet ? Set : Clear;
 
         public bool SetFlag()
         {

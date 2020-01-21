@@ -100,6 +100,8 @@ namespace ConsoleStressTest
                         using (LockedStressObj lck = _vault.SpinLock(token))
                         {
                             lck.RegisterAction(++doneActions);
+                            //bug 61 fix following line now rightly causes compiler error
+                            //lck.Dispose();
                         }
                         token.ThrowIfCancellationRequested();
                         Thread.SpinWait(25000);

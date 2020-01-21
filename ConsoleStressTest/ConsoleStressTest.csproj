@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNetVault" Version="0.1.3.13-beta" />
+    <PackageReference Include="DotNetVault" Version="0.1.4-beta" />
   </ItemGroup>
 
 </Project>

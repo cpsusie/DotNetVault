@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Threading;
+using DotNetVault.Attributes;
 using JetBrains.Annotations;
 
 namespace DotNetVault.Logging
@@ -13,7 +14,7 @@ namespace DotNetVault.Logging
         /// <summary>
         /// The current entry number
         /// </summary>
-        public static long CurrentEntryNum => _entryId.Value;
+        public static long CurrentEntryNum => EntryId.Value;
         /// <summary>
         /// Entry exit log
         /// </summary>
@@ -46,13 +47,14 @@ namespace DotNetVault.Logging
             _class = callingType ?? throw new ArgumentNullException(nameof(always));
             _method = callingMethod ?? throw new ArgumentNullException(nameof(callingMethod));
             _threadId = Thread.CurrentThread.ManagedThreadId;
-            _entryNum = ++_entryId.Value;
+            _entryNum = ++EntryId.Value;
             LogEntry(GetParams(arr));
         }
 
         /// <summary>
         /// Log Exit
         /// </summary>
+        [NoDirectInvoke]
         public void Dispose()
         {
             LogExit();
@@ -157,7 +159,7 @@ namespace DotNetVault.Logging
         }
 
         private readonly int _threadId;
-        private static ThreadLocal<long> _entryId = new ThreadLocal<long>(() => 0);
+        private static readonly ThreadLocal<long> EntryId = new ThreadLocal<long>(() => 0);
         private readonly long _entryNum;
         [NotNull] private readonly Type _class;
         private readonly DateTime _ts;

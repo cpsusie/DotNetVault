@@ -70,5 +70,6 @@
   </Rules>
   <Rules AnalyzerId="DotNetVault" RuleNamespace="DotNetVault">
     <Rule Id="DotNetVault_NotVsProtectable" Action="Error" />
+    <Rule Id="DotNetVault_EarlyDisposeJustification" Action="Info" />
   </Rules>
 </RuleSet>

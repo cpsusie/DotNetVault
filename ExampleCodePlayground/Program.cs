@@ -11,7 +11,7 @@ namespace ExampleCodePlayground
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             KnownIssuesDemonstration.DemonstrateDoubleDispose();
             KnownIssuesDemonstration.DemonstrateBadExtensionMethod();
@@ -21,6 +21,7 @@ namespace ExampleCodePlayground
             StringBuilderCodeSamples.DemonstrateMixedOperations();
             StringBuilderCodeSamples.DemonstrateUseOfExtensionMethodsToSimplify();
             ConvenienceWrappersDemo.ShowWrapperUsage();
+            Bug62TestCases.ExecuteDemonstrationMethods();
            // TestUriIsVs();
 
             //Console.WriteLine("Hello World!");
@@ -106,14 +107,14 @@ namespace ExampleCodePlayground
             ImmutableArray<StringBuilder> immutSb = sb.ToImmutableArray();
             ImmutableArray<DateTime> immut = datesAndTimes.ToImmutableArray();
             var wrapper = VsArrayWrapper<DateTime>.CreateArrayWrapper(datesAndTimes);
-           // var wrapper2 = VsArrayWrapper<StringBuilder>.CreateArrayWrapper(sb);
+            // var wrapper2 = VsArrayWrapper<StringBuilder>.CreateArrayWrapper(sb);
 
             //NOT OK -- is "considered" vault safe but isn't allowed as a protected resource
             //BasicVault<VsArrayWrapper<DateTime>> v = new BasicVault<VsArrayWrapper<DateTime>>(wrapper);
 
             //Ok -- ImmutableArray<DateTime> is vault safe
             //BasicVault<ImmutableArray<DateTime>> v = new BasicVault<ImmutableArray<DateTime>>(immut);
-            
+
             //ok resource is not vault safe but mutresv doesnt require it
             MutableResourceVault<ImmutableArray<StringBuilder>> b =
                 MutableResourceVault<ImmutableArray<StringBuilder>>.CreateMutableResourceVault(
@@ -178,12 +179,69 @@ namespace ExampleCodePlayground
     }
 
     /// <summary>
-    /// problematical -- base class is not vault-safe
+    /// bug fix 48 -- event args can be a base class of a vault-safe type
+    /// even though it itself isn't
     /// </summary>
     [VaultSafe]
-    sealed class MyException : Exception
+    sealed class VsEventArgs : EventArgs
     {
 
+    }
+
+    //bug fix 48
+    //The true parameter on the attribute will make analyzer consider it vault-safe even though it isn't
+    [VaultSafe(10-1 == 8+1)]
+    sealed class BadIdeaButWillWork : BadEventArgs
+    {
+
+    }
+
+    //bug 48 fix -- this should not work -- bad event args cannot be base class of non-vault-safe type
+    //[VaultSafe]
+    //sealed class ShouldNotWork : BadEventArgs
+    //{
+
+    //}
+
+    //This is not a valid base class for event args even though eventargs (empty) is ok
+    class BadEventArgs : EventArgs
+    {
+        public StringBuilder Sb { get; set; } = new StringBuilder();
+    }
+
+    //post bug fix 48 -- base exception class still ok -- but not necessarily derived types.
+    [VaultSafe]
+    sealed class ExceptionNoAdd : Exception
+    {
+
+    }
+
+    //Fixed bug 48 -- no longer deemed vault safe
+    ///// <summary>
+    ///// problematical -- base class is not vault-safe
+    ///// </summary>
+    //[VaultSafe]
+    //sealed class MyException : MutableException
+    //{
+
+    //}
+
+
+    //Won't compile -- not vault safe
+    //[VaultSafe]
+    //sealed class MutableException : Exception
+    //{
+    //    public override string Message => _sb.ToString();
+
+    //    [NotNull] private readonly StringBuilder _sb = new StringBuilder();
+    //}
+
+    class MutableException : Exception
+    {
+        public StringBuilder Help => _sb;
+        public sealed override string Message => _sb.ToString();
+
+        [NotNull] private readonly StringBuilder _sb = new StringBuilder();
     }
 
     [VaultSafe]

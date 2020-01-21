@@ -50,6 +50,7 @@ namespace DotNetVault.LockedResources
         /// <summary>
         /// release the lock and return the protected resource to vault for use by others
         /// </summary>
+        [NoDirectInvoke]
         public void Dispose()
         {
             if (_flag?.TrySet() == true)

@@ -49,6 +49,8 @@ namespace LaundryMachine.LaundryCode
                 using var lck = FlagVault.SpinLock(TimeSpan.FromSeconds(2));
                 if (lck.ShutdownCommandStatus?.StatusCode != CommandRequestStatusCode.Nil)
                 {
+                    //bug 61 fix -- uncommented next line now rightly causes compilation error.
+                    //lck.Dispose();
                     lck.ForceClearPowerDownStatus();
                 }
             }
