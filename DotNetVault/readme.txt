@@ -2,6 +2,12 @@ Synchronization Library and Static Analysis Tool for C# 8
 
 See Pdf for full description of this project.
 
+RELEASE NOTES VERSION 0.1.4.1:
+	
+	Added quick start guide pdf and project (project available on GitHub).
+
+	Updated readme.md
+
 RELEASE NOTES VERSION 0.1.4.0:
     
     Bug# 61 FIXED.  Double dispose is now practically impossible.  Analyzer now forbids out of line, pre-declaration of a variable that will be the subject of a using statement or declaration.  Analysis rules now prevent manual calls to Dispose method and additional method and analysis rules were added to account for the two use-cases where manual release of protected resource is necessary.  These rules make it difficult to accidentally use the new manual release method accidentally.

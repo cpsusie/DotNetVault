@@ -43,7 +43,7 @@ namespace ExampleCodePlayground
         {
             
             BasicVault<string> bvs = new BasicVault<string>("Hi mom", TimeSpan.FromSeconds(2));
-            // BasicVault<StringBuilder> bvsb = new BasicVault<StringBuilder>(new StringBuilder(), TimeSpan.FromSeconds(2));
+            //BasicVault<StringBuilder> bvsb = new BasicVault<StringBuilder>(new StringBuilder(), TimeSpan.FromSeconds(2));
             using (var lck = bvs.SpinLock())
             {
                 Console.WriteLine(lck.Value);
