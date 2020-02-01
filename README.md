@@ -14,6 +14,12 @@ Advantages:
 
 See **Pdf for full description of this project.**
 
+RELEASE NOTES VERSION 0.1.4.2:
+
+    Added quick start guide pdf for Linux (project available on GitHub)
+
+    Upated quick start guide pdf for Windows (project available on GitHub)
+
 RELEASE NOTES VERSION 0.1.4.1:
 
     Added quick start guide pdf and project (project available on GitHub).
@@ -42,12 +48,3 @@ RELEASE NOTES VERSION 0.1.4.0:
     
     Xml Doc Comments for DotNetVault analyzer/library are now included in the NuGet package.
 
-RELEASE NOTES VERSION 0.1.3.13:
-
-    Fixed two flaws in the ConsoleStressTest.  
-    
-    The default ordering comparer for stress test logic now considers ThreadId, then Action Number, then TimeStamp, then Text. 
-    
-    It now takes linearithmic rather than quadratic time to process and validate the results of the Console Stress test.
-    
-    Added a table of know flaws and issues to the pdf documentation.  Code examples shown for these flaws now appear in the ExampleCodePlayground as well.

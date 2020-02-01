@@ -1,6 +1,12 @@
 Synchronization Library and Static Analysis Tool for C# 8
 
-See Pdfs for full description of this project and quick start guide.
+See Pdf for full description of this project.
+
+RELEASE NOTES VERSION 0.1.4.2:
+
+    Added quick start guide pdf for Linux (project available on GitHub)
+
+    Upated quick start guide pdf for Windows (project available on GitHub)
 
 RELEASE NOTES VERSION 0.1.4.1:
 	

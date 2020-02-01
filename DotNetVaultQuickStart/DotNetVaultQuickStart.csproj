@@ -13,11 +13,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="linux pics\Program.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="~%24tNetVault Quick Start Guide.docx" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNetVault" Version="0.1.4.1-beta" />
+    <PackageReference Include="DotNetVault" Version="0.1.4.2-beta" />
     <PackageReference Include="HighPrecisionTimeStamps" Version="0.0.1-alpha" />
   </ItemGroup>
 
