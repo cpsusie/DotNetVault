@@ -20,6 +20,8 @@ Advantages:
 
 See **Pdf for full description of this project.**
 
+**NOTE: Version 0.1.5.0 is released on the v0.1.5 branch.**  Further development on that branch will be dedicated solely to minor cosmetic updates, bug fixes and correction of clerical errors.  **Further feature development will continue on the master branch.**
+
 RELEASE NOTES VERSION 0.1.5.0:
 
    This is the first release not explicitly marked beta or alpha.  This is currently a one-person project produced outside of work hours.  It is almost certainly not bug-free or without flaws, but it has been used extensively enough in the test projects to prove itself useful in managing shared mutable state in complex concurrent state machine scenarios.  I am confident that it will prove useful, despite any residual bugs and flaws.  You should not expect bug free or flawless conformance to specifications.  It will prove, however, far more useful than problematic.  Please report bugs or feature requests.
