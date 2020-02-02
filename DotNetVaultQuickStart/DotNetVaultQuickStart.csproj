@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup Label="Globals">
     <SccProjectName>SAK</SccProjectName>
@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNetVault" Version="0.1.4.2-beta" />
+    <PackageReference Include="DotNetVault" Version="0.1.5" />
     <PackageReference Include="HighPrecisionTimeStamps" Version="0.0.1-alpha" />
   </ItemGroup>
 

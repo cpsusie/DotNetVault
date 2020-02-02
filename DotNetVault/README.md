@@ -1,6 +1,12 @@
 # DotNetVault
 Synchronization Library and Static Analysis Tool for C# 8
 
+DotNetVault takes its inspiration from the synchronization mechanisms provided by Rust language and the Facebook Folly C++ synchronization library. These synchronization mechanisms observe that the mutex should own the data they protect. You literally cannot access the protected data without first obtaining the lock. RAII destroys the lock when it goes out of scope – even if an exception is thrown or early return taken.
+
+The ubiquity of shared mutable state in Garbage Collected languages like C# can work at cross purposes to thread-safety.  One approach to thread-safety in such languages is to elimate the use of mutable state.  Because this is not always possible or even desireable, the synchronization mechanisms employed in C# typically rely on programmer knowledge and discipline.  DotNetVault uses Disposable Ref Structs together with custom language rules enforced by an integrated Roslyn analyzer to prevent unsynchronized sharing of protected resources.  Locks cannot be held longer than their scope and, by default, will timeout.  This enables deadlock-avoidance.
+
+Try DotNetVault. There is a learning curve because it is restrictive about sharing protected resources.  There are plenty of documents and example projects provided with the source code of this project that can ease you into that learning curve and demonstrate DotNetVault's suitability for use in highly complex concurrent code.  Armed with the resources that DotNetVault provides, you will be able to approach concurrent programming, including use of shared mutable state, with a high degree of confidence.
+
 Advantages:
 
 ​	**Deadlock avoidance**: by default, all locks are timed.  If the resource has already been obtained or you have accidentally changed the acquisition order of various locks somewhere in the code, you get a *TimeoutException*, allowing you to identify your mistake.  In addition to being able to base termination of an acquisition attempt on timeout, you can also use a cancellation token to propagate the cancellation request.
@@ -13,6 +19,14 @@ Advantages:
     3. static analysis rules enforced by compilation errors emitted from the integrated Roslyn analyzer prevent references to mutable state from outside the protected resource from becoming part of the protected resource and prevent the leaking of references to mutable state inside the protected resource to the outside.
 
 See **Pdf for full description of this project.**
+
+Please note that the first stable release of the project is in the v.0.1.5.0 branch -- and under releases.  Further commits to THAT branch will be in the nature of bug fixes, minor improvements, correction of clerical errors only.  Feature development will continue in the MASTER branch.
+
+RELEASE NOTES VERSION 0.1.5.0:
+
+   This is the first release not explicitly marked beta or alpha.  This is currently a one-person project produced outside of work hours.  It is almost certainly not bug-free or without flaws, but it has been used extensively enough in the test projects to prove itself useful in managing shared mutable state in complex concurrent state machine scenarios.  I am confident that it will prove useful, despite any residual bugs and flaws.  You should not expect bug free or flawless conformance to specifications.  It will prove, however, far more useful than problematic.  Please report bugs or feature requests.
+
+   Updated Project Description PDF.  Updated README.md.
 
 RELEASE NOTES VERSION 0.1.4.2:
 
