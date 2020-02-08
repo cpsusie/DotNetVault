@@ -283,8 +283,8 @@ namespace DotNetVault.UtilitySources
                         bool isVsSpecImm = mightBeVsSpecImm &&
                                            CheckPossibleImmutableCollectionConditionalVaultSafety(nts, comp,
                                                igtl, token);
-                        bool notVsRefParentsNotReadOnly =
-                            NotVaultSafeBcRefStatusAndNotReadOnly(nts, onFaith, anyReferenceParents, isReadOnlyField,
+                        bool notVsRefParentsNotReadOnly = anyReferenceParents &&
+                            NotVaultSafeBcRefStatusAndNotReadOnly(nts, onFaith, true, isReadOnlyField,
                                 isVsSpecImm);
 
                         if (notVsRefParentsNotReadOnly) return false;

@@ -12,6 +12,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6273AC00-D6E4-4119-93DE-0F0EAE73D450}"
 	ProjectSection(SolutionItems) = preProject
 		DotNetVault Description version 0.1.5.0.pdf = DotNetVault Description version 0.1.5.0.pdf
+		DotNetVault Description version 0.1.5.2.pdf = DotNetVault Description version 0.1.5.2.pdf
 		DotNetVault Quick Start Guide Linux Rider 2019.3.1 -- (Amazon Linux).pdf = DotNetVault Quick Start Guide Linux Rider 2019.3.1 -- (Amazon Linux).pdf
 		DotNetVault Quick Start Guide Windows Vs 2019.pdf = DotNetVault Quick Start Guide Windows Vs 2019.pdf
 		DotNetVault.sln.DotSettings = DotNetVault.sln.DotSettings
