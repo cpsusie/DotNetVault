@@ -1220,7 +1220,7 @@ namespace DotNetVault
 
         #endregion
     }
-
+     
     internal static class StringConversionExtensions
     {
         //if converter is null, uses .ToString()   
@@ -1229,9 +1229,9 @@ namespace DotNetVault
             [CanBeNull] Func<T, string> converter = null)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
-            
             if (items.Count < 1) return "{ }";
-            converter ??= i => i.ToString();
+            
+            converter ??= t => t.ToString();
             StringBuilder sb = new StringBuilder("{");
             foreach (var item in items)
             {

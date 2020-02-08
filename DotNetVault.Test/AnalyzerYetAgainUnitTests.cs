@@ -412,6 +412,41 @@ namespace DotNetVault.Test
             VerifyCSharpDiagnostic(test);
         }
 
+        [TestMethod]
+        public void TestBug64ShouldCompile1()
+        {
+            var test = ResourceFiles.Bug64TestCases.Bug64Demo_ShouldCompile_1;
+            VerifyCSharpDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void TestBug64ShouldCompile2()
+        {
+            var test = ResourceFiles.Bug64TestCases.Bug64Demo_ShouldCompile_2;
+            VerifyCSharpDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void TestBug64ShouldNotCompile1()
+        {
+            var test = ResourceFiles.Bug64TestCases.Bug64Demo_ShouldNotCompile_1;
+            VerifyCSharpDiagnostic(test, res => res.Count() == 1, v => true);
+        }
+
+        [TestMethod]
+        public void TestBug64ShouldNotCompile2()
+        {
+            var test = ResourceFiles.Bug64TestCases.Bug64Demo_ShouldNotCompile_2;
+            VerifyCSharpDiagnostic(test, res => res.Count() == 1, v => true);
+        }
+
+        [TestMethod]
+        public void TestBug64ShouldNotCompile3()
+        {
+            var test = ResourceFiles.Bug64TestCases.Bug64Demo_ShouldNotCompile_3;
+            VerifyCSharpDiagnostic(test, res => res.Count() == 1, v => true);
+        }
+
         //protected override CodeFixProvider GetCSharpCodeFixProvider()
         //{
         //    return new AnalyzerYetAgainCodeFixProvider();

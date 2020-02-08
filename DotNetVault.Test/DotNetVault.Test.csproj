@@ -19,6 +19,11 @@
   <ItemGroup>
     <Compile Remove="TestCases\Bug62NotWorkingTestCase.cs" />
     <Compile Remove="TestCases\Bug62TestCaseOneCurrentlyWorks.cs" />
+    <Compile Remove="TestCases\Bug64Demo_ShouldCompile_1.cs" />
+    <Compile Remove="TestCases\Bug64Demo_ShouldCompile_2.cs" />
+    <Compile Remove="TestCases\Bug64Demo_ShouldNotCompile_1.cs" />
+    <Compile Remove="TestCases\Bug64Demo_ShouldNotCompile_2.cs" />
+    <Compile Remove="TestCases\Bug64Demo_ShouldNotCompile_3.cs" />
     <Compile Remove="TestCases\ConditionallyImmutableClassNonRoImmutF.cs" />
     <Compile Remove="TestCases\ConditionallyImmutStructWithNonROImmutF.cs" />
     <Compile Remove="TestCases\DataFlowTestCases.cs" />
@@ -82,6 +87,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Bug62TestCases.resx</DependentUpon>
+    </Compile>
+    <Compile Update="ResourceFiles\Bug64TestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Bug64TestCases.resx</DependentUpon>
     </Compile>
     <Compile Update="ResourceFiles\ConditionallyVsImmutableTypes.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -154,6 +164,10 @@
     <EmbeddedResource Update="ResourceFiles\Bug62TestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Bug62TestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ResourceFiles\Bug64TestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Bug64TestCases.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="ResourceFiles\ConditionallyVsImmutableTypes.resx">
       <Generator>ResXFileCodeGenerator</Generator>
