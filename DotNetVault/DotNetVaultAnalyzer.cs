@@ -18,7 +18,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 using VaultSafeTypeAnalyzer = DotNetVault.UtilitySources.VaultSafeAnalyzerFactorySource
     .VaultSafeTypeAnalyzerV2;
-
+using BvProtResAnalyzer = DotNetVault.UtilitySources.BvProtResAnalyzerFactorySource.BvProtResAnalyzerImpl;
 [assembly: InternalsVisibleTo("DotNetVault.Test")]
 
 namespace DotNetVault
@@ -40,6 +40,7 @@ namespace DotNetVault
         internal const string DotNetVault_NotDirectlyInvocable = "DotNetVault_NotDirectlyInvocable";
         internal const string DotNetVault_UnjustifiedEarlyDispose = "DotNetVault_UnjustifiedEarlyDispose";
         internal const string DotNetVault_EarlyDisposeJustification = "DotNetVault_EarlyDisposeJustification";
+        internal const string DotNetVault_NoExplicitByRefAlias = "DotNetVault_NoExplicitByRefAlias";
         // ReSharper restore InconsistentNaming
         #endregion        
 
@@ -59,6 +60,7 @@ namespace DotNetVault
                 EntryExitLog.CreateEntryExitLog(true, typeof(DotNetVaultAnalyzer), nameof(Initialize), context);
             try
             {
+                context.RegisterSyntaxNodeAction(AnalyzeRefExpressionForProtectedResource, SyntaxKind.RefExpression);
                 context.RegisterSymbolAction(AnalyzeTypeSymbolForVsTypeParams, SymbolKind.NamedType);
                 context.RegisterSymbolAction(AnalyzeNamedTypeSymbolForVaultSafety, SymbolKind.NamedType);
                 context.RegisterSyntaxNodeAction(AnalyzeInvocationForUmCompliance, SyntaxKind.InvocationExpression);
@@ -80,7 +82,6 @@ namespace DotNetVault
                 throw;
             }
         }
-
         #endregion
 
         #region Primary Analysis Operations
@@ -284,6 +285,35 @@ namespace DotNetVault
             }
 
             static string ExtractTypeName(IDelegateCreationOperation op) => op?.Type?.MetadataName ?? string.Empty;
+        }
+        private void AnalyzeRefExpressionForProtectedResource(SyntaxNodeAnalysisContext obj)
+        {
+            const string methodName = nameof(AnalyzeRefExpressionForProtectedResource);
+            using var _ =
+                EntryExitLog.CreateEntryExitLog(EnableEntryExitLogging, typeof(DotNetVaultAnalyzer), methodName, obj);
+            try
+            {
+                var syntax = (RefExpressionSyntax)obj.Node;
+                BvProtResAnalyzer analyzerUtil = BvProtResAnalyzerFactorySource.DefaultFactoryInstance();
+                obj.CancellationToken.ThrowIfCancellationRequested();
+
+                bool foundIllegalUsage = analyzerUtil.QueryContainsIllegalRefExpression(obj.Compilation, syntax,
+                    obj.SemanticModel, obj.CancellationToken);
+                if (foundIllegalUsage)
+                {
+                    var diagnostic = Diagnostic.Create(NoExplicitByRefAlias, obj.Node.GetLocation());
+                    obj.ReportDiagnostic(diagnostic);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                DebugLog.Log($"{methodName} operation was cancelled.");
+            }
+            catch (Exception ex)
+            {
+                TraceLog.Log(ex);
+                throw;
+            }
         }
 
         private void AnalyzeObjectCreationForVsTpCompliance(SyntaxNodeAnalysisContext context)
@@ -1081,7 +1111,8 @@ namespace DotNetVault
                     .Add(UsingMandatoryAttributeAssignmentMustBeToVariableDeclaredInline)
                     .Add(NotDirectlyInvocableDiagnosticDescriptor)
                     .Add(UnjustifiedEarlyDisposeDiagnostic)
-                    .Add(JustificationOfEarlyDispose);
+                    .Add(JustificationOfEarlyDispose)
+                    .Add(NoExplicitByRefAlias);
             }
             catch (Exception ex)
             {
@@ -1097,6 +1128,14 @@ namespace DotNetVault
         private static readonly LocalizableString Vst_Description = new LocalizableResourceString(nameof(Resources.AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
         private const string Category = "VaultSafety";
 
+        private const string ExplicitByRef_Illegal_Title =
+            "Explicitly access property of protected resource is forbidden.";
+        private const string ExplicitByRef_Illegal_MessageFormat =
+            "Explicit by-reference aliasing of the LockedVaultObject's Value property is forbidden.";
+        private const string ExplicitByRef_Description =
+            "Access the Value property by reference as mediated by the LockedResourceObject.  Explicitly by-ref aliasing is " +
+            "forbidden because that reference might outlive the lock and cause unsynchronized access to the protected resource.";
+        
         private const string UED_Title = "Invocation of early dispose method requires justification.";
         private const string UED_MessageFormat =
             "The method [{0}] is an early disposal method on a LockedResourceObject.  The enclosing method in which it is called [{1}]" +
@@ -1178,6 +1217,10 @@ namespace DotNetVault
             "Generic delegates with type parameters annotated with the VaultSafeTypeParam attribute require that all arguments corresponding to those parameters be vault-safe.";
         // ReSharper restore InconsistentNaming
 
+        private static readonly DiagnosticDescriptor NoExplicitByRefAlias =
+            new DiagnosticDescriptor(DotNetVault_NoExplicitByRefAlias, ExplicitByRef_Illegal_Title,
+                ExplicitByRef_Illegal_MessageFormat, Category, DiagnosticSeverity.Error, true,
+                ExplicitByRef_Description);
         private static readonly DiagnosticDescriptor UsingMandatoryAttributeAssignmentMustBeToVariableDeclaredInline =
             new DiagnosticDescriptor(DiagnosticId_UsingMandatory_Inline, Um_Inline_Title, Um_Inline_Message_Format,
                 Category, DiagnosticSeverity.Error, true, Um_Inline_Description);

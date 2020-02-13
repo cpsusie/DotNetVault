@@ -447,6 +447,36 @@ namespace DotNetVault.Test
             VerifyCSharpDiagnostic(test, res => res.Count() == 1, v => true);
         }
 
+        [TestMethod]
+        public void TestInitialBvRefResAnalysis()
+        {
+            var test = ResourceFiles.BvIllegalRefExprTestCases.BvIllegalRefExprTestCase1;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 1,
+                dx => dx.Descriptor.Id == DotNetVaultAnalyzer.DotNetVault_NoExplicitByRefAlias);
+        }
+
+        [TestMethod]
+        public void TestSecondaryBvRefResAnalysis()
+        {
+            var test = ResourceFiles.BvIllegalRefExprTestCases.BvIllegalRefExprTestCase2;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 1,
+                dx => dx.Descriptor.Id == DotNetVaultAnalyzer.DotNetVault_NoExplicitByRefAlias);
+        }
+
+        [TestMethod]
+        public void TestTertiaryBvRefResAnalysis()
+        {
+            var test = ResourceFiles.BvIllegalRefExprTestCases.BvIllegalRefExprTestCase3;
+            VerifyCSharpDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void TestQuaternaryBvRefResAnalysis()
+        {
+            var test = ResourceFiles.BvIllegalRefExprTestCases.BvIllegalRefExprTestCase4;
+            VerifyCSharpDiagnostic(test);
+        }
+
         //protected override CodeFixProvider GetCSharpCodeFixProvider()
         //{
         //    return new AnalyzerYetAgainCodeFixProvider();

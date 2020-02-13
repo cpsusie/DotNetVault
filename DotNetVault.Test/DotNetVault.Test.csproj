@@ -24,6 +24,10 @@
     <Compile Remove="TestCases\Bug64Demo_ShouldNotCompile_1.cs" />
     <Compile Remove="TestCases\Bug64Demo_ShouldNotCompile_2.cs" />
     <Compile Remove="TestCases\Bug64Demo_ShouldNotCompile_3.cs" />
+    <Compile Remove="TestCases\BvIllegalRefExprTestCase1.cs" />
+    <Compile Remove="TestCases\BvIllegalRefExprTestCase2.cs" />
+    <Compile Remove="TestCases\BvIllegalRefExprTestCase3.cs" />
+    <Compile Remove="TestCases\BvIllegalRefExprTestCase4.cs" />
     <Compile Remove="TestCases\ConditionallyImmutableClassNonRoImmutF.cs" />
     <Compile Remove="TestCases\ConditionallyImmutStructWithNonROImmutF.cs" />
     <Compile Remove="TestCases\DataFlowTestCases.cs" />
@@ -92,6 +96,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Bug64TestCases.resx</DependentUpon>
+    </Compile>
+    <Compile Update="ResourceFiles\BvIllegalRefExprTestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>BvIllegalRefExprTestCases.resx</DependentUpon>
     </Compile>
     <Compile Update="ResourceFiles\ConditionallyVsImmutableTypes.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -168,6 +177,10 @@
     <EmbeddedResource Update="ResourceFiles\Bug64TestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Bug64TestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ResourceFiles\BvIllegalRefExprTestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>BvIllegalRefExprTestCases.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="ResourceFiles\ConditionallyVsImmutableTypes.resx">
       <Generator>ResXFileCodeGenerator</Generator>

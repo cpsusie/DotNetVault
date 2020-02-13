@@ -15,7 +15,7 @@
 
   <PropertyGroup>
     <PackageId>DotNetVault</PackageId>
-    <PackageVersion>0.1.5.2</PackageVersion>
+    <PackageVersion>0.2.0.2-alpha</PackageVersion>
     <Authors>Christopher Susie</Authors>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/cpsusie/DotNetVault</PackageProjectUrl>
@@ -26,31 +26,31 @@
       DotNetVault is a library and static code analysis tool that makes managing shared mutable state in multi-threaded applications more manageable and less error prone. Where errors do still occur, they are easier to locate and identify.
 
 A full project description is included in "DotNetVault Description.pdf".  Source code, example projects, unit tests, stress test and quick start guide on GitHub.
-      
     </Description>
     <PackageReleaseNotes>
-RELEASE NOTES VERSION 0.1.5.2:
+      RELEASE NOTES VERSION 0.2.0.2-alpha
 
-    Fixed Bug 64.  Structs with fields containing immutable reference types as fields were being incorrectly identified as not being vault-safe when those fields were not read-only.  Since structs are value types and the type field is immutable, there is no danger of a data race when one retains a copy of such a protected resource after releasing a lock.  The analyzer was fixed to account for this.  Unit tests were added to confirm the fix and detect future regressions on this issue.  The Project description was updated to reflect this fix and explain Bug 64.
+      This is an unstable alpha release.  The current stable release is 0.1.5.2.
 
-    Updated Project Description PDF.  Updated README.md.
+      The "Value" property of the BasicVault's locked resource object is now returned by reference.  This enables more efficient use of large mutable structs as protected resource objects.  An additional analysis rule was added to prevent ref local aliasing of the property, to prevent possible unsynchronized access.  Documentation updated to reflect.
+      
+      RELEASE NOTES VERSION 0.1.5.2:
 
-RELEASE NOTES VERSION 0.1.5.0:
-  
-    This is the first release not explicitly marked beta or alpha.  This is currently a one-person project produced outside of work hours.  It is almost certainly not bug-free or without flaws, but it has been used extensively enough in the test projects to prove itself useful in managing shared mutable state in complex concurrent state machine scenarios.  I am confident that it will prove useful, despite any residual bugs and flaws.  You should not expect bug free or flawless conformance to specifications.  It will prove, however, far more useful than problematic.  Please report bugs or feature requests.
+      Fixed Bug 64.  Structs with fields containing immutable reference types as fields were being incorrectly identified as not being vault-safe when those fields were not read-only.  Since structs are value types and the type field is immutable, there is no danger of a data race when one retains a copy of such a protected resource after releasing a lock.  The analyzer was fixed to account for this.  Unit tests were added to confirm the fix and detect future regressions on this issue.  The Project description was updated to reflect this fix and explain Bug 64.
 
-    Updated Project Description PDF.  Updated README.md.
+      Updated Project Description PDF.  Updated README.md.
+
 </PackageReleaseNotes>
     <Copyright>Copyright © 2019 CJM Screws, LLC</Copyright>
     <PackageTags>DotNetVault, analyzers, synchronization, thread-safety, threadsafe, deadlock, deadlock-prevention</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <LangVersion>8.0</LangVersion>
-    <Version>0.1.5.2</Version>
+    <Version>0.2.0.2</Version>
     <AssemblyName>DotNetVault</AssemblyName>
     <RootNamespace>DotNetVault</RootNamespace>
     <Company>CJM Screws, LLC</Company>
-    <AssemblyVersion>0.1.5.2</AssemblyVersion>
-    <FileVersion>0.1.5.2</FileVersion>
+    <AssemblyVersion>0.2.0.2</AssemblyVersion>
+    <FileVersion>0.2.0.2</FileVersion>
     <PackageLicenseFile>license.txt</PackageLicenseFile>
   </PropertyGroup>
 

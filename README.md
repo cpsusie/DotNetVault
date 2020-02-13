@@ -20,6 +20,12 @@ Try DotNetVault. There is a learning curve because it is restrictive about shari
 
 See **DotNetVault Description.pdf** for full description of this project.
 
+RELEASE NOTES VERSION 0.2.0.2-alpha
+
+    This is an unstable alpha release.  The current stable release is 0.1.5.2.  
+
+    The "Value" property of the BasicVault's locked resource object is now returned by reference.  This enables more efficient use of large mutable structs as protected resource objects.  An additional analysis rule was added to prevent ref local aliasing of the property, to prevent possible unsynchronized access.  Documentation updated to reflect.
+
 RELEASE NOTES VERSION 0.1.5.2:
 
     Fixed Bug 64.  Structs with fields containing immutable reference types as fields were being incorrectly identified as not being vault-safe when those fields were not read-only.  Since structs are value types and the type field is immutable, there is no danger of a data race when one retains a copy of such a protected resource after releasing a lock.  The analyzer was fixed to account for this.  Unit tests were added to confirm the fix and detect future regressions on this issue.  The Project description was updated to reflect this fix and explain Bug 64.

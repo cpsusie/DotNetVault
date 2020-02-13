@@ -13,6 +13,8 @@ namespace ExampleCodePlayground
     {
         static void Main()
         {
+            MutableStructCareExamples.LargeMutableStructsAreNowEfficientProtectedResourcesWithReturnByReference();
+            MutableStructCareExamples.DemonstrateNeedForRuleAgainstLocalRefAlias();
             KnownIssuesDemonstration.DemonstrateDoubleDispose();
             KnownIssuesDemonstration.DemonstrateBadExtensionMethod();
             KnownIssuesDemonstration.DemonstrateBadArrayBecauseTypeItselfInherentlyLeaksOwnState();

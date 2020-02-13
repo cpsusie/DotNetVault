@@ -29,14 +29,9 @@ namespace DotNetVault.LockedResources
         /// <summary>
         /// Access the protected value
         /// </summary>
-        public T Value
-        {
-            get => _box.Value;
-            set => _box.Value = value;
-        }
-
-        internal ref T InternalValue => ref _box.Value;
-
+        [BasicVaultProtectedResource]
+        public ref T Value => ref _box.Value;
+        
         private LockedVaultObject([NotNull] TVault v, [NotNull] Vault<T>.Box b,
             [NotNull] Func<Vault<T>, Vault<T>.Box, Vault<T>.Box> disposeMethod)
         {
