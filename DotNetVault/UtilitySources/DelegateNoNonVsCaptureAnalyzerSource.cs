@@ -127,7 +127,7 @@ namespace DotNetVault.UtilitySources
                     var semanticModel = con.Compilation.GetSemanticModel(node.SyntaxTree);
                     var dataFlowAnalysisRes = DataFlowAnalyzeNode(node, semanticModel, con.CancellationToken);
                     var nodeParameterSymbols = GetNodeParameterSymbols(node, semanticModel, con.CancellationToken);
-
+                    //TODO FIXIT BUG 76 HERE
                     ParameterSyntax protectedParameter = nodeParameterSymbols.First().Syntax;
                     string protectedParameterName = protectedParameter.Identifier.ValueText;
 
@@ -491,6 +491,22 @@ namespace DotNetVault.UtilitySources
                                 fieldAndPropertyFinder.FindPropertyOrFieldSymbols(m, exprSyntax, tkn);
                             success = analysis?.Succeeded == true;
                             break;
+                        case LocalFunctionStatementSyntax lfss: //added bug 76 fixed
+                            if (lfss.ExpressionBody?.Expression != null)
+                            {
+                                analysis = m.AnalyzeDataFlow(lfss.ExpressionBody.Expression);
+                                identifiedStaticMembers =
+                                    fieldAndPropertyFinder.FindPropertyOrFieldSymbols(m, lfss.ExpressionBody.Expression,
+                                        tkn);
+                            }
+                            else
+                            {
+                                analysis = m.AnalyzeDataFlow(lfss.Body.Statements.First(), lfss.Body.Statements.Last());
+                                identifiedStaticMembers =
+                                    fieldAndPropertyFinder.FindPropertyOrFieldSymbols(m, lfss.Body.Statements, tkn);
+                            }
+                            success = analysis?.Succeeded == true;
+                            break;
                         case null:
                             DebugLog.Log("Received null syntax node for data flow analysis.");
                             success = false;
@@ -593,7 +609,7 @@ namespace DotNetVault.UtilitySources
                 var ret = ImmutableArray<(ParameterSyntax Syntax, ITypeSymbol Type, string IdentifierName)>.Empty;
                 var builder = ret.ToBuilder();
 
-                switch (node)
+                switch (node) //BUG 76 TODO FIXIT HERE
                 {
                     case MethodDeclarationSyntax mds:
                         Debug.Assert(mds.ExpressionBody?.Expression != null ||
@@ -618,6 +634,23 @@ namespace DotNetVault.UtilitySources
                         {
                             builder.Add((sLambParam, ts, sLambParam.Identifier.ValueText));
                         }
+                        break;
+                    case LocalFunctionStatementSyntax lfs:
+                        Debug.Assert(lfs.ExpressionBody?.Expression != null ||
+                                     (lfs.Body != null && lfs.Body.Statements.Any()));
+                        builder.AddRange(from ParameterSyntax ps in lfs.ParameterList.Parameters
+                            let psyntax = ps
+                            let tsInfo = semanticModel.GetSymbolInfo(psyntax.Type)
+                            where tsInfo.Symbol is ITypeSymbol
+                            select (psyntax, (ITypeSymbol)tsInfo.Symbol, psyntax.Identifier.ValueText));
+                        break;
+                    case AnonymousMethodExpressionSyntax ames:
+                        Debug.Assert((ames.Body != null));
+                        builder.AddRange(from ParameterSyntax ps in ames.ParameterList.Parameters
+                            let psyntax = ps
+                            let tsInfo = semanticModel.GetSymbolInfo(psyntax.Type)
+                            where tsInfo.Symbol is ITypeSymbol
+                            select (psyntax, (ITypeSymbol)tsInfo.Symbol, psyntax.Identifier.ValueText));
                         break;
                     case null:
                         DebugLog.Log("NULL syntax node submitted for parameter symbol extraction.");

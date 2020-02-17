@@ -2,6 +2,16 @@ Synchronization Library and Static Analysis Tool for C# 8
 
 See Pdf for full description of this project.
 
+RELEASE NOTES VERSION 0.1.5.4:
+
+      Fixed Bug 76.  Illegal references to non-vault-safe types inside mutable vault's locked resource objects delegates where not being detected in the case of local functions or using anonymous function syntax.  (Lambda syntax and regular method syntax worked fine, still does).  This was corrected.  Unit tests added to verify fix and prevent regressions.  Example code added to playground.  Documentation updated to reflect.  
+
+      Updated Project Description PDF.  Updated README.md.
+
+RELEASE NOTES VERSION 0.1.5.2:
+
+    Fixed Bug 64.  Structs with fields containing immutable reference types as fields were being incorrectly identified as not being vault-safe when those fields were not read-only.  Since structs are value types and the type field is immutable, there is no danger of a data race when one retains a copy of such a protected resource after releasing a lock.  The analyzer was fixed to account for this.  Unit tests were added to confirm the fix and detect future regressions on this issue.  The Project description was updated to reflect this fix and explain Bug 64.
+
 RELEASE NOTES VERSION 0.1.5.0:
 
    This is the first release not explicitly marked beta or alpha.  This is currently a one-person project produced outside of work hours.  It is almost certainly not bug-free or without flaws, but it has been used extensively enough in the test projects to prove itself useful in managing shared mutable state in complex concurrent state machine scenarios.  I am confident that it will prove useful, despite any residual bugs and flaws.  You should not expect bug free or flawless conformance to specifications.  It will prove, however, far more useful than problematic.  Please report bugs or feature requests.

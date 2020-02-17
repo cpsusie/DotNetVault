@@ -205,12 +205,12 @@ namespace DotNetVault
                     INamedTypeSymbol createdDelegateType = scanResult.CreationOpType;
                     IOperation targetOperation = scanResult.Target;
 
-                    //DebugLog.Log(
-                    //    $"Found delegate creation operation assigning to " +
-                    //    $"delegate type [{createdDelegateType}], which has attribute " +
-                    //    $"[{typeof(NoNonVsCaptureAttribute).FullName}].  " +
-                    //    $"The delegate creation operation is {delegateCreationOp} and the target being " +
-                    //    $"assigned to the newly created delegate is {targetOperation}");
+                    DebugLog.Log(
+                        $"Found delegate creation operation assigning to " +
+                        $"delegate type [{createdDelegateType}], which has attribute " +
+                        $"[{typeof(NoNonVsCaptureAttribute).FullName}].  " +
+                        $"The delegate creation operation is {delegateCreationOp} and the target being " +
+                        $"assigned to the newly created delegate is {targetOperation}");
 
                     (bool? IsCompliant, ImmutableArray<ITypeSymbol> NonVsCaptures, ImmutableArray<string>
                         NonVsCaptureText) complianceScanRes =
