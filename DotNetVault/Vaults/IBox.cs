@@ -6,5 +6,6 @@ namespace DotNetVault.Vaults
     {
         bool IsDisposed { get; }
         ref T Value { get; }
+        ref readonly T RoValue { get; }
     }
 }

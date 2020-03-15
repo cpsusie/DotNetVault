@@ -46,9 +46,9 @@ namespace LaundryMachine.LaundryCode
         /// <summary>
         /// All public methods that return a CustomLockedResource (here a LockedLsf) should be have their return values
         /// annotated with the <see cref="UsingMandatoryAttribute"/> attribute.  The methods should call the protected method
-        /// <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
+        /// <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
         /// except as herein described) because it does not require the <see cref="UsingMandatoryAttribute"/>, which requires the IMMEDIATE callee
-        /// to dispose of it.  You should guard your call to <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
+        /// to dispose of it.  You should guard your call to <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
         /// and be sure to dispose it on any path that does not lead to it successfully calling <see cref="LockedLsf.CreateLockedResource"/>,
         /// passing the <see cref="LockedVaultMutableResource{TVault,TResource}"/> to that <see cref="LockedLsf.CreateLockedResource"/> method
         /// and returning the result to the user.  You should NOT dispose the <see cref="LockedVaultMutableResource{TVault,TResource}"/> in the success path.
@@ -98,9 +98,9 @@ namespace LaundryMachine.LaundryCode
         /// <summary>
         /// All public methods that return a CustomLockedResource (here a LockedLsf) should be have their return values
         /// annotated with the <see cref="UsingMandatoryAttribute"/> attribute.  The methods should call the protected method
-        /// <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
+        /// <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
         /// except as herein described) because it does not require the <see cref="UsingMandatoryAttribute"/>, which requires the IMMEDIATE callee
-        /// to dispose of it.  You should guard your call to <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
+        /// to dispose of it.  You should guard your call to <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
         /// and be sure to dispose it on any path that does not lead to it successfully calling <see cref="LockedLsf.CreateLockedResource"/>,
         /// passing the <see cref="LockedVaultMutableResource{TVault,TResource}"/> to that <see cref="LockedLsf.CreateLockedResource"/> method
         /// and returning the result to the user.  You should NOT dispose the <see cref="LockedVaultMutableResource{TVault,TResource}"/> in the success path.
@@ -140,9 +140,9 @@ namespace LaundryMachine.LaundryCode
         /// <summary>
         /// All public methods that return a CustomLockedResource (here a LockedLsf) should be have their return values
         /// annotated with the <see cref="UsingMandatoryAttribute"/> attribute.  The methods should call the protected method
-        /// <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
+        /// <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
         /// except as herein described) because it does not require the <see cref="UsingMandatoryAttribute"/>, which requires the IMMEDIATE callee
-        /// to dispose of it.  You should guard your call to <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
+        /// to dispose of it.  You should guard your call to <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
         /// and be sure to dispose it on any path that does not lead to it successfully calling <see cref="LockedLsf.CreateLockedResource"/>,
         /// passing the <see cref="LockedVaultMutableResource{TVault,TResource}"/> to that <see cref="LockedLsf.CreateLockedResource"/> method
         /// and returning the result to the user.  You should NOT dispose the <see cref="LockedVaultMutableResource{TVault,TResource}"/> in the success path.
@@ -186,9 +186,9 @@ namespace LaundryMachine.LaundryCode
         /// <summary>
         /// All public methods that return a CustomLockedResource (here a LockedLsf) should be have their return values
         /// annotated with the <see cref="UsingMandatoryAttribute"/> attribute.  The methods should call the protected method
-        /// <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
+        /// <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
         /// except as herein described) because it does not require the <see cref="UsingMandatoryAttribute"/>, which requires the IMMEDIATE callee
-        /// to dispose of it.  You should guard your call to <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
+        /// to dispose of it.  You should guard your call to <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
         /// and be sure to dispose it on any path that does not lead to it successfully calling <see cref="LockedLsf.CreateLockedResource"/>,
         /// passing the <see cref="LockedVaultMutableResource{TVault,TResource}"/> to that <see cref="LockedLsf.CreateLockedResource"/> method
         /// and returning the result to the user.  You should NOT dispose the <see cref="LockedVaultMutableResource{TVault,TResource}"/> in the success path.
@@ -233,9 +233,9 @@ namespace LaundryMachine.LaundryCode
         /// <summary>
         /// All public methods that return a CustomLockedResource (here a LockedLsf) should be have their return values
         /// annotated with the <see cref="UsingMandatoryAttribute"/> attribute.  The methods should call the protected method
-        /// <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
+        /// <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
         /// except as herein described) because it does not require the <see cref="UsingMandatoryAttribute"/>, which requires the IMMEDIATE callee
-        /// to dispose of it.  You should guard your call to <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
+        /// to dispose of it.  You should guard your call to <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
         /// and be sure to dispose it on any path that does not lead to it successfully calling <see cref="LockedLsf.CreateLockedResource"/>,
         /// passing the <see cref="LockedVaultMutableResource{TVault,TResource}"/> to that <see cref="LockedLsf.CreateLockedResource"/> method
         /// and returning the result to the user.  You should NOT dispose the <see cref="LockedVaultMutableResource{TVault,TResource}"/> in the success path.
@@ -279,9 +279,9 @@ namespace LaundryMachine.LaundryCode
         /// <summary>
         /// All public methods that return a CustomLockedResource (here a LockedLsf) should be have their return values
         /// annotated with the <see cref="UsingMandatoryAttribute"/> attribute.  The methods should call the protected method
-        /// <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
+        /// <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
         /// except as herein described) because it does not require the <see cref="UsingMandatoryAttribute"/>, which requires the IMMEDIATE callee
-        /// to dispose of it.  You should guard your call to <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
+        /// to dispose of it.  You should guard your call to <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
         /// and be sure to dispose it on any path that does not lead to it successfully calling <see cref="LockedLsf.CreateLockedResource"/>,
         /// passing the <see cref="LockedVaultMutableResource{TVault,TResource}"/> to that <see cref="LockedLsf.CreateLockedResource"/> method
         /// and returning the result to the user.  You should NOT dispose the <see cref="LockedVaultMutableResource{TVault,TResource}"/> in the success path.
@@ -323,9 +323,9 @@ namespace LaundryMachine.LaundryCode
         /// <summary>
         /// All public methods that return a CustomLockedResource (here a LockedLsf) should be have their return values
         /// annotated with the <see cref="UsingMandatoryAttribute"/> attribute.  The methods should call the protected method
-        /// <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
+        /// <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
         /// except as herein described) because it does not require the <see cref="UsingMandatoryAttribute"/>, which requires the IMMEDIATE callee
-        /// to dispose of it.  You should guard your call to <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
+        /// to dispose of it.  You should guard your call to <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
         /// and be sure to dispose it on any path that does not lead to it successfully calling <see cref="LockedLsf.CreateLockedResource"/>,
         /// passing the <see cref="LockedVaultMutableResource{TVault,TResource}"/> to that <see cref="LockedLsf.CreateLockedResource"/> method
         /// and returning the result to the user.  You should NOT dispose the <see cref="LockedVaultMutableResource{TVault,TResource}"/> in the success path.
@@ -368,9 +368,9 @@ namespace LaundryMachine.LaundryCode
         /// <summary>
         /// All public methods that return a CustomLockedResource (here a LockedLsf) should be have their return values
         /// annotated with the <see cref="UsingMandatoryAttribute"/> attribute.  The methods should call the protected method
-        /// <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
+        /// <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
         /// except as herein described) because it does not require the <see cref="UsingMandatoryAttribute"/>, which requires the IMMEDIATE callee
-        /// to dispose of it.  You should guard your call to <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
+        /// to dispose of it.  You should guard your call to <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
         /// and be sure to dispose it on any path that does not lead to it successfully calling <see cref="LockedLsf.CreateLockedResource"/>,
         /// passing the <see cref="LockedVaultMutableResource{TVault,TResource}"/> to that <see cref="LockedLsf.CreateLockedResource"/> method
         /// and returning the result to the user.  You should NOT dispose the <see cref="LockedVaultMutableResource{TVault,TResource}"/> in the success path.
@@ -432,14 +432,14 @@ namespace LaundryMachine.LaundryCode
         #endregion
 
         #region Nested
-        private sealed class LsfvImpl : CustomizableMutableResourceVault<LaundryStatusFlags>
+        private sealed class LsfvImpl : CustomizableAtomicMutableResourceVault<LaundryStatusFlags>
         {
             /// <summary>
             /// Add the following factory method to the nested class
             /// </summary>
             /// <param name="defaultTimeOut">the default time-out</param>
             /// <param name="resourceGen">a function to generate the initial value of the protected resource</param>
-            /// <returns>An implementation of <see cref="CustomizableMutableResourceVault{T}"/> that your custom class
+            /// <returns>An implementation of <see cref="CustomizableAtomicMutableResourceVault{T}"/> that your custom class
             /// (here <see cref="StringBuilderVault"/>) will delegate to.</returns>
             internal static LsfvImpl CreateLsvImpl(TimeSpan defaultTimeOut,
                 [NotNull] Func<LaundryStatusFlags> resourceGen)

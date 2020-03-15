@@ -2,7 +2,9 @@
 using System.Diagnostics;
 using System.Threading;
 using DotNetVault.Attributes;
+using DotNetVault.Interfaces;
 using DotNetVault.LockedResources;
+using JetBrains.Annotations;
 
 namespace DotNetVault.Vaults
 {
@@ -12,12 +14,52 @@ namespace DotNetVault.Vaults
     /// protected resource is not vault safe.
     /// </summary>
     /// <typeparam name="T">the vault-safe protected resource type</typeparam>
-    public sealed class BasicVault<[VaultSafeTypeParam] T> : Vault<T>
+    /// <remarks>This type uses atomics as its underlying synchronization mechanism</remarks>
+    public sealed class BasicVault<[VaultSafeTypeParam] T> : AtomicVault<T>, IBasicVault<T>
     {
         /// <summary>
-        /// Fallback timeout used when supplied timeout not vaid.
+        /// Fallback timeout used when supplied timeout not valid.
         /// </summary>
         public static TimeSpan FallbackTimeout => TimeSpan.FromMilliseconds(250);
+
+        /// <summary>
+        /// Create a basic vault that uses atomics as its synchronization
+        /// mechanism using the specified initial value and the specified default timeout.
+        /// </summary>
+        /// <param name="initialValue">the initial value</param>
+        /// <param name="defaultTimeout">default timeout to use when not otherwise
+        /// specified</param>
+        /// <returns>A BasicVault that uses atomics.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="defaultTimeout"/>
+        /// was not positive.</exception>
+        [NotNull] public static BasicVault<T> CreateAtomicBasicVault(T initialValue, TimeSpan defaultTimeout)
+            => new BasicVault<T>(initialValue, defaultTimeout);
+        /// <summary>
+        /// Create an atomic basic vault with <see cref="FallbackTimeout"/> as its default
+        /// timeout and <paramref name="initialValue"/> as its initial value.
+        /// </summary>
+        /// <param name="initialValue">the initial value</param>
+        /// <returns>A BasicVault that uses atomics.</returns>
+        [NotNull] public static BasicVault<T> CreateAtomicBasicVault(T initialValue)
+            => new BasicVault<T>(initialValue);
+
+        /// <summary>
+        /// Create a basic vault that uses atomics as its synchronization
+        /// mechanism using the specified default timeout.
+        /// </summary>
+        /// <param name="defaultTimeout">the default timeout</param>
+        /// <returns>A basic vault that uses atomics</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="defaultTimeout"/>
+        /// was not positive</exception>
+        [NotNull] public static BasicVault<T> CreateAtomicBasicVault(TimeSpan defaultTimeout)
+            => new BasicVault<T>(defaultTimeout);
+
+        /// <summary>
+        /// Create a basic vault that uses atomics as its synchronization mechanism.  Will
+        /// use <see cref="FallbackTimeout"/> as its default timeout.
+        /// </summary>
+        /// <returns>A basic vault that uses atomics.</returns>
+        [NotNull] public static BasicVault<T> CreateAtomicBasicVault() => new BasicVault<T>();
 
         #region CTORS
 
@@ -51,7 +93,6 @@ namespace DotNetVault.Vaults
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="defaultTimeout"/> was null</exception>
         public BasicVault(T initialValue, TimeSpan defaultTimeout) : base(defaultTimeout)
         {
-
             Init(initialValue);
             Debug.Assert(BoxPtr != null);
         }
@@ -106,7 +147,6 @@ namespace DotNetVault.Vaults
         /// <exception cref="ObjectDisposedException">the object was disposed</exception>
         [return: UsingMandatory]
         public LockedVaultObject<BasicVault<T>, T> Lock() => PerformLock(DefaultTimeout, CancellationToken.None, false);
-
 
         /// <summary>
         ///  Obtain the locked resource.  Busy wait.  Keep attempting until
@@ -168,7 +208,7 @@ namespace DotNetVault.Vaults
         public T CopyCurrentValue(TimeSpan timeout)
         {
             T ret;
-            using (InternalLockedResource ilr = GetInternalLockedResource(timeout))
+            using (var ilr = GetInternalLockedResource(timeout))
             {
                 ret = ilr.Value;
             }
@@ -210,7 +250,7 @@ namespace DotNetVault.Vaults
         /// <exception cref="TimeoutException">resource not obtained within time permitted by <paramref name="timeout"/>.</exception>
         public void SetCurrentValue(TimeSpan timeout, T newValue)
         {
-            using InternalLockedResource ilr = GetInternalLockedResource(timeout);
+            using var ilr = GetInternalLockedResource(timeout);
             ref T temp = ref ilr.Value;
             temp = newValue;
         }
@@ -227,7 +267,7 @@ namespace DotNetVault.Vaults
         {
             try
             {
-                using InternalLockedResource ilr = GetInternalLockedResource(timeout);
+                using var ilr = GetInternalLockedResource(timeout);
                 ref T temp = ref ilr.Value;
                 temp = newValue;
                 return true;
@@ -243,13 +283,13 @@ namespace DotNetVault.Vaults
         {
             if (timeout == null)
             {
-                using (InternalLockedResource ilr = GetInternalLockedResource(token, spin))
+                using (var ilr = GetInternalLockedResource(token, spin))
                 {
                     return LockedVaultObject<BasicVault<T>, T>.CreateLockedResource(this, ilr.Release());
                 }
             }
 
-            using (InternalLockedResource ilr = GetInternalLockedResource(timeout.Value, token, spin))
+            using (var ilr = GetInternalLockedResource(timeout.Value, token, spin))
             {
                 return LockedVaultObject<BasicVault<T>, T>.CreateLockedResource(this, ilr.Release());
             }

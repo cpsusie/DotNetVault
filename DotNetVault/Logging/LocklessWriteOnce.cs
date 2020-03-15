@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using DotNetVault.Exceptions;
 using JetBrains.Annotations;
+
+[assembly: InternalsVisibleTo("VaultUnitTests")]
 
 namespace DotNetVault.Logging
 {

@@ -9,7 +9,7 @@ namespace ExampleCodePlayground
     public static class Bug62TestCases
     {
         internal static MutableResourceVault<StringBuilder> CreateMutableResourceVault() =>
-            MutableResourceVault<StringBuilder>.CreateMutableResourceVault(() => new StringBuilder(),
+            MutableResourceVault<StringBuilder>.CreateAtomicMutableResourceVault(() => new StringBuilder(),
                 TimeSpan.FromMilliseconds(100));
 
         internal static ImmutableArray<string> BunchOfStrings => TheStrings;

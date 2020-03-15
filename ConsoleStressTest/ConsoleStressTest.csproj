@@ -12,8 +12,12 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants />
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="DotNetVault" Version="0.2.0.2-alpha" />
+    <PackageReference Include="DotNetVault" Version="0.2.1.9-alpha" />
   </ItemGroup>
 
 </Project>

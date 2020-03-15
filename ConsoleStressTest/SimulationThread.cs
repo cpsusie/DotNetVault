@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Threading;
-using DotNetVault.Vaults;
 using JetBrains.Annotations;
 using LockedStressObj = DotNetVault.LockedResources.
     LockedVaultMutableResource<DotNetVault.Vaults.MutableResourceVault<ConsoleStressTest.StressTestObject>,
         ConsoleStressTest.StressTestObject>;
+
 namespace ConsoleStressTest
 {
+
+    using MutableResourceVault = DotNetVault.Vaults.MutableResourceVault<StressTestObject>;
     sealed class SimulationThread : IDisposable
     {
         public const int UninitializedThreadId = -1;
@@ -19,26 +21,20 @@ namespace ConsoleStressTest
         public int ManagedThreadId => _started.IsSet ? _managedThreadId : UninitializedThreadId;
 
         public SimulationThread(int numActions, 
-            [NotNull] MutableResourceVault<StressTestObject> vault)
+            [NotNull] MutableResourceVault vault, [NotNull] LocklessStartSignal startSignal)
         {
             _numActions = numActions > 0
                 ? numActions
                 : throw new ArgumentOutOfRangeException(nameof(numActions), numActions, @"Value must be positive.");
             _vault = vault ?? throw new ArgumentNullException(nameof(vault));
+            _started = startSignal ?? throw new ArgumentNullException(nameof(startSignal));
             _thread = new Thread(ThreadLoop) {Name = $"StressTestThread_{Interlocked.Increment(ref _threadNo)}", IsBackground = false, Priority = ThreadPriority.Normal};
             _thread.Start(_cts.Token);
         }
 
         public void Dispose() => Dispose(true);
 
-        public void Begin()
-        {
-            if (!_started.TrySet() || _terminated.IsSet || _disposed.IsSet)
-            {
-                throw new InvalidOperationException("Unable to start thread!");
-            }
-        }
-
+       
         public void Join(CancellationToken token)
         {
             bool sentCancel = false;
@@ -90,11 +86,13 @@ namespace ConsoleStressTest
             if (cancellationTokenObject is CancellationToken token && !_started.IsSet && !_terminated.IsSet &&
                 !_disposed.IsSet)
             {
+                const int nonYieldMax = 50;
                 SetManagedThreadId();
                 try
                 {
                     WaitForStartedOrDisposed(token);
                     int doneActions = 0;
+                    //int notYieldedCount = 0;
                     while (doneActions < _numActions)
                     {
                         using (LockedStressObj lck = _vault.SpinLock(token))
@@ -103,9 +101,25 @@ namespace ConsoleStressTest
                             //bug 61 fix following line now rightly causes compiler error
                             //lck.Dispose();
                         }
-                        token.ThrowIfCancellationRequested();
-                        Thread.SpinWait(25000);
-                        Thread.Yield();
+                        Thread.SpinWait(10000);
+                        //Thread.Sleep(TimeSpan.FromMilliseconds(5));
+                        
+                        //if (doneActions == -1)
+                        //{
+                        //    token.ThrowIfCancellationRequested();
+                        //    Thread.Sleep(TimeSpan.FromMilliseconds(250));
+                        //}
+                        //else
+                        //{
+                        //    token.ThrowIfCancellationRequested();
+
+                        //    notYieldedCount += Thread.Yield() ? (-notYieldedCount) : 1;
+                        //    if (notYieldedCount > nonYieldMax)
+                        //    {
+                        //        Thread.Sleep(TimeSpan.FromMilliseconds(250));
+                        //        notYieldedCount = 0;
+                        //    }
+                        //}
                     }
                 }
                 catch (OperationCanceledException)
@@ -173,7 +187,6 @@ namespace ConsoleStressTest
             while (!_started.IsSet && !_disposed.IsSet)
             {
                 token.ThrowIfCancellationRequested();
-                Thread.Sleep(TimeSpan.FromMilliseconds(10));
             }
         }
 
@@ -202,11 +215,11 @@ namespace ConsoleStressTest
             }
         }
 
-        [NotNull] private readonly MutableResourceVault<StressTestObject> _vault;
+        [NotNull] private readonly MutableResourceVault _vault;
         private readonly int _numActions;
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
         private LocklessSetOnceFlagVal _disposed = new LocklessSetOnceFlagVal();
-        private LocklessSetOnceFlagVal _started = new LocklessSetOnceFlagVal();
+        [NotNull] private readonly LocklessStartSignal _started;
         private LocklessSetOnceFlagVal _terminated = new LocklessSetOnceFlagVal();
         private LocklessSetOnceFlagVal _faulted = new LocklessSetOnceFlagVal();
         private volatile int _managedThreadId=UninitializedThreadId;
@@ -214,6 +227,38 @@ namespace ConsoleStressTest
         private static volatile int _threadNo;
 
        
+    }
+
+    public sealed class LocklessStartSignal
+    {
+        public bool IsSet
+        {
+            get
+            {
+                int code = _set;
+                return code != NotSet;
+            }
+        }
+
+        public bool TrySet()
+        {
+            const int wantToBe = Set;
+            const int needToBeNow = NotSet;
+            return Interlocked.CompareExchange(ref _set, wantToBe, needToBeNow) == needToBeNow;
+        }
+
+        public void SetOrThrow()
+        {
+            bool ok = TrySet();
+            if (!ok) throw new InvalidOperationException("The flag has already been set.");
+        }
+
+        public override string ToString() =>
+            $"{typeof(LocklessStartSignal).Name} -- Status: [{(IsSet ? "SET" : "NOT SET")}]";
+
+        private volatile int _set = NotSet;
+        private const int NotSet = 0;
+        private const int Set = 1;
     }
 
     public sealed class ThreadFaultedEventArgs : EventArgs

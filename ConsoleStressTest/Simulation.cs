@@ -10,6 +10,7 @@ using JetBrains.Annotations;
 
 namespace ConsoleStressTest
 {
+    using MutableResourceVault = MutableResourceVault<StressTestObject>;
     internal sealed class StressSimulation : IStressSimulation
     {
         internal static IStressSimulation CreateStressSimulation(int numThreads, int actionsPerThread) => new StressSimulation(numThreads, actionsPerThread);
@@ -30,12 +31,12 @@ namespace ConsoleStressTest
             if (actionsPerThread < 1) throw new ArgumentOutOfRangeException(nameof(actionsPerThread), actionsPerThread, @"Argument must be positive.");
             _eventRaiser = EventRaisingThread.CreateEventRaiser("StressSimEventRaiser");
             
-            _vault = MutableResourceVault<StressTestObject>.CreateMutableResourceVault(() => new StressTestObject(),
+            _vault = Configuration<StressTestObject>.CreateMrv(() => new StressTestObject(),
                 TimeSpan.FromSeconds(2));
             var builder = ImmutableArray.CreateBuilder<SimulationThread>(numThreads);
             while (builder.Count < numThreads)
             {
-                var thread = new SimulationThread(actionsPerThread, _vault);
+                var thread = new SimulationThread(actionsPerThread, _vault, _startSignal);
                 builder.Add(thread);
                 thread.Terminated += Thread_Terminated;
                 thread.Faulted += Thread_Faulted;
@@ -52,6 +53,7 @@ namespace ConsoleStressTest
             }
             ActionsPerThread = actionsPerThread;
             NumberOfThreads = numThreads;
+            
         }
 
         public void StartSimulation()
@@ -105,12 +107,14 @@ namespace ConsoleStressTest
         private void ExecuteSimulationThread(object cancellationTokenObject)
         {
             _endedAt.SetThreadAffinity();
-            DateTime ts = TimeStampSource.Now;
+            DateTime ts; 
             if (cancellationTokenObject is CancellationToken token && _status.Status == StressSimCode.Starting)
             {
                 try
                 {
-                    _threads.ApplyToAll(thrd => thrd.Begin());
+                    Thread.Sleep(TimeSpan.FromMilliseconds(500));
+                    _startSignal.SetOrThrow();
+                    ts = TimeStampSource.Now;
                     _startedAt = ts;
                     if (_status.TrySetStarted())
                     {
@@ -220,6 +224,7 @@ namespace ConsoleStressTest
         [NotNull] private readonly MutableResourceVault<StressTestObject> _vault;
         [NotNull] private readonly IEventRaiser _eventRaiser;
         [NotNull] private readonly CancellationTokenSource _cts = new CancellationTokenSource();
+        [NotNull] private readonly LocklessStartSignal _startSignal = new LocklessStartSignal();
         private readonly ImmutableArray<SimulationThread> _threads;
         private DateTime? _startedAt;
         [NotNull] private readonly WriteOnceDateTime _endedAt = new WriteOnceDateTime();
@@ -492,5 +497,48 @@ namespace ConsoleStressTest
                 }
             }
         }
+    }
+
+    public static class Configuration<T>
+    {
+        [NotNull]
+        public static string FactoryType =>
+            TheFactory.Value is AtomicMrvFactory ? "Atomic Vault" : "Vault of Unknown Sync Mechanism";
+
+        public static bool IsFactorySet => TheFactory.IsSet;
+
+        public static bool IsAtomicFactory => TheFactory.IsSet && TheFactory.Value is AtomicMrvFactory;
+
+        [NotNull]
+        public static MutableResourceVault<T> CreateMrv([NotNull] Func<T> ctor, TimeSpan timeout)
+        {
+            IMutableResourceVaultFactory<T> factory = TheFactory.Value;
+            return factory.CreateMutableResourceVault(ctor, timeout);
+        }
+
+        public static void UseAtomicFactory()
+        {
+            bool set = TheFactory.TrySetToAlternateValue(new AtomicMrvFactory());
+            bool setOrAlreadySetToAtomic = set || IsAtomicFactory;
+            if (!setOrAlreadySetToAtomic)
+            {
+                throw new InvalidOperationException("The factory has already been set to a non-atomic factory.");
+            }
+        }
+
+        private sealed class AtomicMrvFactory : IMutableResourceVaultFactory<T>
+        {
+            public MutableResourceVault<T> CreateMutableResourceVault(Func<T> ctor, TimeSpan defTimeout) =>
+                MutableResourceVault<T>.CreateAtomicMutableResourceVault(
+                    ctor ?? throw new ArgumentNullException(nameof(ctor)), defTimeout);
+        }
+
+        [NotNull] private static readonly LocklessLazyWriteOnce<IMutableResourceVaultFactory<T>> TheFactory = new LocklessLazyWriteOnce<IMutableResourceVaultFactory<T>>(() => new AtomicMrvFactory());
+        
+    }
+
+    internal interface IMutableResourceVaultFactory<T>
+    {
+        [NotNull] MutableResourceVault<T> CreateMutableResourceVault([NotNull] Func<T> ctor, TimeSpan defTimeout);
     }
 }

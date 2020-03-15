@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace DotNetVault.Vaults
 {
 
-    internal interface IMutableResourceVaultFactory<TDerivedMutableResourceVault, TResource> where TDerivedMutableResourceVault : MutableResourceVault<TResource>
+    internal interface IMutableResourceVaultFactory<TDerivedMutableResourceVault, TResource> 
     {
         /// <summary>
         /// Create a vault

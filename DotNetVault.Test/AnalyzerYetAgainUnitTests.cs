@@ -21,7 +21,10 @@ namespace DotNetVault.Test
     [TestClass]
     public class UnitTest : CodeFixVerifier
     {
-        public static readonly string NotVaultSafeFormatString = Resources.AnalyzerMessageFormat; 
+        public static readonly string NotVaultSafeFormatString = Resources.AnalyzerMessageFormat;
+
+
+
         //No diagnostics expected to show up
         [TestMethod]
         public void ValidateEmpty()
@@ -30,7 +33,47 @@ namespace DotNetVault.Test
 
             VerifyCSharpDiagnostic(test);
         }
+        [TestMethod]
+        public void Bug76TestCase1()
+        {
+            var test = ResourceFiles.Bug76TestCases.Bug76TestCase1;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 1, dx => dx.Id == DotNetVaultAnalyzer.DotNetVault_VsDelegateCapture);
+        }
 
+        [TestMethod]
+        public void Bug76TestCase2()
+        {
+            var test = ResourceFiles.Bug76TestCases.Bug76TestCase2;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 1, dx => dx.Id == DotNetVaultAnalyzer.DotNetVault_VsDelegateCapture);
+        }
+
+        [TestMethod]
+        public void Bug76TestCase3()
+        {
+            var test = ResourceFiles.Bug76TestCases.Bug76TestCase3;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 2, dx => dx.Id == DotNetVaultAnalyzer.DotNetVault_VsDelegateCapture);
+        }
+
+        [TestMethod]
+        public void Bug76TestCase4()
+        {
+            var test = ResourceFiles.Bug76TestCases.Bug76TestCase4;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 2, dx => dx.Id == DotNetVaultAnalyzer.DotNetVault_VsDelegateCapture);
+        }
+
+        [TestMethod]
+        public void Bug76TestCase5()
+        {
+            var test = ResourceFiles.Bug76TestCases.Bug76TestCase5;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 5, dx => dx.Id == DotNetVaultAnalyzer.DotNetVault_VsDelegateCapture);
+        }
+
+        [TestMethod]
+        public void Bug76TestCase6()
+        {
+            var test = ResourceFiles.Bug76TestCases.Bug76TestCase6;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 4, dx => dx.Id == DotNetVaultAnalyzer.DotNetVault_VsDelegateCapture);
+        }
         [TestMethod]
         public void TestVaultSafeGenericTypeWithVsTypeParam()
         {

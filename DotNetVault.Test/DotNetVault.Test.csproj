@@ -24,6 +24,12 @@
     <Compile Remove="TestCases\Bug64Demo_ShouldNotCompile_1.cs" />
     <Compile Remove="TestCases\Bug64Demo_ShouldNotCompile_2.cs" />
     <Compile Remove="TestCases\Bug64Demo_ShouldNotCompile_3.cs" />
+    <Compile Remove="TestCases\Bug76TestCase1.cs" />
+    <Compile Remove="TestCases\Bug76TestCase2.cs" />
+    <Compile Remove="TestCases\Bug76TestCase3.cs" />
+    <Compile Remove="TestCases\Bug76TestCase4.cs" />
+    <Compile Remove="TestCases\Bug76TestCase5.cs" />
+    <Compile Remove="TestCases\Bug76TestCase6.cs" />
     <Compile Remove="TestCases\BvIllegalRefExprTestCase1.cs" />
     <Compile Remove="TestCases\BvIllegalRefExprTestCase2.cs" />
     <Compile Remove="TestCases\BvIllegalRefExprTestCase3.cs" />
@@ -96,6 +102,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Bug64TestCases.resx</DependentUpon>
+    </Compile>
+    <Compile Update="ResourceFiles\Bug76TestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Bug76TestCases.resx</DependentUpon>
     </Compile>
     <Compile Update="ResourceFiles\BvIllegalRefExprTestCases.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -177,6 +188,10 @@
     <EmbeddedResource Update="ResourceFiles\Bug64TestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Bug64TestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ResourceFiles\Bug76TestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Bug76TestCases.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="ResourceFiles\BvIllegalRefExprTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>

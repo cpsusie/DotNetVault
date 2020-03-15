@@ -45,7 +45,7 @@ namespace ExampleCodePlayground
         public static void DemonstrateBadExtensionMethod()
         {
             using (var mrv =
-                MutableResourceVault<StringBuilder>.CreateMutableResourceVault(() => new StringBuilder("AWESOME"),
+                MutableResourceVault<StringBuilder>.CreateAtomicMutableResourceVault(() => new StringBuilder("AWESOME"),
                     TimeSpan.FromMilliseconds(250)))
             {
                 int lengthOfTheStringBuilder;
@@ -87,7 +87,7 @@ namespace ExampleCodePlayground
         public static void DemonstrateBadArrayBecauseTypeItselfInherentlyLeaksOwnState()
         {
             using (var mrv =
-                MutableResourceVault<BadArray>.CreateMutableResourceVault(() => new BadArray(),
+                MutableResourceVault<BadArray>.CreateAtomicMutableResourceVault(() => new BadArray(),
                     TimeSpan.FromMilliseconds(250)))
             {
                 {

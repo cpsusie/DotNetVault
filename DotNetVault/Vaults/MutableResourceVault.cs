@@ -14,11 +14,13 @@ namespace DotNetVault.Vaults
     /// It is similar to <see cref="BasicVault{T}"/> in the functionality it exposes, save that 
     /// it does not provide convenience functions such as copying the value out of the vault
     /// and the locked resource it provides (of type <see cref="LockedVaultMutableResource{TVault,TResource}"/>
-    /// restricts access to delegates annotated with the restrictive <see cref="NoNonVsCaptureAttribute"/> delgate
+    /// restricts access to delegates annotated with the restrictive <see cref="NoNonVsCaptureAttribute"/> delegate
     /// to prevent leakage of the resource outside the LockedResource and/or vault.
     /// </summary>
     /// <typeparam name="T">The non-Vault-Safe resource the vault protects.</typeparam>
-    public class MutableResourceVault<T> : Vault<T>
+    /// <remarks>This vault uses atomics as its synchronization mechanism.  If you wish the vault
+    /// to use <see cref="System.Threading.Monitor"/> and sync objects instead, use <see cref="MutableResourceMonitorVault{T}"/>.</remarks>
+    public class MutableResourceVault<T> : AtomicVault<T>
     {
 
         #region Factory Method
@@ -34,7 +36,7 @@ namespace DotNetVault.Vaults
         /// default timeout of <paramref name="defaultTimeout"/></returns>
         /// <exception cref="ArgumentNullException"><paramref name="mutableResourceCreator"/> was null</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="defaultTimeout"/> was not positive.</exception>
-        public static MutableResourceVault<T> CreateMutableResourceVault([NotNull] Func<T> mutableResourceCreator,
+        public static MutableResourceVault<T> CreateAtomicMutableResourceVault([NotNull] Func<T> mutableResourceCreator,
             TimeSpan defaultTimeout)
         {
             IMutableResourceVaultFactory<MutableResourceVault<T>, T> factory =
@@ -43,6 +45,11 @@ namespace DotNetVault.Vaults
                 () => new MutableResourceVault<T>(defaultTimeout));
         }
         #endregion
+
+        /// <summary>
+        /// Fallback timeout used when supplied timeout not valid.
+        /// </summary>
+        public static TimeSpan FallbackTimeout => TimeSpan.FromMilliseconds(250);
 
         #region Protected CTOR
         /// <summary>
@@ -154,7 +161,7 @@ namespace DotNetVault.Vaults
 
         #region Protected Mutable Resource Vault Factory Nested Type Definition
         /// <summary>
-        /// A factory for creating vaults of this type.  Can also be used to create derived vaults such as the <see cref="CustomizableMutableResourceVault{T}"/>
+        /// A factory for creating vaults of this type.  Can also be used to create derived vaults such as the <see cref="CustomizableAtomicMutableResourceVault{T}"/>
         /// or its example implementation .. see <see cref="StringBuilderVault"/>.
         /// </summary>
         /// <typeparam name="TDerivedMutableResourceVault">The type of the mutable resource vault this creates, must be of type <see cref="MutableResourceVault{T}"/>
@@ -250,6 +257,12 @@ namespace DotNetVault.Vaults
         #endregion
 
         #region Protected Methods
+
+        /// <inheritdoc />
+        protected sealed override void Dispose(bool disposing, TimeSpan? timeout = null)
+            =>  base.Dispose(disposing, timeout);
+        
+
         /// <summary>
         /// Creates the LockedResource.  Until you actually return it to the ultimate consumer in one of the <see cref="Lock()"/> or <see cref="SpinLock()"/>
         /// methods (which are annotated with <see cref="UsingMandatoryAttribute"/>, guaranteeing disposal) it is YOUR responsiblity to make sure
@@ -265,17 +278,17 @@ namespace DotNetVault.Vaults
         /// to dispose the resource ourselves if we've obtained it ... before rethrowing)</exception>
         /// <exception cref="OperationCanceledException">the operation was cancelled and the cancellation was received via <paramref name="token"/>.
         /// The user should handle this, not you or me (except, if we obtained the resource we need to dispose it before rethrowing).</exception>
-        protected virtual LockedVaultMutableResource<MutableResourceVault<T>, T> PerformLock(TimeSpan? timeout, CancellationToken token, bool spin)
+        protected LockedVaultMutableResource<MutableResourceVault<T>, T> PerformLock(TimeSpan? timeout, CancellationToken token, bool spin)
         {
             if (timeout == null)
             {
-                using (InternalLockedResource ilr = GetInternalLockedResource(token, spin))
+                using (AtomicLockedResource ilr = GetInternalLockedResource(token, spin))
                 {
                     return LockedVaultMutableResource<MutableResourceVault<T>, T>.CreateLockedResource(this, ilr.Release());
                 }
             }
 
-            using (InternalLockedResource ilr = GetInternalLockedResource(timeout.Value, token, spin))
+            using (AtomicLockedResource ilr = GetInternalLockedResource(timeout.Value, token, spin))
             {
                 return LockedVaultMutableResource<MutableResourceVault<T>, T>.CreateLockedResource(this, ilr.Release());
             }

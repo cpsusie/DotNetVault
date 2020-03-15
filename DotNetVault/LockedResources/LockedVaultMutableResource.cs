@@ -101,8 +101,10 @@ namespace DotNetVault.LockedResources
     /// </summary>
     /// <typeparam name="TVault">The vault type</typeparam>
     /// <typeparam name="TResource">The protected resource type</typeparam>
-    /// <seealso cref="LockedVaultMutableResource{TVault,TResource}"/>
-    public readonly ref struct LockedVaultMutableResource<TVault, TResource> where TVault : Vault<TResource>
+    /// <remarks>This implementation is returned from vaults that use atomics as their internal synchronization mechanism.
+    /// <seealso cref="LockedMonVaultMutableResource{TVault, TResource}"/> which is the locked resource object for the <see cref="MutableResourceMonitorVault{T}"/>,
+    /// a mutable resource vault that <seealso cref="System.Threading.Monitor"/> and sync objects for synchronization.</remarks>
+    public readonly ref struct LockedVaultMutableResource<TVault, TResource> where TVault : AtomicVault<TResource>
     {
         #region Static Factory
         /// <summary>
@@ -117,7 +119,7 @@ namespace DotNetVault.LockedResources
         internal static LockedVaultMutableResource<TVault, TResource> CreateLockedResource([NotNull] TVault vault,
             [NotNull] Vault<TResource>.Box box)
         {
-            Func<Vault<TResource>, Vault<TResource>.Box, Vault<TResource>.Box> releaseFunc = Vault<TResource>.ReleaseResourceMethod;
+            Func<TVault, Vault<TResource>.Box, Vault<TResource>.Box> releaseFunc = AtomicVault<TResource>.ReleaseResourceMethod;
             var temp = new LockedVaultMutableResource<TVault, TResource>(vault, box, releaseFunc);
             return temp;
         }
@@ -229,7 +231,7 @@ namespace DotNetVault.LockedResources
         {
             Debug.Assert((_disposeMethod == null) == (_box == null));
             Vault<TResource>.Box b = _box;
-            Func<Vault<TResource>, Vault<TResource>.Box, Vault<TResource>.Box> disposeMethod
+            Func<TVault, Vault<TResource>.Box, Vault<TResource>.Box> disposeMethod
                 = _disposeMethod;
             if (disposeMethod != null)
             {
@@ -241,7 +243,7 @@ namespace DotNetVault.LockedResources
 
         #region Private CTOR
         private LockedVaultMutableResource([NotNull] TVault v, [NotNull] Vault<TResource>.Box b,
-           [NotNull] Func<Vault<TResource>, Vault<TResource>.Box, Vault<TResource>.Box> disposeMethod)
+           [NotNull]  Func<TVault, Vault<TResource>.Box, Vault<TResource>.Box> disposeMethod)
         {
             Debug.Assert(v != null && b != null && disposeMethod != null);
             _vault = v;
@@ -251,7 +253,7 @@ namespace DotNetVault.LockedResources
         #endregion
 
         #region Privates
-        private readonly Func<Vault<TResource>, Vault<TResource>.Box, Vault<TResource>.Box> _disposeMethod;
+        private readonly Func<TVault, Vault<TResource>.Box, Vault<TResource>.Box> _disposeMethod;
         private readonly TVault _vault;
         private readonly Vault<TResource>.Box _box;
         #endregion

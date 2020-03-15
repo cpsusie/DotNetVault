@@ -119,7 +119,7 @@ namespace ExampleCodePlayground
 
             //ok resource is not vault safe but mutresv doesnt require it
             MutableResourceVault<ImmutableArray<StringBuilder>> b =
-                MutableResourceVault<ImmutableArray<StringBuilder>>.CreateMutableResourceVault(
+                MutableResourceVault<ImmutableArray<StringBuilder>>.CreateAtomicMutableResourceVault(
                     () => immutSb.ToImmutableArray(), TimeSpan.FromSeconds(2));
             
             //fixed it -- included all invocation returns not just object creation expression
@@ -146,7 +146,7 @@ namespace ExampleCodePlayground
         static void TestLegalUseOfWrapper()
         {
             MutableResourceVault<List<string>> mrvOfListOfString =
-                MutableResourceVault<List<string>>.CreateMutableResourceVault(
+                MutableResourceVault<List<string>>.CreateAtomicMutableResourceVault(
                     () => new List<string> { "Ramsey", "Cersei", "Joffrey" }, TimeSpan.FromSeconds(2));
 
             using var lockedStrList = mrvOfListOfString.Lock();

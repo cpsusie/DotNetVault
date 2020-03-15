@@ -13,7 +13,6 @@ using JetBrains.Annotations;
 namespace DotNetVault.CustomVaultExamples.CustomVaults
 {
     /// <summary>
-    /// Inherit this directly from Vault base class <see cref="Vault{T}"/>
     /// This is an example of how to make a custom vault with a custom locked resource type:
     /// the primary advantage to using this rather than a plain <see cref="MutableResourceVault{T}"/> is because
     /// you can provide an API similar to the protected resource's API and not have to always rely on sometimes awkward
@@ -22,6 +21,7 @@ namespace DotNetVault.CustomVaultExamples.CustomVaults
     /// reference types that have mutable state and has a well-known public interface which may be preferable to use
     /// of delegates and closures for query and mutation actions performed on it while protected.
     /// </summary>
+    /// <remarks>This vault uses atomics, for <see cref="Monitor"/> and sync object based syncro, see <see cref="StringBuilderMonitorVault"/>.</remarks>
     public sealed class StringBuilderVault : IVault
     {
         #region Public Properties
@@ -91,9 +91,9 @@ namespace DotNetVault.CustomVaultExamples.CustomVaults
         /// <summary>
         /// All public methods that return a CustomLockedResource (here a LockedStringBuilder) should be have their return values
         /// annotated with the <see cref="UsingMandatoryAttribute"/> attribute.  The methods should call the protected method
-        /// <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
+        /// <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
         /// except as herein described) because it does not require the <see cref="UsingMandatoryAttribute"/>, which requires the IMMEDIATE callee
-        /// to dispose of it.  You should guard your call to <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
+        /// to dispose of it.  You should guard your call to <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
         /// and be sure to dispose it on any path that does not lead to it successfully calling <see cref="LockedStringBuilder.CreateLockedResource"/>,
         /// passing the <see cref="LockedVaultMutableResource{TVault,TResource}"/> to that <see cref="LockedStringBuilder.CreateLockedResource"/> method
         /// and returning the result to the user.  You should NOT dispose the <see cref="LockedVaultMutableResource{TVault,TResource}"/> in the success path.
@@ -143,9 +143,9 @@ namespace DotNetVault.CustomVaultExamples.CustomVaults
         /// <summary>
         /// All public methods that return a CustomLockedResource (here a LockedStringBuilder) should be have their return values
         /// annotated with the <see cref="UsingMandatoryAttribute"/> attribute.  The methods should call the protected method
-        /// <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
+        /// <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
         /// except as herein described) because it does not require the <see cref="UsingMandatoryAttribute"/>, which requires the IMMEDIATE callee
-        /// to dispose of it.  You should guard your call to <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
+        /// to dispose of it.  You should guard your call to <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
         /// and be sure to dispose it on any path that does not lead to it successfully calling <see cref="LockedStringBuilder.CreateLockedResource"/>,
         /// passing the <see cref="LockedVaultMutableResource{TVault,TResource}"/> to that <see cref="LockedStringBuilder.CreateLockedResource"/> method
         /// and returning the result to the user.  You should NOT dispose the <see cref="LockedVaultMutableResource{TVault,TResource}"/> in the success path.
@@ -185,9 +185,9 @@ namespace DotNetVault.CustomVaultExamples.CustomVaults
         /// <summary>
         /// All public methods that return a CustomLockedResource (here a LockedStringBuilder) should be have their return values
         /// annotated with the <see cref="UsingMandatoryAttribute"/> attribute.  The methods should call the protected method
-        /// <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
+        /// <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
         /// except as herein described) because it does not require the <see cref="UsingMandatoryAttribute"/>, which requires the IMMEDIATE callee
-        /// to dispose of it.  You should guard your call to <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
+        /// to dispose of it.  You should guard your call to <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
         /// and be sure to dispose it on any path that does not lead to it successfully calling <see cref="LockedStringBuilder.CreateLockedResource"/>,
         /// passing the <see cref="LockedVaultMutableResource{TVault,TResource}"/> to that <see cref="LockedStringBuilder.CreateLockedResource"/> method
         /// and returning the result to the user.  You should NOT dispose the <see cref="LockedVaultMutableResource{TVault,TResource}"/> in the success path.
@@ -231,9 +231,9 @@ namespace DotNetVault.CustomVaultExamples.CustomVaults
         /// <summary>
         /// All public methods that return a CustomLockedResource (here a LockedStringBuilder) should be have their return values
         /// annotated with the <see cref="UsingMandatoryAttribute"/> attribute.  The methods should call the protected method
-        /// <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
+        /// <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
         /// except as herein described) because it does not require the <see cref="UsingMandatoryAttribute"/>, which requires the IMMEDIATE callee
-        /// to dispose of it.  You should guard your call to <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
+        /// to dispose of it.  You should guard your call to <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
         /// and be sure to dispose it on any path that does not lead to it successfully calling <see cref="LockedStringBuilder.CreateLockedResource"/>,
         /// passing the <see cref="LockedVaultMutableResource{TVault,TResource}"/> to that <see cref="LockedStringBuilder.CreateLockedResource"/> method
         /// and returning the result to the user.  You should NOT dispose the <see cref="LockedVaultMutableResource{TVault,TResource}"/> in the success path.
@@ -278,9 +278,9 @@ namespace DotNetVault.CustomVaultExamples.CustomVaults
         /// <summary>
         /// All public methods that return a CustomLockedResource (here a LockedStringBuilder) should be have their return values
         /// annotated with the <see cref="UsingMandatoryAttribute"/> attribute.  The methods should call the protected method
-        /// <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
+        /// <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
         /// except as herein described) because it does not require the <see cref="UsingMandatoryAttribute"/>, which requires the IMMEDIATE callee
-        /// to dispose of it.  You should guard your call to <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
+        /// to dispose of it.  You should guard your call to <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
         /// and be sure to dispose it on any path that does not lead to it successfully calling <see cref="LockedStringBuilder.CreateLockedResource"/>,
         /// passing the <see cref="LockedVaultMutableResource{TVault,TResource}"/> to that <see cref="LockedStringBuilder.CreateLockedResource"/> method
         /// and returning the result to the user.  You should NOT dispose the <see cref="LockedVaultMutableResource{TVault,TResource}"/> in the success path.
@@ -324,9 +324,9 @@ namespace DotNetVault.CustomVaultExamples.CustomVaults
         /// <summary>
         /// All public methods that return a CustomLockedResource (here a LockedStringBuilder) should be have their return values
         /// annotated with the <see cref="UsingMandatoryAttribute"/> attribute.  The methods should call the protected method
-        /// <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
+        /// <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
         /// except as herein described) because it does not require the <see cref="UsingMandatoryAttribute"/>, which requires the IMMEDIATE callee
-        /// to dispose of it.  You should guard your call to <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
+        /// to dispose of it.  You should guard your call to <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
         /// and be sure to dispose it on any path that does not lead to it successfully calling <see cref="LockedStringBuilder.CreateLockedResource"/>,
         /// passing the <see cref="LockedVaultMutableResource{TVault,TResource}"/> to that <see cref="LockedStringBuilder.CreateLockedResource"/> method
         /// and returning the result to the user.  You should NOT dispose the <see cref="LockedVaultMutableResource{TVault,TResource}"/> in the success path.
@@ -368,9 +368,9 @@ namespace DotNetVault.CustomVaultExamples.CustomVaults
         /// <summary>
         /// All public methods that return a CustomLockedResource (here a LockedStringBuilder) should be have their return values
         /// annotated with the <see cref="UsingMandatoryAttribute"/> attribute.  The methods should call the protected method
-        /// <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
+        /// <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
         /// except as herein described) because it does not require the <see cref="UsingMandatoryAttribute"/>, which requires the IMMEDIATE callee
-        /// to dispose of it.  You should guard your call to <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
+        /// to dispose of it.  You should guard your call to <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
         /// and be sure to dispose it on any path that does not lead to it successfully calling <see cref="LockedStringBuilder.CreateLockedResource"/>,
         /// passing the <see cref="LockedVaultMutableResource{TVault,TResource}"/> to that <see cref="LockedStringBuilder.CreateLockedResource"/> method
         /// and returning the result to the user.  You should NOT dispose the <see cref="LockedVaultMutableResource{TVault,TResource}"/> in the success path.
@@ -413,9 +413,9 @@ namespace DotNetVault.CustomVaultExamples.CustomVaults
         /// <summary>
         /// All public methods that return a CustomLockedResource (here a LockedStringBuilder) should be have their return values
         /// annotated with the <see cref="UsingMandatoryAttribute"/> attribute.  The methods should call the protected method
-        /// <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
+        /// <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/>.  This method is protected (not for public consumption
         /// except as herein described) because it does not require the <see cref="UsingMandatoryAttribute"/>, which requires the IMMEDIATE callee
-        /// to dispose of it.  You should guard your call to <see cref="CustomizableMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
+        /// to dispose of it.  You should guard your call to <see cref="CustomizableAtomicMutableResourceVault{T}.GetLockedResourceBase"/> with a try catch
         /// and be sure to dispose it on any path that does not lead to it successfully calling <see cref="LockedStringBuilder.CreateLockedResource"/>,
         /// passing the <see cref="LockedVaultMutableResource{TVault,TResource}"/> to that <see cref="LockedStringBuilder.CreateLockedResource"/> method
         /// and returning the result to the user.  You should NOT dispose the <see cref="LockedVaultMutableResource{TVault,TResource}"/> in the success path.
@@ -500,17 +500,17 @@ namespace DotNetVault.CustomVaultExamples.CustomVaults
 
         #region Nested class 
         /// <summary>
-        /// Make a nested class (private or protected) that inherits from the abstract class <see cref="CustomizableMutableResourceVault{T}"/>
+        /// Make a nested class (private or protected) that inherits from the abstract class <see cref="CustomizableAtomicMutableResourceVault{T}"/>
         /// Calls in <see cref="StringBuilderVault"/> (or your custom vault) are delegated to this implementation class.
         /// </summary>
-        private sealed class StringBuilderVaultImpl : CustomizableMutableResourceVault<StringBuilder>
+        private sealed class StringBuilderVaultImpl : CustomizableAtomicMutableResourceVault<StringBuilder>
         {
             /// <summary>
             /// Add the following factory method to the nested class
             /// </summary>
             /// <param name="defaultTimeOut">the default time-out</param>
             /// <param name="resourceGen">a function to generate the initial value of the protected resource</param>
-            /// <returns>An implementation of <see cref="CustomizableMutableResourceVault{T}"/> that your custom class
+            /// <returns>An implementation of <see cref="CustomizableAtomicMutableResourceVault{T}"/> that your custom class
             /// (here <see cref="StringBuilderVault"/>) will delegate to.</returns>
             internal static StringBuilderVaultImpl CreateStringBuilderVaultImpl(TimeSpan defaultTimeOut,
                 Func<StringBuilder> resourceGen)
@@ -531,7 +531,7 @@ namespace DotNetVault.CustomVaultExamples.CustomVaults
             }
 
             /// <summary>
-            /// Derive from the factory if needed to be used in static factory method shown <see cref="StringBuilderVaultImpl.CreateStringBuilderVaultImpl"/>
+            /// Derive from the factory if needed to be used in static factory method shown <see cref="CreateStringBuilderVaultImpl"/>
             /// </summary>
             private sealed class
                 StringBuilderVaultImplFactory : MutableResourceVaultFactory<StringBuilderVaultImpl>
@@ -548,6 +548,8 @@ namespace DotNetVault.CustomVaultExamples.CustomVaults
                 {
                 }
             }
+
+            
         }
         #endregion
 

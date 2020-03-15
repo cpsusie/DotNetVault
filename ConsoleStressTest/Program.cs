@@ -26,6 +26,7 @@ namespace ConsoleStressTest
                 {
                     Console.WriteLine($"Executing simulation with the following arguments: [{arguments.ToString()}]:");
                     LogPrecisionOfTimestampSource();
+                    Console.WriteLine($"Using sync mechanism: [{Configuration<StressTestObject>.FactoryType}]");
                     TimeSpan updateEvery = TimeSpan.FromSeconds(2);
                     int numThreads = arguments.NumberThreads;
                     int numActionsPerThread = arguments.ActionsPerThread;

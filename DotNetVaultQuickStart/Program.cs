@@ -119,7 +119,7 @@ namespace DotNetVaultQuickStart
             string finalResults;
             //See comments in the BasicVault demonstration regarding disposing VAULTS
             using (var mutableResourceVault =
-                MutableResourceVault<SortedSet<DogActionRecord>>.CreateMutableResourceVault(
+                MutableResourceVault<SortedSet<DogActionRecord>>.CreateAtomicMutableResourceVault(
                     () => new SortedSet<DogActionRecord>(), TimeSpan.FromSeconds(1)))
             {
                 List<Dog> dogs = new List<Dog>

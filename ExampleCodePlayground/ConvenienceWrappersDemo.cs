@@ -13,7 +13,7 @@ namespace ExampleCodePlayground
         {
             Console.WriteLine("Begin showing wrapper usage.");
             MutableResourceVault<List<int>> vault =
-                MutableResourceVault<List<int>>.CreateMutableResourceVault(() => 
+                MutableResourceVault<List<int>>.CreateAtomicMutableResourceVault(() => 
                         new List<int> { 1, 2, 3, 4 },
                     TimeSpan.FromMilliseconds(250));
             ImmutableArray<int> finalContents;

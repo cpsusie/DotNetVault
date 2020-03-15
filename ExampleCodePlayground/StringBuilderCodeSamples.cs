@@ -189,7 +189,7 @@ namespace ExampleCodePlayground
         }
 
         private static MutableResourceVault<StringBuilder> CreateExampleVault() =>
-            MutableResourceVault<StringBuilder>.CreateMutableResourceVault(() => new StringBuilder("Hello, world!"),
+            MutableResourceVault<StringBuilder>.CreateAtomicMutableResourceVault(() => new StringBuilder("Hello, world!"),
                 TimeSpan.FromMilliseconds(250));
     }
     

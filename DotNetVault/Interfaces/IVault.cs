@@ -1,4 +1,5 @@
 ﻿using System;
+using DotNetVault.Attributes;
 
 namespace DotNetVault.Interfaces
 {
@@ -41,5 +42,49 @@ namespace DotNetVault.Interfaces
         /// methods should wait before throwing a <see cref="TimeoutException"/>
         /// </summary>
         TimeSpan DefaultTimeout { get; }
+    }
+
+    /// <summary>
+    /// A basic vault
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public interface IBasicVault<[VaultSafeTypeParam] T> : IVault
+    {
+        /// <summary>
+        /// Wait for specified time period to obtain the resource, then copy protected value and return it
+        /// </summary>
+        /// <param name="timeout">the timeout</param>
+        /// <returns>a copy of the protected value</returns>
+        /// <exception cref="TimeoutException">didn't obtain resource in time</exception>
+        /// <exception cref="ObjectDisposedException">the object was disposed</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="timeout"/> not positive.</exception>
+        T CopyCurrentValue(TimeSpan timeout);
+        /// <summary>
+        /// Attempt to get the locked resource for the time specified.  Return it with a flag indicating success/failure
+        /// </summary>
+        /// <param name="timeout">how long should we wait</param>
+        /// <returns>A tuple with the value and a bool indicating success/failure.  If false, the value is undefined and probable equals
+        /// default value of <typeparamref name="T"/></returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="timeout"/> not positive.</exception>
+        /// <exception cref="ObjectDisposedException">object was disposed</exception>
+        (T value, bool success) TryCopyCurrentValue(TimeSpan timeout);
+        /// <summary>
+        /// Try to obtain the resource, then overwrite it with the specified value
+        /// </summary>
+        /// <param name="timeout">how long should we wait</param>
+        /// <param name="newValue">value to overwrite current protected value with</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="timeout"/> not positive.</exception>
+        /// <exception cref="ObjectDisposedException">object was disposed</exception>
+        /// <exception cref="TimeoutException">resource not obtained within time permitted by <paramref name="timeout"/>.</exception>
+        void SetCurrentValue(TimeSpan timeout, T newValue);
+        /// <summary>
+        /// Try to obtain the resource.  Once obtained, overwrite it with specified value
+        /// </summary>
+        /// <param name="timeout">how long should we wait</param>
+        /// <param name="newValue">the new value</param>
+        /// <returns>true for success, false for failure</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="timeout"/> not positive.</exception>
+        /// <exception cref="ObjectDisposedException">object was disposed</exception>
+        bool TrySetNewValue(TimeSpan timeout, T newValue);
     }
 }

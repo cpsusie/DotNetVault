@@ -8,14 +8,14 @@ namespace DotNetVault.CodeExamples
     {
         internal static void CreateMutableResourceVaultTheCorrectWay()
         {
-            var sbVault = MutableResourceVault<StringBuilder>.CreateMutableResourceVault(() => 
+            var sbVault = MutableResourceVault<StringBuilder>.CreateAtomicMutableResourceVault(() => 
                 new StringBuilder(), TimeSpan.FromMilliseconds(250));
             Console.WriteLine(@$"We just created a [{sbVault}] in the correct way -- " +
                               @"only the mutable resource vault will ever see the StringBuilder it constructs.");
         }
         internal static void CreateMutableResourceVaultTheIncorrectWay()
         {
-            var sbVault = MutableResourceVault<StringBuilder>.CreateMutableResourceVault(() => BadPreExistingStringBuilder,
+            var sbVault = MutableResourceVault<StringBuilder>.CreateAtomicMutableResourceVault(() => BadPreExistingStringBuilder,
                 TimeSpan.FromMilliseconds(250));
             Console.WriteLine(
                 $@"We just created an [{sbVault}] in a very, very bad way.  "+
@@ -32,7 +32,7 @@ namespace DotNetVault.CodeExamples
         internal static void CreateMoreComplicatedMutableResourceTheCorrectWay()
         {
             var sbVault = MutableResourceVault<PrettyBadMoreComplexExample>
-                .CreateMutableResourceVault(() =>
+                .CreateAtomicMutableResourceVault(() =>
 
                 {
                     var sbOne = new StringBuilder();
@@ -49,7 +49,7 @@ namespace DotNetVault.CodeExamples
             StringBuilder shouldBeSecond)
         {
             var sbVault =
-                MutableResourceVault<PrettyBadMoreComplexExample>.CreateMutableResourceVault(() =>
+                MutableResourceVault<PrettyBadMoreComplexExample>.CreateAtomicMutableResourceVault(() =>
                     {
                         var sbOne = new StringBuilder();
                         //VERY BAD!  Any change to ShouldBeSecond (which is accessible outside the vault)

@@ -1,53 +1,27 @@
 Synchronization Library and Static Analysis Tool for C# 8
 
-See Pdf for full description of this project.
+    DotNetVault is a library and static code analysis tool that makes managing shared mutable state in multi-threaded applications more manageable and less error prone.  It also provides a common abstraction over several commonly used synchronization mechanisms, allowing you to change from one underlying type to another (such as from lock free synchronization to mutex/monitor lock based) without needing to refactor your code. Where errors do still occur, they are easier to locate and identify.
+
+    It provides an abstraction over several different underlying synchronization mechanisms: lock-free synchronization using atomics, Monitor.Enter (i.e. C# lock(syncObj) {}) and ReaderWriterLockSlim. Because the common functionality shared by vaults providing these varied underlying mechanism is exposed by a common (compile-time) API, it is easier than ever to experiment with changing the underlying mechanism without need for much code refactoring.  Simply change the type of vault you instantiate to one that uses the synchronization mechanism you desire.
+
+    A full project description is included in "DotNetVault Description.pdf".  Source code, example projects, unit tests, stress test and quick start guide on GitHub.
+
+RELEASE NOTES VERSION 0.2.1.9-alpha 
+
+    This release contains MAJOR feature updates but is still considered unstable alpha.
+
+    Major new feature: vaults with varying underlying synchronization mechanisms.  You may now chose lock=free atomics (only mechanism before), the .NET standard Monitor.Enter (used by C# lock statement) or ReaderWriterLockSlim.  Because these vaults have a compatible (at compile-time) API, you can easily switch between synchronization mechanisms without any extensive refactoring required.  Also, the new vault based on ReaderWriterLock slim allows for shared readonly locks, upgradable readonly locks and exclusive read-write locks.  If you are coming from an old version of this project, you may need to refactor in some places as their are a significant number of small breaking changes.  It should, however, be a quick and painless process.
+    
+    Fixed Bug 76.  Illegal references to non-vault-safe types inside mutable vault's locked resource objects delegates where not being detected in the case of local functions or using anonymous function syntax. 
+
+    Fixed Bug 64.  Structs with fields containing immutable reference types as fields were being incorrectly identified as not being vault-safe when those fields were not read-only.  Since structs are value types and the type field is immutable, there is no danger of a data race when one retains a copy of such a protected resource after releasing a lock.  The analyzer was fixed to account for this.  Unit tests were added to confirm the fix and detect future regressions on this issue.  The Project description was updated to reflect this fix and explain Bug 64.
+
+    More unit tests.  There are now two unit test projects included.  The older one (DotNetVault.Test) tests the functionality of the built-in static analyzer.  The newer unit test project (VaultUnitTests) tests the functionality and synchronization mechanisms provided for the vaults.  It may also serve, in addition to the pre-existing sample code projects, as an introduction to this library.
+
+    Documentation (including "DotNetVault Description.pdf") updated to reflect changes.
 
 RELEASE NOTES VERSION 0.2.0.2-alpha
 
     This is an unstable alpha release.  The current stable release is 0.1.5.2.  
 
     The "Value" property of the BasicVault's locked resource object is now returned by reference.  This enables more efficient use of large mutable structs as protected resource objects.  An additional analysis rule was added to prevent ref local aliasing of the property, to prevent possible unsynchronized access.  Documentation updated to reflect.
-
-RELEASE NOTES VERSION 0.1.5.2:
-
-    Fixed Bug 64.  Structs with fields containing immutable reference types as fields were being incorrectly identified as not being vault-safe when those fields were not read-only.  Since structs are value types and the type field is immutable, there is no danger of a data race when one retains a copy of such a protected resource after releasing a lock.  The analyzer was fixed to account for this.  Unit tests were added to confirm the fix and detect future regressions on this issue.  The Project description was updated to reflect this fix and explain Bug 64.
-
-RELEASE NOTES VERSION 0.1.5.0:
-
-   This is the first release not explicitly marked beta or alpha.  This is currently a one-person project produced outside of work hours.  It is almost certainly not bug-free or without flaws, but it has been used extensively enough in the test projects to prove itself useful in managing shared mutable state in complex concurrent state machine scenarios.  I am confident that it will prove useful, despite any residual bugs and flaws.  You should not expect bug free or flawless conformance to specifications.  It will prove, however, far more useful than problematic.  Please report bugs or feature requests.
-
-   Updated Project Description PDF.  Updated README.md.
-
-RELEASE NOTES VERSION 0.1.4.2:
-
-    Added quick start guide pdf for Linux (project available on GitHub)
-
-    Upated quick start guide pdf for Windows (project available on GitHub)
-
-RELEASE NOTES VERSION 0.1.4.1:
-	
-	Added quick start guide pdf and project (project available on GitHub).
-
-	Updated readme.md
-
-RELEASE NOTES VERSION 0.1.4.0:
-    
-    Bug# 61 FIXED.  Double dispose is now practically impossible.  Analyzer now forbids out of line, pre-declaration of a variable that will be the subject of a using statement or declaration.  Analysis rules now prevent manual calls to Dispose method and additional method and analysis rules were added to account for the two use-cases where manual release of protected resource is necessary.  These rules make it difficult to accidentally use the new manual release method accidentally.
-
-    Bug# 62 FIXED.  Analysis now considers call of extension method using extension method syntax to be equivalent to a call thereto using static syntax.
-
-    Bug# 48 Fields in base classes were not being considered in vault safety analysis.  An otherwise fine sealed class could be considered vault safe despite fields in a base clase violating vault-safety rules.
-    
-    Bug# 48 FIXED.  Analyzer now considers all fields from base classes when performing vault-safety analysis.  If a base class has field that, if present in sealed derived class being analyzed for vault-safety, would prevent the sealed derived class from being considered vault-safe, the sealed derived class will not be considered vault-safe.  A derived class, however, will not be considered not vault-safe MERELY because it inherits from a base class.  This change to the analyzer, does not, however, permit the base classes themselves to be used in a vault-safe context.
-
-    Laundry machine simulation can go significantly more quickly now.  With parameters of 1, 2, and 3 milliseconds and 200 laundry articles, the test completes on my pc in less than two minutes.  It no longer sleeps during task simulation if the timespan parameters entered are small enough that the sleeping will cause the tasks to take much longer than the parameters specified.  
-
-    A few convenience-based changes were made to the LaundryMachine simulation and the ConsoleStressTest.  Code in the ExampleCodePlayground, ConsoleStressTest and LaundryStessTest projects was updated to comply with new analysis rules as needed.
-
-    The console stress test now outputs whether the time stamps it gathers are based on a high precision timer or not.
-
-    Unit tests were added to the unit test project that validate the new analyis rules.
-
-    The pdf documentation was edited and updated based on the foregoing changes.
-
-    Xml Doc Comments for DotNetVault analyzer/library are now included in the NuGet package.

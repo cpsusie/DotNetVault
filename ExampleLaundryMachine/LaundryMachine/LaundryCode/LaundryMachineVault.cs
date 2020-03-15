@@ -440,14 +440,14 @@ namespace LaundryMachine.LaundryCode
         #endregion
 
         #region Nested
-        private sealed class LmvImpl : CustomizableMutableResourceVault<LaundryMachine>
+        private sealed class LmvImpl : CustomizableAtomicMutableResourceVault<LaundryMachine>
         {
             /// <summary>
             /// Add the following factory method to the nested class
             /// </summary>
             /// <param name="defaultTimeOut">the default time-out</param>
             /// <param name="resourceGen">a function to generate the initial value of the protected resource</param>
-            /// <returns>An implementation of <see cref="CustomizableMutableResourceVault{T}"/> that your custom class
+            /// <returns>An implementation of <see cref="CustomizableAtomicMutableResourceVault{T}"/> that your custom class
             /// (here <see cref="StringBuilderVault"/>) will delegate to.</returns>
             internal static LmvImpl CreateLsvImpl(TimeSpan defaultTimeOut,
                 [NotNull] Func<LaundryMachine> resourceGen)
@@ -458,6 +458,7 @@ namespace LaundryMachine.LaundryCode
                     resourceGen ?? throw new ArgumentNullException(nameof(resourceGen)), defaultTimeOut,
                     () => new LmvImpl(defaultTimeOut));
             }
+            
 
             /// <summary>
             /// Create whatever ctors necessary to call base impl class.

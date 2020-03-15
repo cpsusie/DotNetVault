@@ -40,6 +40,7 @@ namespace DotNetVault.CustomVaultExamples.CustomLockedResources
     /// For some types, you may need to substitute VaultSafe alternatives (such as <see cref="ImmutableArray{T}"/> for <see cref="List{T}"/>)
     /// or you may not be able to provide the entire API.
     /// </remarks>
+    /// <remarks>This is the atomics-based locked resource object</remarks>
     public readonly ref struct LockedStringBuilder
     {
         #region Static Factory Method
