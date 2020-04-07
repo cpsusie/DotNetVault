@@ -6,6 +6,12 @@ Synchronization Library and Static Analysis Tool for C# 8
 
     A full project description is included in "DotNetVault Description.pdf".  Source code, example projects, unit tests, stress test and quick start guide on GitHub.
 
+RELEASE NOTES VERSION 0.2.1.22-beta
+
+     This release adds a ReadWriteStringBuffer vault that provides thread-safe readonly, upgradable readonly and writable access to a StringBuilder object.  It also (when binaries or source retrieved from GitHub) includes the "Clorton Game" which demonstrates usage of the readwrite vault and provides a stress test to validate its functionality.
+
+     "DotNetVault.Description.pdf" updated to reflect changes.
+
 RELEASE NOTES VERSION 0.2.1.9-alpha 
 
     This release contains MAJOR feature updates but is still considered unstable alpha.
@@ -19,9 +25,3 @@ RELEASE NOTES VERSION 0.2.1.9-alpha
     More unit tests.  There are now two unit test projects included.  The older one (DotNetVault.Test) tests the functionality of the built-in static analyzer.  The newer unit test project (VaultUnitTests) tests the functionality and synchronization mechanisms provided for the vaults.  It may also serve, in addition to the pre-existing sample code projects, as an introduction to this library.
 
     Documentation (including "DotNetVault Description.pdf") updated to reflect changes.
-
-RELEASE NOTES VERSION 0.2.0.2-alpha
-
-    This is an unstable alpha release.  The current stable release is 0.1.5.2.  
-
-    The "Value" property of the BasicVault's locked resource object is now returned by reference.  This enables more efficient use of large mutable structs as protected resource objects.  An additional analysis rule was added to prevent ref local aliasing of the property, to prevent possible unsynchronized access.  Documentation updated to reflect.

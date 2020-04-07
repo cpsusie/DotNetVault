@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup Label="Globals">
     <SccProjectName>SAK</SccProjectName>
@@ -8,17 +8,13 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
-    <UseWPF>true</UseWPF>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="DotNetVault" Version="0.2.1.22-beta" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\LaundryMachine\LaundryMachine.csproj" />
+    <PackageReference Include="HighPrecisionTimeStamps" Version="0.0.1-alpha" />
   </ItemGroup>
 
 </Project>

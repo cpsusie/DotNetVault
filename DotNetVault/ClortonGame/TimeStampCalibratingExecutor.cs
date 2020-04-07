@@ -1,8 +1,7 @@
 ﻿using DotNetVault.TestCaseHelpers;
-using HpTimesStamps;
 using JetBrains.Annotations;
 
-namespace VaultUnitTests.ClortonGame
+namespace DotNetVault.ClortonGame
 {
     sealed class TimeStampCalibratingExecutor : Executor
     {
@@ -12,7 +11,7 @@ namespace VaultUnitTests.ClortonGame
 
         protected override void StartupActions()
         {
-            TimeStampSource.Calibrate();
+            CgTimeStampSource.Calibrate();
         }
     }
 }

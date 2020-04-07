@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 
 namespace DotNetVault.TestCaseHelpers
 {
-    class Executor : IDisposable
+    class Executor : IExecutor
     {
         internal static Executor CreateExecutor() => CreateExecutor(DefaultNamePrefix, (str) => new Executor(str));
         internal static Executor CreateExecutor([NotNull] string name) =>
@@ -48,11 +48,11 @@ namespace DotNetVault.TestCaseHelpers
         
         protected Executor([NotNull] string namePrefix)
         {
-            string threadName = $"{namePrefix}_{(Interlocked.Increment(ref s_threadCount))}";
+            string threadName = $"{namePrefix}_{(Interlocked.Increment(ref _sThreadCount))}";
             _t = new Thread(ThreadLoop){IsBackground = true, Name = threadName};
         }
 
-        public void EnqueueAction([NotNull] Action a)
+        public void EnqueueAction(Action a)
         {
             if (Started && !Terminated && !IsDisposed && !Faulted)
             {
@@ -160,6 +160,6 @@ namespace DotNetVault.TestCaseHelpers
         private SetOnceValFlag _disposed =default;
         [NotNull] private readonly CancellationTokenSource _cts = new CancellationTokenSource();
         [NotNull] private readonly Thread _t;
-        private static long s_threadCount;
+        private static long _sThreadCount;
     }
 }

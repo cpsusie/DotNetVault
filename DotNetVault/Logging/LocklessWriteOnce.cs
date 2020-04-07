@@ -55,10 +55,8 @@ namespace DotNetVault.Logging
             }
         }
 
-        public WriteOnce([NotNull] Func<T> defaultInit)
-        {
+        public WriteOnce([NotNull] Func<T> defaultInit) =>
             _defaultInit = defaultInit ?? throw new ArgumentNullException(nameof(defaultInit));
-        }
 
         public WriteOnce() => _defaultInit = null;
 
@@ -88,6 +86,15 @@ namespace DotNetVault.Logging
 
         public static implicit operator T([NotNull] LocklessWriteOnce<T> getMyVal) =>
             (getMyVal ?? throw new ArgumentNullException(nameof(getMyVal))).Value;
+
+        public bool HasValue
+        {
+            get
+            {
+                T val = _field;
+                return val != null;
+            }
+        }
 
         public T Value
         {

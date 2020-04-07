@@ -2,6 +2,12 @@ Synchronization Library and Static Analysis Tool for C# 8
 
 See "DotNetVaultDescription.Pdf" for full description of this project.
 
+RELEASE NOTES VERSION 0.2.1.22-beta
+
+     This release adds a ReadWriteStringBuffer vault that provides thread-safe readonly, upgradable readonly and writable access to a StringBuilder object.  It also (when binaries or source retrieved from GitHub) includes the "Clorton Game" which demonstrates usage of the readwrite vault and provides a stress test to validate its functionality.
+
+     "DotNetVault.Description.pdf" updated to reflect changes.
+
 RELEASE NOTES VERSION 0.2.1.9-alpha
 
     This release contains MAJOR feature updates but is still considered unstable alpha.

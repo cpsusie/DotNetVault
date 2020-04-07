@@ -2,8 +2,8 @@
 using System.Runtime.CompilerServices;
 using DotNetVault.Interfaces;
 using DotNetVault.Logging;
-using DotNetVault.ToggleFlags;
 using JetBrains.Annotations;
+using SetOnceValFlag = DotNetVault.ToggleFlags.SetOnceValFlag;
 using TTwoStepDisposeFlag = DotNetVault.DisposeFlag.TwoStepDisposeFlag;
 using TSimpleDisposeFlag = DotNetVault.DisposeFlag.DisposeFlag;
 

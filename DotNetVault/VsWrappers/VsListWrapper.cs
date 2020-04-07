@@ -81,4 +81,23 @@ namespace DotNetVault.VsWrappers
         [NotNull] private readonly List<T> _wrapped; 
         #endregion
     }
+
+    ///// <summary>
+    ///// 
+    ///// </summary>
+    ///// <typeparam name="T"></typeparam>
+    //public readonly ref struct ListReadOnlyView<[VaultSafeTypeParam] T>
+    //{
+    //    /// <summary>
+    //    /// 
+    //    /// </summary>
+    //    /// <param name="index"></param>
+    //    public ref readonly T this[int index] => ref _wrapped[index];
+
+    //    private ListReadOnlyView(List<T> toWrap) =>
+    //        _wrapped = toWrap ?? throw new ArgumentNullException(nameof(toWrap));
+        
+
+    //    private readonly List<T> _wrapped;
+    //}
 }
