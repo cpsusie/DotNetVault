@@ -21,7 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		readme.txt = readme.txt
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VaultUnitTests", "VaultUnitTests\VaultUnitTests.csproj", "{B489B243-65A8-44EA-A4CF-1EE825334973}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VaultUnitTests", "VaultUnitTests\VaultUnitTests.csproj", "{D0598457-B37E-4416-AAEC-53973098507F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,15 +41,33 @@ Global
 		{DDC79759-AD9A-4251-94DA-E72B2B5EE6AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDC79759-AD9A-4251-94DA-E72B2B5EE6AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DDC79759-AD9A-4251-94DA-E72B2B5EE6AE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B489B243-65A8-44EA-A4CF-1EE825334973}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B489B243-65A8-44EA-A4CF-1EE825334973}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B489B243-65A8-44EA-A4CF-1EE825334973}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B489B243-65A8-44EA-A4CF-1EE825334973}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0598457-B37E-4416-AAEC-53973098507F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0598457-B37E-4416-AAEC-53973098507F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0598457-B37E-4416-AAEC-53973098507F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0598457-B37E-4416-AAEC-53973098507F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {546FB336-1819-465C-B157-F33FC17E6577}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 5
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://cjmscrews.visualstudio.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = DotNetVault\\DotNetVault.csproj
+		SccProjectName1 = DotNetVault
+		SccLocalPath1 = DotNetVault
+		SccProjectUniqueName2 = DotNetVault.Vsix\\DotNetVault.Vsix.csproj
+		SccProjectName2 = DotNetVault.Vsix
+		SccLocalPath2 = DotNetVault.Vsix
+		SccProjectUniqueName3 = DotNetVault.Test\\DotNetVault.Test.csproj
+		SccProjectName3 = DotNetVault.Test
+		SccLocalPath3 = DotNetVault.Test
+		SccProjectUniqueName4 = VaultUnitTests\\VaultUnitTests.csproj
+		SccProjectName4 = VaultUnitTests
+		SccLocalPath4 = VaultUnitTests
 	EndGlobalSection
 EndGlobal

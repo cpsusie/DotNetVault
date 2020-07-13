@@ -66,6 +66,14 @@ state, with a high degree of confidence.
 
 See **DotNetVault Description.pdf** for full description of this project.
 
+RELEASE NOTES VERSION 0.2.2.1-beta:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    A BigValueListVault added, providing a vault protecting a list-like collection, especially suited for large value types. 
+
+    Unit tests added, including a stress test called Cafe Babe game.  The Cafe Babe game is a unit test and stand-alone console-driven stress testing utility.
+
+    "DotNetVault.Description.pdf" updated to reflect changes.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 RELEASE NOTES VERSION 0.2.1.22-beta
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  This is a beta release.  Current stable release is 0.1.5.4.

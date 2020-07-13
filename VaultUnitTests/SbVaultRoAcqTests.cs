@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using DotNetVault;
-using DotNetVault.Attributes;
 using DotNetVault.Vaults;
 using JetBrains.Annotations;
 using Xunit;

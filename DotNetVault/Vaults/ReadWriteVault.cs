@@ -234,7 +234,8 @@ namespace DotNetVault.Vaults
             }
 
             [SuppressMessage("ReSharper", "RedundantLambdaParameterType")]
-            internal static RwVaultInternalLockedResource CreateInternalLockedResource<TV>([NotNull] TV owner, TimeSpan? timeout,
+            internal static RwVaultInternalLockedResource 
+                CreateInternalLockedResource<TV>([NotNull] TV owner, TimeSpan? timeout,
            CancellationToken token, AcquisitionMode mode, bool vaultDisposing = false) where TV : ReadWriteVault<T>
             {
                 if (owner == null) throw new ArgumentNullException(nameof(owner));

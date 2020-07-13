@@ -5,16 +5,22 @@ using Xunit.Abstractions;
 
 namespace VaultUnitTests
 {
-    public abstract class VaultAcqBehaviorTest : IClassFixture<VaultFactoryFixture>
+    public abstract class VaultAcqBehaviorTest : TestBase<VaultFactoryFixture>
+    {
+        protected VaultAcqBehaviorTest([NotNull] ITestOutputHelper helper, [NotNull] VaultFactoryFixture fixture) : base(helper, fixture)
+        {
+        }
+    }
+
+    public abstract class TestBase<TFixture> : IClassFixture<TFixture> where TFixture : class
     {
         [NotNull] public ITestOutputHelper Helper { get; }
-        [NotNull] public VaultFactoryFixture Fixture { get; }
+        [NotNull] public TFixture Fixture { get; }
 
-        protected VaultAcqBehaviorTest([NotNull] ITestOutputHelper helper, [NotNull] VaultFactoryFixture fixture)
+        protected TestBase([NotNull] ITestOutputHelper helper, [NotNull] TFixture fixture)
         {
             Helper = helper ?? throw new ArgumentNullException(nameof(helper));
             Fixture = fixture ?? throw new ArgumentNullException(nameof(fixture));
         }
-
     }
 }

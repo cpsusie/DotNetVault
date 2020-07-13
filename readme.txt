@@ -6,6 +6,14 @@ Synchronization Library and Static Analysis Tool for C# 8
 
     A full project description is included in "DotNetVault Description.pdf".  Source code, example projects, unit tests, stress test and quick start guide on GitHub.
 
+RELEASE NOTES VERSION 0.2.2.1-beta:
+
+    A BigValueListVault added, providing a vault protecting a list-like collection, especially suited for large value types. 
+
+    Unit tests added, including a stress test called Cafe Babe game.  The Cafe Babe game is a unit test and stand-alone console-driven stress testing utility.
+
+    "DotNetVault.Description.pdf" updated to reflect changes.
+
 RELEASE NOTES VERSION 0.2.1.22-beta
 
      This release adds a ReadWriteStringBuffer vault that provides thread-safe readonly, upgradable readonly and writable access to a StringBuilder object.  It also (when binaries or source retrieved from GitHub) includes the "Clorton Game" which demonstrates usage of the readwrite vault and provides a stress test to validate its functionality.

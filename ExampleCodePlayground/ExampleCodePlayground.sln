@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.29613.14
+VisualStudioVersion = 16.0.29920.165
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExampleCodePlayground", "ExampleCodePlayground.csproj", "{10190D47-C116-426F-A5C0-B62FB9F48CF3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExampleCodePlayground", "ExampleCodePlayground.csproj", "{8E7BF927-7B31-466B-890E-F12049A45751}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,16 +11,16 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{10190D47-C116-426F-A5C0-B62FB9F48CF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{10190D47-C116-426F-A5C0-B62FB9F48CF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{10190D47-C116-426F-A5C0-B62FB9F48CF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{10190D47-C116-426F-A5C0-B62FB9F48CF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E7BF927-7B31-466B-890E-F12049A45751}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E7BF927-7B31-466B-890E-F12049A45751}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E7BF927-7B31-466B-890E-F12049A45751}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E7BF927-7B31-466B-890E-F12049A45751}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {8D4EA514-BD10-4B1E-97C1-546BB01786CC}
+		SolutionGuid = {FEB0296C-43D4-4015-9CCC-20365F0DD597}
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
 		SccNumberOfProjects = 1

@@ -232,8 +232,6 @@ namespace DotNetVault.ClortonGame
             _startTime = default;
             _outputHelper = outputHelper;
             _numReaders = numReaders;
-
-
         }
         #endregion
         
@@ -244,7 +242,6 @@ namespace DotNetVault.ClortonGame
         /// </summary>
         /// <returns>the vault.</returns>
         [NotNull] private protected abstract TVault InitTVault();
-
         [NotNull]
         private protected abstract ArbiterThread<TVault> InitArbiterThread([NotNull] TVault vault, [NotNull] IOutputHelper outputHelper);
         [NotNull] private protected abstract WriterThread<TVault> InitWriterThread([NotNull] TVault vault,
