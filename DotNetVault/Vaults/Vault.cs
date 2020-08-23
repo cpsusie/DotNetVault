@@ -234,7 +234,7 @@ namespace DotNetVault.Vaults
         }
 
 
-        private SetOnceValFlag _initCalled = default;
+        private SetOnceValFlag _initCalled;
         private readonly TimeSpan _defaultTimeout;
         [NotNull] private protected readonly TTwoStepDisposeFlag _disposeFlag = new TTwoStepDisposeFlag();
         [CanBeNull] private protected volatile Box _resourcePtr;

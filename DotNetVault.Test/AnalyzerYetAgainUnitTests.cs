@@ -112,8 +112,7 @@ namespace DotNetVault.Test
             var test = ResourceFiles.EarlyReleaseTestCases.EarlyReleaseErrorCaseHaver;
             VerifyCSharpDiagnostic(test, col => col.Count() == 1, dx => dx.Id == DotNetVaultAnalyzer.DotNetVault_EarlyDisposeJustification &&
                                                                         dx.Severity == DiagnosticSeverity.Info && dx.DefaultSeverity == DiagnosticSeverity.Info &&
-                                                                        dx.GetMessage().Contains("DisposingOnError"));
-        }
+                                                                        dx.GetMessage().Contains("DisposingOnError")); }
 
         [TestMethod]
         public void TestUnjustifiedEarlyRelease()
@@ -162,6 +161,71 @@ namespace DotNetVault.Test
                 col => col.Single().Id 
                        == DotNetVaultAnalyzer.DiagnosticId_VaultSafeTypes,
                 dx => true);
+        }
+
+        [TestMethod]
+        public void TestNotOkBadAssignUs()
+        {
+            var test = ResourceFiles.NdiTestCases.NoCopyBadAssignUsingStatement;
+            SortedSet<string> expectedIds = new SortedSet<string>{DotNetVaultAnalyzer.DotNetVault_UsingMandatory_NoCopyAssignment, DotNetVaultAnalyzer.DotNetVault_UsingMandatory_NoCopyIllegalPass};
+            VerifyCSharpDiagnostic(test,
+                dxes => new SortedSet<string>(dxes.Select(dx => dx.Descriptor.Id)).SetEquals(expectedIds), dx => true);
+
+
+        }
+
+        [TestMethod]
+        public void TestInlineNotOkCase()
+        {
+            Dictionary<string, int> expectedCounts = new Dictionary<string, int>
+            {
+                {DotNetVaultAnalyzer.DotNetVault_UsingMandatory_NoCopyAssignment, 8},
+                {DotNetVaultAnalyzer.DotNetVault_UsingMandatory_NoCopyIllegalPass, 4},
+                {DotNetVaultAnalyzer.DotNetVault_UsingMandatory_NoLockedResourceWrappersAllowedInScope, 2}
+            };
+
+            Dictionary<string, int> actualCounts = new Dictionary<string, int>
+            {
+                {DotNetVaultAnalyzer.DotNetVault_UsingMandatory_NoCopyAssignment, 0},
+                {DotNetVaultAnalyzer.DotNetVault_UsingMandatory_NoCopyIllegalPass, 0},
+                {DotNetVaultAnalyzer.DotNetVault_UsingMandatory_NoLockedResourceWrappersAllowedInScope, 0}
+            };
+
+            var test = ResourceFiles.NdiTestCases.NoCopyAttributeWithBadAssignment;
+            VerifyCSharpDiagnostic(test, dxes =>
+            {
+                foreach (var dx in dxes)
+                {
+                    ++actualCounts[dx.Id];
+                }
+                return actualCounts.All(kvp => expectedCounts[kvp.Key] == kvp.Value);
+
+            }, dx => true);
+        }
+
+        [TestMethod]
+        public void TestCopyAssignmentOne()
+        {
+            var test = ResourceFiles.CopyAssignmentTestCases.CopyAssignmentTestCase1;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 3,
+                dx => dx.Id == DotNetVaultAnalyzer
+                    .DotNetVault_UsingMandatory_IrregularLockedResourceObjects_NotAllowedInScope);
+        }
+
+        [TestMethod]
+        public void TestCopyAssignmentTwo()
+        {
+            var test = ResourceFiles.CopyAssignmentTestCases.CopyAssignmentTestCase2;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 1,
+                dx => dx.Id == DotNetVaultAnalyzer.DotNetVault_UsingMandatory_NoCopyAssignment);
+        }
+
+        [TestMethod]
+        public void TestBadExtensionMethod()
+        {
+            var test = ResourceFiles.NdiTestCases.ExtensionMethodPbvTest;
+            VerifyCSharpDiagnostic(test, dxes => dxes.SingleOrDefault() != null,
+                dx => dx.Id == DotNetVaultAnalyzer.DotNetVault_UsingMandatory_NoCopyIllegalPass_ExtMethod);
         }
 
         [TestMethod]
@@ -216,6 +280,78 @@ namespace DotNetVault.Test
                 dx.Id == DotNetVaultAnalyzer.DiagnosticId_UsingMandatory_Inline ||
                 (dx.Id == DotNetVaultAnalyzer.DotNetVault_NotDirectlyInvocable && dx.Location.GetLineSpan().StartLinePosition.Line == zeroIdxVersion);
         }
+
+        [TestMethod]
+        public void TestNdiNotOkIllegalWrapper()
+        {
+            var test = ResourceFiles.NdiTestCases.IllegalWrapperTestCase;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 2,
+                dx => dx.Descriptor.Id ==
+                      DotNetVaultAnalyzer.DotNetVault_UsingMandatory_NoLockedResourceWrappersAllowedInScope);
+        }
+
+        [TestMethod]
+        public void TestNdiNotOkIllegalWrapperTestCaseTwo()
+        {
+            var test = ResourceFiles.NdiTestCases.illegalwrappertestcase2;
+            VerifyCSharpDiagnostic(test, col => col.Any(), dx => true);
+        }
+
+        [TestMethod]
+        public void TestNdiNotOkIllegalWrapperCaseThree()
+        {
+            var test = ResourceFiles.NdiTestCases.illegalwrappertestcase3;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 1,
+                dx => dx.Id == DotNetVaultAnalyzer.DotNetVault_UsingMandatory_NoLockedResourceWrappersAllowedInScope);
+        }
+
+        [TestMethod]
+        public void TestNdiNotOkIllegalWrapperCaseFour()
+        {
+            var test = ResourceFiles.NdiTestCases.IllegalWrapperTestCase4;
+            VerifyCSharpDiagnostic(test, col => col.Any(),
+                dx => dx.Id == DotNetVaultAnalyzer.DotNetVault_UsingMandatory_NoLockedResourceWrappersAllowedInScope);
+        }
+
+        [TestMethod]
+        public void TestNdiNotOkDeepIllegalWrapper()
+        {
+            var test = ResourceFiles.NdiTestCases.TestDeepIllegalWrapper;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 2,
+                dx => dx.Descriptor.Id ==
+                      DotNetVaultAnalyzer.DotNetVault_UsingMandatory_NoLockedResourceWrappersAllowedInScope);
+        }
+
+        [TestMethod]
+        public void TestDeepWrapperActuallyOk()
+        {
+            var test = ResourceFiles.NdiTestCases.TestDeepWrapperActuallyOk;
+            VerifyCSharpDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void TestRefStructAttrOkCases()
+        {
+            var test = ResourceFiles.RefStructAttributeTestCases.RefStructAttributeTestsOk;
+            VerifyCSharpDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void TestRefStructAttrNotOkCase1()
+        {
+            var test = ResourceFiles.RefStructAttributeTestCases.RefStructAttrNotOkCase1;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 1,
+                dx => dx.Descriptor.Id == DotNetVaultAnalyzer.DotNetVault_OnlyOnRefStruct);
+        }
+
+        [TestMethod]
+        public void TestRefStructAttrNotOkCase2()
+        {
+            var test = ResourceFiles.RefStructAttributeTestCases.RoRegularNotARefStructCase2;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 1,
+                dx => dx.Descriptor.Id == DotNetVaultAnalyzer.DotNetVault_OnlyOnRefStruct);
+        }
+
 
         [TestMethod]
         public void TestNotVsEx()
@@ -583,7 +719,8 @@ namespace DotNetVault.Test
                 .AddMetadataReference(projectId, UriReference)
                 .AddMetadataReference(projectId, NameReference)
                 .AddMetadataReference(projectId, NdiReference)
-                .AddMetadataReference(projectId, UmReference);
+                .AddMetadataReference(projectId, UmReference)
+                .AddMetadataReference(projectId, NcReference);
 
 
             int count = 0;
@@ -610,5 +747,6 @@ namespace DotNetVault.Test
         private static readonly MetadataReference NameReference = MetadataReference.CreateFromFile(typeof(Name).Assembly.Location);
         private static readonly MetadataReference NdiReference = MetadataReference.CreateFromFile(typeof(NoDirectInvokeAttribute).Assembly.Location);
         private static readonly MetadataReference UmReference = MetadataReference.CreateFromFile(typeof(UsingMandatoryAttribute).Assembly.Location);
+        private static readonly MetadataReference NcReference = MetadataReference.CreateFromFile(typeof(NoCopyAttribute).Assembly.Location);
     }
 }

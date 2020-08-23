@@ -3,6 +3,19 @@
 namespace DotNetVault.Attributes
 {
     /// <summary>
+    /// This attribute marks a return value to indicate it cannot be copied
+    /// ... either by passing it by value to a property setter or by using the assignment operator
+    /// </summary>
+    /// <remarks>Allowing copying of locked resource objects can potentially allow
+    /// use-after-free (which potentially can enable unsynchronized access to the protected resource).
+    /// </remarks>
+    [AttributeUsage(AttributeTargets.Struct)]
+    public sealed class NoCopyAttribute : Attribute
+    {
+        internal static readonly string ShortenedName = "NoCopy";
+    }
+
+    /// <summary>
     /// This attribute is decorates the return value of invocation expressions.
     /// It mandates that the IMMEDIATE caller protected the value returned by a using statement
     /// or declaration, making it an error to fail to do so.

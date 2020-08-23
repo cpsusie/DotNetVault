@@ -17,7 +17,7 @@ namespace ExampleCodePlayground
         [NotNull]
         public string Text
         {
-            get => _text ??= string.Empty;
+            readonly get => _text ??  string.Empty;
             set => _text = value ?? throw new ArgumentNullException(nameof(value));
         }
 

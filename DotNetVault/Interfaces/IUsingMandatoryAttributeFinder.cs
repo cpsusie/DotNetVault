@@ -9,4 +9,9 @@ namespace DotNetVault.Interfaces
         bool HasUsingMandatoryReturnTypeSyntax([NotNull] InvocationExpressionSyntax syntax,
             [NotNull] SemanticModel model);
     }
+
+    internal interface INoCopyAttributeFinder
+    {
+        bool HasNoCopyReturnTypeSyntax([NotNull] InvocationExpressionSyntax syntax, [NotNull] SemanticModel mode);
+    }
 }

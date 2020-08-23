@@ -62,6 +62,119 @@ namespace DotNetVault.Test.ResourceFiles {
         
         /// <summary>
         ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using DotNetVault.Attributes;
+        ///using JetBrains.Annotations;
+        ///
+        ///namespace DotNetVault.Test.TestCases
+        ///{
+        ///    [NoCopy]
+        ///    public readonly ref struct NoCopyAttributeWithBadAssignment
+        ///    {
+        ///        [return: UsingMandatory]
+        ///        public static NoCopyAttributeWithBadAssignment CreateValue([NotNull] string s) =&gt;
+        ///            new NoCopyAttributeWithBadAssignment(s);
+        ///        public string Name =&gt; _name ?? string.Empty;
+        ///
+        ///        public vo [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ExtensionMethodPbvTest {
+            get {
+                return ResourceManager.GetString("ExtensionMethodPbvTest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using DotNetVault.Vaults;
+        ///using RwLck = DotNetVault.CustomVaultExamples.CustomLockedResources.StringBuilderRwLockedResource;
+        ///namespace DotNetVault.Test.TestCases
+        ///{
+        ///    public ref struct IllegalWrapper
+        ///    {
+        ///        public static IllegalWrapper CreateCopyInSneakyWay(in RwLck lck, DateTime ts) =&gt; new IllegalWrapper(in lck, ts);
+        ///
+        ///        public RwLck WrappedLockedResource;
+        ///        public DateTime Ts;
+        ///
+        ///        public void SetLockedResource(in RwLck lck) =&gt; WrappedLockedResource = lck;        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string IllegalWrapperTestCase {
+            get {
+                return ResourceManager.GetString("IllegalWrapperTestCase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using DotNetVault.Vaults;
+        ///using RwLck = DotNetVault.CustomVaultExamples.CustomLockedResources.StringBuilderRwLockedResource;
+        ///namespace DotNetVault.Test.TestCases
+        ///{
+        ///    public ref struct IllegalWrapper
+        ///    {
+        ///        public static IllegalWrapper CreateCopyInSneakyWay(in RwLck lck, DateTime ts) =&gt; new IllegalWrapper(in lck, ts);
+        ///
+        ///        public RwLck WrappedLockedResource;
+        ///        public DateTime Ts;
+        ///
+        ///        public void SetLockedResource(in RwLck lck) =&gt; WrappedLockedResource = lck;        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string illegalwrappertestcase2 {
+            get {
+                return ResourceManager.GetString("illegalwrappertestcase2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using DotNetVault.Vaults;
+        ///using RwLock = DotNetVault.CustomVaultExamples.CustomLockedResources.StringBuilderRwLockedResource;
+        ///namespace DotNetVault.Test.TestCases
+        ///{
+        ///    ref struct RwLockWrapper
+        ///    {
+        ///        public RwLock WrappedLock { get; }
+        ///        public string Name { get; }
+        ///
+        ///        public RwLockWrapper(in RwLock lck, string text)
+        ///        {
+        ///            WrappedLock = lck;
+        ///            Name = text ?? string.Empty;
+        ///        }
+        ///
+        ///        public new readonly string ToString() =&gt; Wra [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string illegalwrappertestcase3 {
+            get {
+                return ResourceManager.GetString("illegalwrappertestcase3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Text;
+        ///using DotNetVault.CustomVaultExamples.CustomLockedResources;
+        ///using DotNetVault.Vaults;
+        ///using RoLock = DotNetVault.CustomVaultExamples.CustomLockedResources.StringBuilderRoLockedResource;
+        ///using UpRoLock = DotNetVault.CustomVaultExamples.CustomLockedResources.StringBuilderUpgradableRoLockedResource;
+        ///using RwLock = DotNetVault.CustomVaultExamples.CustomLockedResources.StringBuilderRwLockedResource;
+        ///
+        ///namespace DotNetVault.Test.TestCases
+        ///{
+        ///
+        ///
+        ///    static class IllegalWr [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string IllegalWrapperTestCase4 {
+            get {
+                return ResourceManager.GetString("IllegalWrapperTestCase4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
         ///using DotNetVault.TestCaseHelpers;
         ///
         ///namespace DotNetVault.Test.TestCases
@@ -136,6 +249,98 @@ namespace DotNetVault.Test.ResourceFiles {
         internal static string NdiNotOkTestTwo {
             get {
                 return ResourceManager.GetString("NdiNotOkTestTwo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using DotNetVault.Attributes;
+        ///using JetBrains.Annotations;
+        ///
+        ///namespace DotNetVault.Test.TestCases
+        ///{
+        ///    [NoCopy]
+        ///    public readonly ref struct NoCopyAttributeWithBadAssignment
+        ///    {
+        ///        [return: UsingMandatory]
+        ///        public static NoCopyAttributeWithBadAssignment CreateValue([NotNull] string s) =&gt;
+        ///            new NoCopyAttributeWithBadAssignment(s);
+        ///        public string Name =&gt; _name ?? string.Empty;
+        ///
+        ///        public vo [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string NoCopyAttributeWithBadAssignment {
+            get {
+                return ResourceManager.GetString("NoCopyAttributeWithBadAssignment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using DotNetVault.Attributes;
+        ///using JetBrains.Annotations;
+        ///
+        ///namespace DotNetVault.Test.TestCases
+        ///{
+        ///    [NoCopy]
+        ///    public readonly ref struct NoCopyAttributeWithBadAssignment
+        ///    {
+        ///        [return: UsingMandatory]
+        ///        public static NoCopyAttributeWithBadAssignment CreateValue([NotNull] string s) =&gt;
+        ///            new NoCopyAttributeWithBadAssignment(s);
+        ///        public string Name =&gt; _name ?? string.Empty;
+        ///        public new string ToString() =&gt; Name;
+        ///        public void Dispose [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string NoCopyBadAssignUsingStatement {
+            get {
+                return ResourceManager.GetString("NoCopyBadAssignUsingStatement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using DotNetVault.Vaults;
+        ///using RwLck = DotNetVault.CustomVaultExamples.CustomLockedResources.StringBuilderRwLockedResource;
+        ///namespace DotNetVault.Test.TestCases
+        ///{
+        ///    public readonly ref struct FinalBadWrapper
+        ///    {
+        ///        public RwLck Lock =&gt; _rwLck;
+        ///        public DateTime Stamp =&gt; _ts;
+        ///        public string Text =&gt; _text ?? &quot;NONE&quot;;
+        ///
+        ///        internal FinalBadWrapper(in RwLck lck, string text)
+        ///        {
+        ///            _rwLck = lck;
+        ///            _text = text ?? throw new ArgumentNu [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string TestDeepIllegalWrapper {
+            get {
+                return ResourceManager.GetString("TestDeepIllegalWrapper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using DotNetVault.Vaults;
+        ///using RwLck = DotNetVault.CustomVaultExamples.CustomLockedResources.StringBuilderRwLockedResource;
+        ///using RoLck = DotNetVault.CustomVaultExamples.CustomLockedResources.StringBuilderRoLockedResource;
+        ///namespace DotNetVault.Test.TestCases
+        ///{
+        ///    public readonly ref struct FinalBadWrapper
+        ///    {
+        ///        public RwLck Lock =&gt; _rwLck;
+        ///        public DateTime Stamp =&gt; _ts;
+        ///        public string Text =&gt; _text ?? &quot;NONE&quot;;
+        ///
+        ///        internal FinalBadWrapper(in RwLck lck,  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string TestDeepWrapperActuallyOk {
+            get {
+                return ResourceManager.GetString("TestDeepWrapperActuallyOk", resourceCulture);
             }
         }
         

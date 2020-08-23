@@ -1,4 +1,14 @@
-﻿RELEASE NOTES VERSION 0.2.2.1-beta:
+﻿RELEASE NOTES VERSION 0.2.2.12-beta:
+
+    Fixed a Bug 92 where copying a protected resource into another ref-struct declared in a larger scope (of the same type or containing a field at any level of nesting in its graph) could result in unsynchronized access.  
+
+    Fix was accomplished by the addition of more analyzer rules and attributes that can trigger them.
+
+    Unit tests were added to validate the fix and code was added to the ExampleCodePlayground demonstrating Bug92.
+
+    A full description of Bug 92, the new attributes and analyzer rules is available now in "DotNetVault Description.pdf".
+
+RELEASE NOTES VERSION 0.2.2.1-beta:
 
     A BigValueListVault added, providing a vault protecting a list-like collection, especially suited for large value types. 
 

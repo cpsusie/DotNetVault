@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.Runtime.Serialization;
 using DotNetVault.Attributes;
 
 namespace DotNetVault.DeadBeefCafeBabeGame
@@ -8,45 +9,46 @@ namespace DotNetVault.DeadBeefCafeBabeGame
     /// Represents the result of a Clorton Game
     /// </summary>
     [VaultSafe]
+    [DataContract]
     public readonly struct DeadBeefCafeGameResult : IEquatable<DeadBeefCafeGameResult>
     {
         /// <summary>
         /// Time it started
         /// </summary>
-        public readonly DateTime StartedAt;
+        [DataMember] public readonly DateTime StartedAt;
         /// <summary>
         /// Time it ended
         /// </summary>
-        public readonly DateTime EndedAt;
+        [DataMember] public readonly DateTime EndedAt;
         /// <summary>
         /// Whether the game ended bc cancelled
         /// </summary>
-        public readonly bool Cancelled;
+        [DataMember] public readonly bool Cancelled;
         /// <summary>
         /// The final value of the array 
         /// </summary>
-        public readonly ImmutableArray<UInt256> FinalArray;
+        public ReadOnlyArrayWrapper<UInt256> FinalArray =>
+            _arrayWrapper.IsDefault ? ReadOnlyArrayWrapper<UInt256>.Empty : _arrayWrapper;
         /// <summary>
         /// Final 'x' count in string (may not be value when clorton was written)
         /// </summary>
-        public readonly int XCount;
+        [DataMember] public readonly int XCount;
         /// <summary>
         /// Final 'o' count in string (may not be value when clorton was written)
         /// </summary>
-        public readonly int OCount;
+        [DataMember] public readonly int OCount;
         /// <summary>
         /// The index of the winning reader thread (null if game ended without winner)
         /// </summary>
-        public readonly int? WinningThreadIndex;
+        [DataMember] public readonly int? WinningThreadIndex;
         /// <summary>
         /// The game ended successfully.
         /// </summary>
-        public readonly bool Success;
-
+        [DataMember] public readonly bool Success;
         /// <summary>
         /// The index at which <see cref="DeadBeefCafeBabeGameConstants.LookForNumber"/> was written, if any.
         /// </summary>
-        public readonly int? NumberFoundAtIndex;
+        [DataMember] public readonly int? NumberFoundAtIndex;
 
         /// <inheritdoc />
         public bool Equals(DeadBeefCafeGameResult other) => this == other;
@@ -106,7 +108,7 @@ namespace DotNetVault.DeadBeefCafeBabeGame
             StartedAt = start;
             EndedAt = end;
             Cancelled = cancel;
-            FinalArray = final.IsDefault ? throw new ArgumentException(@"The parameter was not initialized", nameof(final)) : final;
+            _arrayWrapper = final.IsDefault ? throw new ArgumentException(@"The parameter was not initialized", nameof(final)) : final;
             XCount = xCount;
             OCount = oCount;
             WinningThreadIndex = winningThreadIdx;
@@ -114,7 +116,7 @@ namespace DotNetVault.DeadBeefCafeBabeGame
             NumberFoundAtIndex = lookForNumberFoundAtIdx;
         }
 
-        private static bool Equals(ImmutableArray<UInt256> lhs, ImmutableArray<UInt256> rhs)
+        private static bool Equals(ReadOnlyArrayWrapper<UInt256> lhs, ReadOnlyArrayWrapper<UInt256> rhs)
         {
             if (lhs.IsDefault && rhs.IsDefault) return true;
             if (lhs.IsDefault || rhs.IsDefault) return false;
@@ -122,13 +124,13 @@ namespace DotNetVault.DeadBeefCafeBabeGame
             
             for (int i = 0; i < lhs.Length; ++i)
             {
-                ref readonly var lVal = ref lhs.ItemRef(i);
-                ref readonly var rVal = ref rhs.ItemRef(i);
+                ref readonly var lVal = ref lhs[i];
+                ref readonly var rVal = ref rhs[i];
                 if (lVal != rVal) return false;
             }
             return true;
         }
 
-
+        [DataMember] private readonly ReadOnlyArrayWrapper<UInt256> _arrayWrapper;
     }
 }

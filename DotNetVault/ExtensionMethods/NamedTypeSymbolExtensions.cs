@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using DotNetVault.Logging;
 using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 
@@ -68,5 +69,19 @@ namespace DotNetVault.ExtensionMethods
             }
             return false;
         }
+
+        public static bool IsRefLikeType([NotNull] this INamedTypeSymbol nts, [NotNull] INamedTypeSymbol refStructAttribute)
+        {
+            if (nts == null) throw new ArgumentNullException(nameof(nts));
+            if (refStructAttribute == null) throw new ArgumentNullException(nameof(refStructAttribute));
+
+            if (nts.IsRefLikeType) return true;
+            return DoesNamedTypeHaveAttribute(nts, refStructAttribute);
+
+        }
+
+        
+
+        
     }
 }

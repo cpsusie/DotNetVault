@@ -37,10 +37,72 @@ namespace DotNetVault.UtilitySources
                 return pnt.Ok ?? false;
             }
 
-            public bool IsPartOfInlineDeclUsingConstruct([NotNull] InvocationExpressionSyntax syntax)
+            public (bool ok, BlockSyntax ContainingBlockSyntax, UsingStatementSyntax UsingStatementSyntax) FindBlockOrUsingStatement(InvocationExpressionSyntax syntax)
+            {
+                BlockSyntax usingDeclarationBlock;
+                UsingStatementSyntax usingStateSyntax;
+                bool ok;
+                ParentNodeType pnt = ParentNodeType.FindTerminalParentNode(syntax);
+                if (true == pnt.Ok)
+                {
+                    switch (pnt.TerminalNode?.Kind())
+                    {
+                        default:
+                        case null:
+                            ok = false;
+                            usingDeclarationBlock = null;
+                            usingStateSyntax = null;
+                            break;
+                        case SyntaxKind.LocalDeclarationStatement:
+                            (ok, usingDeclarationBlock) =
+                                FindBlockSyntaxAncestor((LocalDeclarationStatementSyntax) pnt.TerminalNode);
+                            usingStateSyntax = null;
+                            break;
+                        case SyntaxKind.UsingStatement:
+                            usingStateSyntax = (UsingStatementSyntax) pnt.TerminalNode;
+                            usingDeclarationBlock = null;
+                            ok = true;
+                            //(ret, pNode) = HasVariableDeclarationChildNode((UsingStatementSyntax)pnt.TerminalNode);
+                            //Debug.Assert(!ret || pNode != null);
+                            break;
+                    }
+                }
+                else
+                {
+                    ok = false;
+                    usingDeclarationBlock = null;
+                    usingStateSyntax = null;
+                }
+
+                Debug.Assert(!ok || ((usingStateSyntax == null) != (usingDeclarationBlock == null)));
+                Debug.Assert(ok || (usingStateSyntax == null && usingDeclarationBlock == null));
+                return (ok, usingDeclarationBlock, usingStateSyntax);
+
+                (bool FoundBlockSyntax, BlockSyntax Bs) FindBlockSyntaxAncestor(LocalDeclarationStatementSyntax ldss)
+                {
+                    BlockSyntax bs = null;
+                    SyntaxNode current = ldss;
+                    while (bs == null && current != null)
+                    {
+                        if (current is BlockSyntax blk)
+                        {
+                            bs = blk;
+                        }
+                        else
+                        {
+                            current = current.Parent;
+                        }
+                    }
+
+                    return (bs != null, bs);
+                }
+            }
+
+            public (bool PartOfInlineDeclUsing, VariableDeclarationSyntax ParentNode) IsPartOfInlineDeclUsingConstruct(InvocationExpressionSyntax syntax)
             {
                 if (syntax == null) throw new ArgumentNullException(nameof(syntax));
                 ParentNodeType pnt = ParentNodeType.FindTerminalParentNode(syntax);
+                VariableDeclarationSyntax pNode;
                 bool ret;
                 if (true == pnt.Ok)
                 {
@@ -49,20 +111,26 @@ namespace DotNetVault.UtilitySources
                         default:
                         case null:
                             ret = false;
+                            pNode = null;
                             break;
                         case SyntaxKind.LocalDeclarationStatement:
                             ret = true;
+                            pNode = pnt.TerminalNode.ChildNodes().OfType<VariableDeclarationSyntax>().FirstOrDefault();
+                            Debug.Assert(pNode != null);
                             break;
                         case SyntaxKind.UsingStatement:
-                            ret = HasVariableDeclarationChildNode((UsingStatementSyntax) pnt.TerminalNode);
+                            (ret, pNode) = HasVariableDeclarationChildNode((UsingStatementSyntax) pnt.TerminalNode);
+                            Debug.Assert( !ret || pNode != null);
                             break;
                     }
                 }
                 else
                 {
                     ret = false;
+                    pNode = null;
                 }
-                return ret;
+                Debug.Assert(!ret || pNode != null);
+                return (ret, pNode);
             }
 
             public Type ExpectedTypeOfSyntaxObject => typeof(InvocationExpressionSyntax);
@@ -71,7 +139,7 @@ namespace DotNetVault.UtilitySources
                 IsPartOfUsingConstruct(
                     (InvocationExpressionSyntax) (syntax ?? throw new ArgumentNullException(nameof(syntax))));
             bool Interfaces.IUsingStatementSyntaxAnalyzer.IsPArtOfInlineDeclUsingConstruct(object syntax) =>
-                IsPartOfInlineDeclUsingConstruct((InvocationExpressionSyntax) syntax);
+                IsPartOfInlineDeclUsingConstruct((InvocationExpressionSyntax) syntax).PartOfInlineDeclUsing;
 
             private struct ParentNodeType
             {
@@ -130,7 +198,12 @@ namespace DotNetVault.UtilitySources
                 }
             }
 
-            private bool HasVariableDeclarationChildNode(UsingStatementSyntax syntax) => syntax.ChildNodes().OfType<VariableDeclarationSyntax>().Any();
+            private (bool HasIt, VariableDeclarationSyntax Syntax) HasVariableDeclarationChildNode(UsingStatementSyntax syntax)
+            {
+                VariableDeclarationSyntax ret = syntax.ChildNodes().OfType<VariableDeclarationSyntax>()
+                    .FirstOrDefault();
+                return (ret != null, ret);
+            }
         }
 
         private static Func<IUsingStatementSyntaxAnalyzer> UsingStatementAnalyzerFactory

@@ -64,8 +64,33 @@ complex concurrent code. Armed with the resources that DotNetVault provides, you
 will be able to approach concurrent programming, including use of shared mutable
 state, with a high degree of confidence.
 
+**Development Roadmap**: 
+	As of version 0.2.2.12-beta, Version 0.2 is feature complete 
+and with luck will be released in its first non-beta version soon. Any further
+releases in version two will hopefully be limited to documentation content updates, cleanup
+of test code and demonstration code.  Bug fixes may also be released in Version 2 
+but no new features (except as needed to fix bugs) should be expected.  
+
+	Future development in Version 0.2 after it is released in non-beta form will
+be limited to the correction of bugs and other flaws and perhaps refactoring to 
+the extent it does not materially change behavior.
+
+	After Version 0.2, new features will be developed under 0.3.  These
+features currently center on taking advantage of Roslyn Analyzers which should be
+available with .NET 5. 
+
 See **DotNetVault Description.pdf** for full description of this project.
 
+RELEASE NOTES VERSION 0.2.2.12-beta:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Fixed a Bug 92 where copying a protected resource into another ref-struct declared in a larger scope (of the same type or containing a field at any level of nesting in its graph) could result in unsynchronized access.  
+
+    Fix was accomplished by the addition of more analyzer rules and attributes that can trigger them.
+
+    Unit tests were added to validate the fix and code was added to the ExampleCodePlayground demonstrating Bug92.
+
+    A full description of Bug 92, the new attributes and analyzer rules is available now in **DotNetVault Description.pdf**.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 RELEASE NOTES VERSION 0.2.2.1-beta:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     A BigValueListVault added, providing a vault protecting a list-like collection, especially suited for large value types. 
@@ -83,24 +108,4 @@ RELEASE NOTES VERSION 0.2.1.22-beta
  "DotNetVault.Description.pdf" updated to reflect changes.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-RELEASE NOTES VERSION 0.2.1.9-alpha
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-This release contains MAJOR feature updates but is still considered unstable alpha.
-
-Major new feature: vaults with varying underlying synchronization mechanisms.  You may now chose lock=free atomics (only mechanism before), the .NET standard Monitor.Enter (used by C# lock statement) or ReaderWriterLockSlim.  Because these vaults have a compatible (at compile-time) API, you can easily switch between synchronization mechanisms without any extensive refactoring required.  Also, the new vault based on ReaderWriterLock slim allows for shared readonly locks, upgradable readonly locks and exclusive read-write locks.  If you are coming from an old version of this project, you may need to refactor in some places as their are a significant number of small breaking changes.  It should, however, be a quick and painless process.
-
-Fixed Bug 76.  Illegal references to non-vault-safe types inside mutable vault's locked resource objects delegates where not being detected in the case of local functions or using anonymous function syntax. 
-
-More unit tests.  There are now two unit test projects included.  The older one (DotNetVault.Test) tests the functionality of the built-in static analyzer.  The newer unit test project (VaultUnitTests) tests the functionality and synchronization mechanisms provided for the vaults.  It may also serve, in addition to the pre-existing sample code projects, as an introduction to this library.
-
-Documentation (including "DotNetVault Description.pdf") updated to reflect changes.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-RELEASE NOTES VERSION 0.2.0.2-alpha
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-This is an unstable alpha release.  The current stable release is 0.1.5.2.  
-
-The "Value" property of the BasicVault's locked resource object is now returned by reference.  This enables more efficient use of large mutable structs as protected resource objects.  An additional analysis rule was added to prevent ref local aliasing of the property, to prevent possible unsynchronized access.  Documentation updated to reflect.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

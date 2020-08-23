@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.Threading;
 using System.Diagnostics;
 using DotNetVault.ClortonGame;
+using DotNetVault.Logging;
 using DotNetVault.Vaults;
 using JetBrains.Annotations;
 using UpgrLockedRes = DotNetVault.LockedResources.UpgradableRoValListLockedResource<DotNetVault.Vaults.ReadWriteValueListVault<DotNetVault.DeadBeefCafeBabeGame.UInt256>, DotNetVault.DeadBeefCafeBabeGame.UInt256>;
@@ -20,7 +22,7 @@ namespace DotNetVault.DeadBeefCafeBabeGame
         /// <exception cref="ArgumentNullException"><paramref name="vault"/> or <paramref name="helper"/> was null.</exception>
         public ArbiterThread([NotNull] ReadWriteValueListVault<UInt256> vault, [NotNull] IOutputHelper helper) : base(
             vault, helper) { }
-
+        
         /// <inheritdoc />
         protected override void ExecuteJob(CancellationToken token)
         {
@@ -31,7 +33,7 @@ namespace DotNetVault.DeadBeefCafeBabeGame
                     //gets an upgradable read only lock
                     using (var lck = _valueList.UpgradableRoLock(token))
                     {
-                        (bool terminationConditionFound, string message) =
+                        (bool terminationConditionFound, string message, int itemsConsidered) =
                             DoesTerminationApply(in lck);
                         if (terminationConditionFound)
                         {
@@ -40,8 +42,10 @@ namespace DotNetVault.DeadBeefCafeBabeGame
                             //write lock
                             using var writeLock = lck.Lock(token);
                             writeLock.Insert(insertionIndex, in LookFor);
-                            _helper.WriteLine("At {0} Arbiter wrote {1} at index {2}.", CgTimeStampSource.Now.ToString("O") ,LookFor.ToString(),
-                                insertionIndex.ToString());
+                            
+                            _helper.WriteLine("At {0} Arbiter wrote {1} at index {2} making the last index of the array to consider at validation time: {3}", 
+                                CgTimeStampSource.Now.ToString("O") ,LookFor.ToString(),
+                                insertionIndex.ToString(), lck.Count - 1);
                             _helper.WriteLine(message);
                             return; //the write lock is released, then the upgradable read lock.
                         }
@@ -71,11 +75,11 @@ namespace DotNetVault.DeadBeefCafeBabeGame
         /// <inheritdoc />
         protected override Thread InitThread() => new Thread(ThreadLoop) { IsBackground = true, Name = "ArbiterThread" };
 
-        private (bool Applies, string Message) DoesTerminationApply(in UpgrLockedRes lck)
+        private (bool Applies, string Message, int ItemsConsidered) DoesTerminationApply(in UpgrLockedRes lck)
         {
             bool ret;
             string message;
-
+            int considered = lck.Count;
             (int firstCharCount, int secondCharCount) = GetFrequencyHistogram(in lck);
             int comparisonResult = firstCharCount.CompareTo(secondCharCount);
             
@@ -105,7 +109,11 @@ namespace DotNetVault.DeadBeefCafeBabeGame
                     : $"  The condition DOES NOT apply: their difference {difference.ToString()} IS NOT divisible by 13");
             }
 
-            return (ret, message);
+            if (ret && lck.Count != considered)
+            {
+                throw new InvalidOperationException("Data corruption detected: contents did not remain constant.");
+            }
+            return (ret, message, considered);
 
         }
 
@@ -123,7 +131,7 @@ namespace DotNetVault.DeadBeefCafeBabeGame
             Debug.Assert(firstCount + secondCount == lck.Count, "firstCount + secondCount == lck.Count");
             return (firstCount, secondCount);
         }
-
+        
         [NotNull] private readonly Random _rGen = new Random();
     }
 }

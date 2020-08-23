@@ -36,12 +36,18 @@
     <Compile Remove="TestCases\BvIllegalRefExprTestCase4.cs" />
     <Compile Remove="TestCases\ConditionallyImmutableClassNonRoImmutF.cs" />
     <Compile Remove="TestCases\ConditionallyImmutStructWithNonROImmutF.cs" />
+    <Compile Remove="TestCases\CopyAssignmentTestCase1.cs" />
+    <Compile Remove="TestCases\CopyAssignmentTestCase2.cs" />
     <Compile Remove="TestCases\DataFlowTestCases.cs" />
     <Compile Remove="TestCases\DelegateCreationOpsAndDynamic.cs" />
     <Compile Remove="TestCases\DiagnosticALittleMoreComplex.cs" />
     <Compile Remove="TestCases\EarlyReleaseErrorCaseHaver.cs" />
     <Compile Remove="TestCases\EmitsDiagnosticUmRequiresInlineDecl.cs" />
     <Compile Remove="TestCases\EventArgsOkTest.cs" />
+    <Compile Remove="TestCases\ExtensionMethodPbvTest.cs" />
+    <Compile Remove="TestCases\IllegalWrapperTestCase.cs" />
+    <Compile Remove="TestCases\illegalwrappertestcase2.cs" />
+    <Compile Remove="TestCases\illegalwrappertestcase3.cs" />
     <Compile Remove="TestCases\ImmutableCollectionIsVaultSafe.cs" />
     <Compile Remove="TestCases\ImmutableStructIsVaultSafe.cs" />
     <Compile Remove="TestCases\ImmutableStructIsVsUnmanaged.cs" />
@@ -50,6 +56,8 @@
     <Compile Remove="TestCases\NdiMixedWithNotInlineNotOkCaseThree.cs" />
     <Compile Remove="TestCases\NdiNotOkCaseOne.cs" />
     <Compile Remove="TestCases\NdiNotOkTestTwo.cs" />
+    <Compile Remove="TestCases\NoCopyAttributeWithBadAssignment.cs" />
+    <Compile Remove="TestCases\NoCopyBadAssignUsingStatement.cs" />
     <Compile Remove="TestCases\NoDiagnosticALittleMoreComplex.cs" />
     <Compile Remove="TestCases\NoDiagnosticAttributeButAllUpper.cs" />
     <Compile Remove="TestCases\NoDiagnosticBecauseOnFaith.cs" />
@@ -59,12 +67,17 @@
     <Compile Remove="TestCases\NotVsException.cs" />
     <Compile Remove="TestCases\NullableNotHeldAgainstTest.cs" />
     <Compile Remove="TestCases\QueryTestCases.cs" />
+    <Compile Remove="TestCases\RefStructAttributeTestsOk.cs" />
+    <Compile Remove="TestCases\RefStructAttrNotOkCase1.cs" />
+    <Compile Remove="TestCases\RoRegularNotARefStructCase2.cs" />
     <Compile Remove="TestCases\SbAndUriBNotVaultSafe.cs" />
     <Compile Remove="TestCases\ShouldTriggerDiagnosticBecauseNoUsing.cs" />
     <Compile Remove="TestCases\ShouldTriggerDiagnosticLowercaseAndVsAttribute.cs" />
     <Compile Remove="TestCases\ShouldTriggerDiagnosticLowercaseAndVsAttributeV2.cs" />
     <Compile Remove="TestCases\ShouldTriggerDiagnosticLowercaseAndVsAttributeV3.cs" />
     <Compile Remove="TestCases\TestBaseClassWbVsIfSealed.cs" />
+    <Compile Remove="TestCases\TestDeepIllegalWrapper.cs" />
+    <Compile Remove="TestCases\TestDeepWrapperActuallyOk.cs" />
     <Compile Remove="TestCases\TestDynamicNeverConsideredVaultSafe.cs" />
     <Compile Remove="TestCases\TestEarlyReleaseBadJustification.cs" />
     <Compile Remove="TestCases\TestFindEarlyReleaseAttribute.cs" />
@@ -81,15 +94,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="2.9.6">
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.3.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="2.0.0" />
-    <PackageReference Include="MSTest.TestFramework" Version="2.0.0" />
-    <PackageReference Include="System.Collections.Immutable" Version="1.6.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.7.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.1.2" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.1.2" />
+    <PackageReference Include="System.Collections.Immutable" Version="1.7.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -118,6 +131,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>ConditionallyVsImmutableTypes.resx</DependentUpon>
     </Compile>
+    <Compile Update="ResourceFiles\CopyAssignmentTestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CopyAssignmentTestCases.resx</DependentUpon>
+    </Compile>
     <Compile Update="ResourceFiles\EarlyReleaseTestCases.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -132,6 +150,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>NullableNotHeldAgainstTests.resx</DependentUpon>
+    </Compile>
+    <Compile Update="ResourceFiles\RefStructAttributeTestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>RefStructAttributeTestCases.resx</DependentUpon>
     </Compile>
     <Compile Update="ResourceFiles\UsingMandatoryTestCases.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -201,6 +224,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ConditionallyVsImmutableTypes.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Update="ResourceFiles\CopyAssignmentTestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>CopyAssignmentTestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="ResourceFiles\EarlyReleaseTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>EarlyReleaseTestCases.Designer.cs</LastGenOutput>
@@ -212,6 +239,10 @@
     <EmbeddedResource Update="ResourceFiles\NullableNotHeldAgainstTests.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>NullableNotHeldAgainstTests.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ResourceFiles\RefStructAttributeTestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>RefStructAttributeTestCases.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="ResourceFiles\UsingMandatoryTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -253,10 +284,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DotNetVault\DotNetVault.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="TestCases\" />
   </ItemGroup>
 
 </Project>

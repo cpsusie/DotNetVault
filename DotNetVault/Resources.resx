@@ -122,11 +122,11 @@
     <comment>An optional longer localizable description of the diagnostic.</comment>
   </data>
   <data name="AnalyzerMessageFormat" xml:space="preserve">
-    <value>Type name '{0}' is annotated with the VaultSafe attribute but is not provably vault-safe.</value>
+    <value>Type name '{0}' is annotated with the VaultSafe attribute but is not provably vault-safe</value>
     <comment>The format-able message the diagnostic displays.</comment>
   </data>
   <data name="AnalyzerTitle" xml:space="preserve">
-    <value>Types annotated with the VaultSafe attribute must be vault-safe.</value>
+    <value>Types annotated with the VaultSafe attribute must be vault-safe</value>
     <comment>The title of the diagnostic.</comment>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />

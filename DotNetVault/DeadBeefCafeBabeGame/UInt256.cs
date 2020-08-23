@@ -1,8 +1,16 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using System.Text;
 using DotNetVault.Attributes;
 using DotNetVault.RefReturningCollections;
+using JetBrains.Annotations;
+using Microsoft.CodeAnalysis;
 
 namespace DotNetVault.DeadBeefCafeBabeGame
 {
@@ -10,6 +18,7 @@ namespace DotNetVault.DeadBeefCafeBabeGame
     /// A limited purpose unsigned equatable and comparable 256 integer used to demonstrate
     /// value list vaults.
     /// </summary>
+    [DataContract]
     public readonly struct UInt256 : IEquatable<UInt256>, IComparable<UInt256>
     {
 
@@ -148,10 +157,10 @@ namespace DotNetVault.DeadBeefCafeBabeGame
             return ret;
         }
 
-        private readonly ulong _high;
-        private readonly ulong _middleHigh;
-        private readonly ulong _middleLow;
-        private readonly ulong _low;
+        [DataMember] private readonly ulong _high;
+        [DataMember] private readonly ulong _middleHigh;
+        [DataMember] private readonly ulong _middleLow;
+        [DataMember] private readonly ulong _low;
     }
 
     /// <summary>
@@ -186,6 +195,240 @@ namespace DotNetVault.DeadBeefCafeBabeGame
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Compare(UInt256 x, UInt256 y) => Compare(in x, in y);
+    }
+
+    /// <summary>
+    /// A delegate used to establish whether a relation between lhs
+    /// and rhs exists.  Accepts by reference.
+    /// </summary>
+    /// <typeparam name="T">The type</typeparam>
+    /// <param name="lhs">left hand comparand</param>
+    /// <param name="rhs">right hand comparand</param>
+    /// <returns>true if the relation exists, false otherwise</returns>
+    public delegate bool RefRelationPredicate<T>(in T lhs, in T rhs);
+
+    /// <summary>
+    /// An array wrapper that can be data contract serialized
+    /// and allows by reference indexing and enumeration.
+    /// </summary>
+    /// <typeparam name="T">the type stored</typeparam>
+    [DataContract]
+    [VaultSafe(true)]
+    public readonly struct ReadOnlyArrayWrapper<[VaultSafeTypeParam] T> : IEquatable<ReadOnlyArrayWrapper<T>>, IReadOnlyList<T>
+    {
+        /// <summary>
+        /// Convert an immutable array to this wrapper
+        /// </summary>
+        /// <param name="convert">the immutable array</param>
+        public static implicit operator ReadOnlyArrayWrapper<T>(ImmutableArray<T> convert) =>
+            new ReadOnlyArrayWrapper<T>(convert.ToArray());
+
+        /// <summary>
+        /// Convert one of these guys to an immutable array
+        /// </summary>
+        /// <param name="wrapper">to be converted</param>
+        public static implicit operator ImmutableArray<T>(ReadOnlyArrayWrapper<T> wrapper) =>
+            wrapper._arr.ToImmutableArray();
+
+        /// <summary>
+        /// Create a readonly array from a collection
+        /// </summary>
+        /// <param name="source">the collection</param>
+        /// <returns>a readonly array</returns>
+        public static ReadOnlyArrayWrapper<T> CreateReadonlyArray([NotNull] IEnumerable<T> source)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            return new ReadOnlyArrayWrapper<T>(source.ToArray());
+        }
+
+        /// <summary>
+        /// Uninitialized value
+        /// </summary>
+        public static ReadOnlyArrayWrapper<T> Default { get; } = default;
+
+        /// <summary>
+        /// Initialized but empty value
+        /// </summary>
+        public static ReadOnlyArrayWrapper<T> Empty { get; } = new ReadOnlyArrayWrapper<T>(Array.Empty<T>());
+
+        /// <summary>
+        /// True if the value has not been initialized.
+        /// </summary>
+        public bool IsDefault => _arr == null;
+
+        /// <summary>
+        /// Get the item at the specified index
+        /// </summary>
+        /// <param name="index">the index to get</param>
+        /// <exception cref="IndexOutOfRangeException"></exception>
+        /// <exception cref="NullReferenceException">Has default value.</exception>
+        public ref readonly T this[int index] => ref _arr[index];
+        /// <inheritdoc />
+        public int Count => _arr.Length;
+
+        /// <summary>
+        /// Alias for <see cref="Count"/>
+        /// </summary>
+        public int Length => _arr.Length;
+        
+        /// <summary>
+        /// Provides array's count as a long.
+        /// </summary>
+        public long LongLength => _arr.LongLength;
+
+        /// <summary>
+        /// Convert to a read-only span.
+        /// </summary>
+        /// <returns>A read-only span as a view of the array</returns>
+        public ReadOnlySpan<T> AsSpan() => _arr.AsSpan();
+
+        /// <summary>
+        /// see if item occurs in collection
+        /// </summary>
+        /// <param name="item">item </param>
+        /// <param name="eqComparer">equality comparer</param>
+        /// <returns>true if it appears in collection, false otherwise</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="eqComparer"/> was null</exception>
+        public bool Contains(in T item, [NotNull] RefRelationPredicate<T> eqComparer)
+            => IndexOf(in item, eqComparer) > -1;
+
+        /// <summary>
+        /// see at which index the item first appears in collection.
+        /// </summary>
+        /// <param name="item">the item</param>
+        /// <param name="eqComparer">equality comparer</param>
+        /// <returns>the index if found, -1 otherwise</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="eqComparer"/> was null.</exception>
+        public int IndexOf(in T item, [NotNull] RefRelationPredicate<T> eqComparer )
+        {
+            if (eqComparer == null) throw new ArgumentNullException(nameof(eqComparer));
+            for (int i = 0; i < _arr.Length; ++i)
+            {
+                if (eqComparer(in item, in _arr[i]))
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        T IReadOnlyList<T>.this[int index] => this[index];
+
+        /// <summary>
+        /// Get an enumerator
+        /// </summary>
+        /// <returns>an enumerator</returns>
+        public Enumerator GetEnumerator() => Enumerator.GetEnumerator(this);
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        /// <summary>
+        /// Compares two objects of this type to see if they wrap (reference equality only)
+        /// the same underlying array
+        /// </summary>
+        /// <param name="lhs">left hand operand</param>
+        /// <param name="rhs">right hand operand</param>
+        /// <returns>true if they wrap same array, false otherwise</returns>
+        public static bool operator ==(ReadOnlyArrayWrapper<T> lhs, ReadOnlyArrayWrapper<T> rhs) =>
+            ReferenceEquals(lhs._arr, rhs._arr);
+        /// <summary>
+        /// Compares two objects of this type to see if they wrap (reference equality only)
+        /// distinct underling arrays 
+        /// </summary>
+        /// <param name="lhs">left hand operand</param>
+        /// <param name="rhs">right hand operand</param>
+        /// <returns>true if they wrap distinct arrays, false otherwise</returns>
+        public static bool operator !=(ReadOnlyArrayWrapper<T> lhs, ReadOnlyArrayWrapper<T> rhs) => !(lhs == rhs);
+
+        /// <inheritdoc />
+        public override int GetHashCode() => _arr?.GetHashCode() ?? 0;
+
+        /// <inheritdoc />
+        public override bool Equals(object other) => other is ReadOnlyArrayWrapper<T> roaw && roaw == this;
+
+        /// <inheritdoc />
+        public bool Equals(ReadOnlyArrayWrapper<T> other) => other == this;
+
+        private ReadOnlyArrayWrapper([NotNull] T[] arr) => _arr = arr ?? throw new ArgumentNullException(nameof(arr));
+
+        /// <summary>
+        /// A by ref enumerator
+        /// </summary>
+        public struct Enumerator : IEnumerator<T>
+        {
+            /// <summary>
+            /// Create enumerator
+            /// </summary>
+            /// <param name="owner">the owner</param>
+            /// <returns>an enumerator</returns>
+            internal static Enumerator GetEnumerator(ReadOnlyArrayWrapper<T> owner) => new Enumerator(owner);
+
+
+            /// <summary>
+            /// Get the current item
+            /// </summary>
+            /// <exception cref="NullReferenceException">Enumerator has not been initialized.</exception>
+            /// <exception cref="IndexOutOfRangeException">Enumerator not in valid state.</exception>
+            public readonly ref readonly T Current => ref _arr[_idx];
+
+            T IEnumerator<T>.Current
+            {
+                get
+                {
+                    if (_arr == null) throw new InvalidOperationException("Enumerator has not been initialized.");
+                    return Current;
+                }
+            }
+
+            object IEnumerator.Current
+            {
+                get
+                {
+                    if (_arr == null) throw new InvalidOperationException("Enumerator has not been initialized.");
+                    return Current;
+                }
+            }
+
+            /// <inheritdoc />
+            public bool MoveNext()
+            {
+                if (_arr == null)
+                {
+                    throw new InvalidOperationException("The enumerator has not been initialized.");
+                }
+
+                int temp = ++_idx;
+                return temp > -1 && temp < _arr.Length;
+            }
+
+            /// <inheritdoc />
+            public void Reset()
+            {
+                if (_arr == null)
+                {
+                    throw new InvalidOperationException("The enumerator has not been initialized.");
+                }
+
+                _idx = -1;
+            }
+
+            /// <inheritdoc />
+            public void Dispose() {}
+
+            private Enumerator(ReadOnlyArrayWrapper<T> wrapper)
+            {
+                _arr = wrapper._arr ??
+                       throw new ArgumentException(
+                           @"The array has not been initialized.", nameof(wrapper));
+                _idx = -1;
+            }
+
+            private int _idx;
+            private readonly T[] _arr;
+        }
+
+        [DataMember] private readonly T[] _arr;
+        
+
     }
 
 }

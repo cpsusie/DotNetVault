@@ -17,6 +17,8 @@ namespace DotNetVault.LockedResources
     /// </summary>
     /// <typeparam name="TVault">The vault type</typeparam>
     /// <typeparam name="TItem">The vault-safe self-equatable and self-comparable value type held by the list.</typeparam>
+    [NoCopy]
+    [RefStruct]
     public readonly ref struct RoValListLockedResource<TVault, [VaultSafeTypeParam] TItem> 
         where TVault : ReadWriteListVault<TItem, BigValueList<TItem>> where TItem : struct, IEquatable<TItem>, IComparable<TItem>
     {

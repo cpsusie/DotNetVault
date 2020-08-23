@@ -13,6 +13,19 @@ namespace ExampleCodePlayground
     {
         static void Main()
         {
+            //bug 92 is fixed code should not be run but exits to demonstrate analyzer operations
+            //uncomment designated code to get various correct compiler errors
+            //Console.WriteLine("BEGIN BUG 92 DEMO");
+            //Bug92Demo.ShowBug92Fix();
+            //Bug92Demo.ShowPassByValueNowForbidden();
+            //Console.WriteLine("END BUG 92 DEMO");
+            Console.WriteLine();
+            Console.WriteLine();
+
+            UsingBigMutableStructExample.ReadOnlyAccess();
+            UsingBigMutableStructExample.ReadWriteAccess();
+            UsingBigMutableStructExample.UpgradableTest();
+
             MutableStructCareExamples.LargeMutableStructsAreNowEfficientProtectedResourcesWithReturnByReference();
             MutableStructCareExamples.DemonstrateNeedForRuleAgainstLocalRefAlias();
             KnownIssuesDemonstration.DemonstrateDoubleDispose();

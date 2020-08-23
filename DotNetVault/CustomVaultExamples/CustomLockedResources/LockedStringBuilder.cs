@@ -41,6 +41,8 @@ namespace DotNetVault.CustomVaultExamples.CustomLockedResources
     /// or you may not be able to provide the entire API.
     /// </remarks>
     /// <remarks>This is the atomics-based locked resource object</remarks>
+    [NoCopy]
+    [RefStruct]
     public readonly ref struct LockedStringBuilder
     {
         #region Static Factory Method

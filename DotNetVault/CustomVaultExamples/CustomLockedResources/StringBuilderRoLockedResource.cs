@@ -12,6 +12,8 @@ namespace DotNetVault.CustomVaultExamples.CustomLockedResources
     /// Read-write view of a string builder provided by the readonly lock methods
     /// of the <see cref="StringBufferReadWriteVault"/>.
     /// </summary>
+    [NoCopy]
+    [RefStruct]
     public readonly ref struct StringBuilderRwLockedResource
     {
         #region Factory Method
@@ -598,6 +600,8 @@ namespace DotNetVault.CustomVaultExamples.CustomLockedResources
     /// Read-only view of a string builder provided by the readonly lock methods
     /// of the <see cref="StringBufferReadWriteVault"/>.
     /// </summary>
+    [NoCopy]
+    [RefStruct]
     public ref struct StringBuilderRoLockedResource
     {
         #region Factory
@@ -704,6 +708,8 @@ namespace DotNetVault.CustomVaultExamples.CustomLockedResources
     /// Read-only view of a string builder provided by the readonly lock methods
     /// of the <see cref="StringBufferReadWriteVault"/>.
     /// </summary>
+    [NoCopy]
+    [RefStruct]
     public ref struct StringBuilderUpgradableRoLockedResource
     {
         #region Factory
@@ -896,6 +902,7 @@ namespace DotNetVault.CustomVaultExamples.CustomLockedResources
         #endregion
     }
 
+    [RefStruct]
     internal ref struct SubStringMatcher
     {
         public static int FindFirstIndexOfSubString([NotNull] StringBuilder str, [NotNull] string substr)

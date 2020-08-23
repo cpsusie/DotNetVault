@@ -1,4 +1,4 @@
 ﻿[*.cs]
 
-# IDE0032: Use auto property
-dotnet_style_prefer_auto_properties = false:silent
+# RS2008: Enable analyzer release tracking for the analyzer project containing rule 'DotNetVault_UsingMandatory_DeclaredInline'
+dotnet_diagnostic.RS2008.severity = suggestion

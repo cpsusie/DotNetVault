@@ -41,6 +41,8 @@ namespace DotNetVault.CustomVaultExamples.CustomLockedResources
     /// or you may not be able to provide the entire API.
     /// </remarks>
     /// <remarks>This locked resource object is for the sync object / monitor custom vault</remarks>
+    [NoCopy]
+    [RefStruct]
     public readonly ref struct LockedMonitorStringBuilder
     {
         #region Static Factory Method

@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
+using System.Xml;
 using DotNetVault.Attributes;
 using DotNetVault.ClortonGame;
 using DotNetVault.DeadBeefCafeBabeGame;
@@ -17,12 +18,12 @@ namespace CafeBabeGame
     class Program
     {
         private static readonly IDeadBeefCafeGameFactory GameFactory = new DeadBeefCafeGameFactorySource().FactoryInstance;
-
+        
         static void Main(string[] args)
         {
             CgTimeStampSource.SupplyAlternateProvider(HpTimeStampProvider.CreateInstance());
             TimeStampSource.Calibrate();
-            (bool gotFileOk, string errorGettingFile, FileInfo outputFile, int numGames) = GetOutputFile(args);
+            (bool gotFileOk, string errorInfo, FileInfo outputFile, int numGames) = GetOutputFile(args);
             Debug.Assert((outputFile != null) == gotFileOk);
             if (gotFileOk)
             {
@@ -53,20 +54,25 @@ namespace CafeBabeGame
                     }
                 }
             }
+            else
+            {
+                Console.Error.WriteLine(
+                    "There was a problem parsing the parameters passed hereto." +
+                    $"{(!string.IsNullOrEmpty(errorInfo) ? ("  " + errorInfo) : string.Empty)}");
+            }
 
         }
 
-        private static void PlayMultipleCafeBabeGames(int count, FileInfo outputFile)
+        private static void PlayMultipleCafeBabeGames(int count, FileInfo failureOutputFile)
         {
             if (count < 1) throw new ArgumentOutOfRangeException(nameof(count), count, "Parameter not positive.");
-            string failingBufferContents = string.Empty;
             StringBuilder allLog = new StringBuilder();
             for (int i = 1; i <= count; ++i)
             {
                 using IBufferBasedOutputHelper outputHelper = OrderedThreadSafeTestOutputHelper.CreateInstance();
                 {
                     Console.WriteLine($"Starting game {i} of {count}");
-                    Result r = default;
+                    Result r;
                     using (GameFactory.CreateDeadBeefCafeGame(outputHelper, 3, CafeBabeGame_GameEnded))
                     {
                         r = WaitForGameEndOrTimeout(TimeSpan.FromSeconds(3)) ?? default;
@@ -75,7 +81,7 @@ namespace CafeBabeGame
                             Console.Error.WriteLine(
                                 $"FAILED: The cafe babe game# {i} of {count} faulted.  No results can be retrieved.");
                             string bufferContents = TryGetBufferContents(TimeSpan.FromSeconds(2), outputHelper);
-                            LogContents(i, null, bufferContents, outputFile);
+                            LogContents(i, null, bufferContents, failureOutputFile);
                             return;
                         }
 
@@ -84,12 +90,16 @@ namespace CafeBabeGame
                         {
                             Console.WriteLine($"Game {i} of {count} finished ok.");
                             string buffer = outputHelper.GetCurrentTextAndClearBuffer(TimeSpan.FromSeconds(2));
-                            if (!ValidateLog(buffer))
+                            if (!ValidateLog(buffer, r.GameResult.Value.FinalArray))
                             {
-                                throw new InvalidOperationException("Unable to validate buffer: [" + buffer + "].");
+                                Console.Error.WriteLine("Buffer validation failed.");
+                                CafeBabeResultStorage storage = CafeBabeResultStorage.CreateStorageObject(in r, buffer);
+                                SerializersDeserializers.SerializeObjectToFile(storage, failureOutputFile);
+                                Console.Error.WriteLine("Failing contents written to output file: [" + failureOutputFile + "].");
+                                throw new InvalidOperationException("Unable to validate buffer contents.");
                             }
 
-                            allLog.Append(buffer);
+                            allLog.AppendLine($"Game {i} of {count} finished ok.");
                         }
                         else
                         {
@@ -106,6 +116,9 @@ namespace CafeBabeGame
                                     ? ("The winning reader thread was thread at index " +
                                        r.GameResult?.WinningThreadIndex.Value + ".")
                                     : "There was no winning thread.");
+                                string outputBuffer =
+                                    TryGetBufferContents(TimeSpan.FromMilliseconds(500), outputHelper);
+                                LogContents(i, in r, outputBuffer ?? string.Empty, failureOutputFile);
                             }
 
                             Environment.Exit(-1);
@@ -113,64 +126,21 @@ namespace CafeBabeGame
                         }
                     }
 
-                    using (var sw = outputFile.CreateText())
-                    {
-                        sw.Write(allLog);
-                    }
-
-                    try
-                    {
-                        outputFile.Refresh();
-                        if (!outputFile.Exists)
-                        {
-                            throw new FileNotFoundException("Unable to validate output file write.",
-                                outputFile.FullName);
-                        }
-                    }
-                    catch (FileNotFoundException)
-                    {
-                        throw;
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new FileNotFoundException("Unable to validate output file write.", outputFile.FullName,
-                            ex);
-                    }
-
-                    Console.WriteLine($"Successfully wrote to {outputFile.FullName}.");
 
                 }
 
                 void LogContents(int gameNum, in Result res, string buff, FileInfo of)
                 {
-                    Console.WriteLine($"Writing final string and logs to file for failed game# {gameNum}.");
+                    Console.WriteLine($"Writing data to file for failed game# {gameNum}.");
                     try
                     {
-                        using (var sw = of.CreateText())
-                        {
-                            sw.WriteLine("The final string was:");
-                            sw.WriteLine(res.ArrayText);
-                            sw.WriteLine("END FINAL STRING");
-
-                            if (!string.IsNullOrWhiteSpace(buff))
-                            {
-                                sw.WriteLine();
-                                sw.WriteLine("Log follows:");
-                                sw.WriteLine(buff);
-                                sw.WriteLine("End LOG.");
-                            }
-                            else
-                            {
-                                sw.WriteLine();
-                                sw.WriteLine("Log unavailable.");
-                            }
-                        }
-
-                        Console.WriteLine("Successfully wrote to [" + outputFile.FullName + "].");
+                        
+                        SerializersDeserializers.SerializeObjectToFile(CafeBabeResultStorage.CreateStorageObject(in res, buff), of);
+                        Console.WriteLine("Successfully wrote to [" + of.FullName + "].");
                     }
                     catch (Exception ex)
                     {
-                        Console.Error.WriteLine("There was an error writing to file [" + outputFile.FullName +
+                        Console.Error.WriteLine("There was an error writing to file [" + of.FullName +
                                                 "]: contents: [" + ex + "].  File not written.");
                     }
                 }
@@ -253,7 +223,7 @@ namespace CafeBabeGame
             Console.WriteLine(finalRes.Success ? "The game was successful!" : "The game FAILED.");
             if (finalRes.Success)
             {
-                bool validated = ValidateLog(bufferContents);
+                bool validated = ValidateLog(bufferContents, finalRes.FinalArray);
                 if (validated)
                 {
                     Console.WriteLine("The results were validated.");
@@ -310,136 +280,111 @@ namespace CafeBabeGame
 
         }
 
-        static bool ValidateLog(string gameLog)
+        static bool ValidateLog(string gameLog, ReadOnlyArrayWrapper<UInt256> array)
         {
 
-            if (string.IsNullOrWhiteSpace(gameLog))
+            if (string.IsNullOrWhiteSpace(gameLog) || array.IsDefault)
             {
                 return false;
             }
             var arr = gameLog.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
 
             const string upTo = "0xDEAD_BEEF_CAFE_BABE_DEAD_BEEF_CAFE_BABE_DEAD_BEEF_CAFE_BABE_DEAD_BEEF_CAFE_BABE";
-            const string xVal =
-                "0xC0DE_D00D_FEA2_B00B_C0DE_D00D_FEA2_B00B_C0DE_D00D_FEA2_B00B_C0DE_D00D_FEA2_B00B";
             const string oVal =
+                "0xC0DE_D00D_FEA2_B00B_C0DE_D00D_FEA2_B00B_C0DE_D00D_FEA2_B00B_C0DE_D00D_FEA2_B00B";
+            const string xVal =
                 "0xFACE_C0CA_F00D_BAD0_FACE_C0CA_F00D_BAD0_FACE_C0CA_F00D_BAD0_FACE_C0CA_F00D_BAD0";
 
-            int xCount = 0;
-            int oCount = 0;
+            int expectedExes = -1;
+            int expectedOes = -1;
             var strings = (from str in arr
-                           where str?.StartsWith("Logged at") == true && (str.Contains(upTo, StringComparison.OrdinalIgnoreCase) || str.Contains(xVal, StringComparison.OrdinalIgnoreCase) || str.Contains(oVal, StringComparison.OrdinalIgnoreCase))
+                           where str.StartsWith("Logged at") && (str.Contains(upTo, StringComparison.OrdinalIgnoreCase) 
+                                                                 || str.Contains(xVal, StringComparison.OrdinalIgnoreCase) 
+                                                                 || str.Contains(oVal, StringComparison.OrdinalIgnoreCase))
                            select str.Split(' ', StringSplitOptions.RemoveEmptyEntries)).ToArray();
-
+            bool foundDeadBeef = false, foundCounts = false;
             int indexOfDeadBeef = -1;
-            int idx = -1;
+            int strIdx = -1;
             foreach (var item in strings)
             {
-                ++idx;
-                if (item.Length == 10)
+                ++strIdx;
+                switch (item.Length)
                 {
-                    if (string.Equals(item[6].Trim(), upTo, StringComparison.OrdinalIgnoreCase))
-                        indexOfDeadBeef = idx;
+                    case 23:
+                        if (string.Equals(item[6].Trim(), upTo, StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (foundDeadBeef)
+                            {
+                                return false;
+                            }
+                            indexOfDeadBeef = strIdx;
+                            foundDeadBeef = true;
+                        }
+
+                        break;
+                    case 25:
+                        string xCt = item[4];
+                        string oCt = item[9];
+                        bool parsedOk = int.TryParse(oCt, out expectedOes) && int.TryParse(xCt, out expectedExes);
+                        if (!parsedOk)
+                        {
+                            return false;
+                        }
+                        foundCounts = true;
+                        break;
+                }
+
+                if (foundCounts && foundDeadBeef)
+                {
                     break;
                 }
             }
 
-
-
-            if (indexOfDeadBeef < 0 || indexOfDeadBeef >= strings.Length)
+            if (indexOfDeadBeef < 0 || indexOfDeadBeef >= strings.Length || expectedExes == -1 || expectedOes == -1)
             {
                 return false;
             }
 
-            var slice = strings.AsSpan().Slice(0, indexOfDeadBeef);
-            foreach (var str in slice)
+
+            string deadBeef = strings[indexOfDeadBeef].Last();
+            bool gotIdx = int.TryParse(deadBeef, out int lastIdxToConsider);
+            if (!gotIdx)
             {
-                if (str.Length < 9)
-                    return false;
-
-                bool isEx = string.Equals(str[4].Trim(), xVal, StringComparison.OrdinalIgnoreCase);
-                bool isO = string.Equals(str[4].Trim(), oVal, StringComparison.OrdinalIgnoreCase);
-
-                if (isO == isEx)
+                return false;
+            }
+            var constants = new DeadBeefCafeBabeGameConstants();
+            var slice = array.AsSpan().Slice(0, lastIdxToConsider + 1);
+            int xCount = 0;
+            int oCount = 0;
+            int deadBeefCount = 0;
+            foreach (ref readonly var value in slice)
+            {
+                if (value == constants.LookForNumber)
                 {
-                    return false;
+                    ++deadBeefCount;
                 }
-
-                bool parsedCount = int.TryParse(str[7], out int s);
-                if (!parsedCount)
+                else if (value == constants.XNumber)
                 {
-                    return false;
+                    ++xCount;
                 }
-
-                if (isEx)
+                else if (value == constants.ONumber)
                 {
-                    xCount += s;
+                    ++oCount;
                 }
                 else
                 {
-                    oCount += s;
+                    return false;
                 }
-
             }
 
-
-            int difference = xCount - oCount;
-            if (difference < 0)
+            int difference = Math.Abs(xCount - oCount);
+            if (difference == 0 || difference % 13 != 0)
             {
-                difference = 0 - difference;
-            }
-
-            return difference % 13 == 0;
-
-
-        }
-
-        private static bool ValidateFinalResult(in DeadBeefCafeGameResult finalRes)
-        {
-            Console.WriteLine();
-            Console.WriteLine("Validating correctness of final result.");
-            var finalArray = finalRes.FinalArray;
-            int firstIdx = finalArray.IndexOf(DeadBeefCafeBabeGameBase.GameConstants.LookForNumber);
-            if (firstIdx < 0)
-            {
-                Console.Error.WriteLine("UNABLE TO VALIDATE RESULTS.  POSSIBLE FLAW IN VAULT.");
-                Console.Error.WriteLine(DeadBeefCafeBabeGameBase.GameConstants.LookForNumber + " not found!");
                 return false;
             }
-            else
-            {
-                ReadOnlySpan<UInt256> preCafeBabeSpan = finalArray.AsSpan();
-                preCafeBabeSpan = preCafeBabeSpan.Slice(0, firstIdx);
-                int xCount = 0;
-                int oCount = 0;
-                foreach (ref readonly var num in preCafeBabeSpan)
-                {
-                    if (num == DeadBeefCafeBabeGameBase.GameConstants.XNumber)
-                        ++xCount;
-                    else if (num == DeadBeefCafeBabeGameBase.GameConstants.ONumber)
-                        ++oCount;
-                }
-               
 
-                Console.WriteLine(
-                    $"Before {DeadBeefCafeBabeGameBase.GameConstants.LookForNumber}, there were {xCount} \"x numbers\" and {oCount} \"o numbers\".");
-                int diff = xCount - oCount;
-                diff = diff < 0 ? -diff : diff;
-                Console.WriteLine($"The difference between the two counts is {diff}.");
-                bool validated = diff % 13 == 0;
-                if (validated)
-                {
-                    Console.WriteLine(
-                        "The difference between the two counts is evenly divisible by thirteen.  VALIDATED.");
-                    Console.WriteLine();
-                    return true;
-                }
-
-                Console.Error.WriteLine(
-                    "The difference between the two is NOT evenly divisible by thirteen.  WARNING RESULTS NOT VALIDATED.  POSSIBLE FLAW IN VAULT LOGIC.");
-                Console.Error.WriteLine();
-                return false;
-            }
+            return deadBeefCount == 1 && xCount == expectedExes &&
+                   oCount == expectedOes;
         }
 
         private static Result?  WaitForGameEndOrTimeout(TimeSpan maxWait)
@@ -487,9 +432,16 @@ namespace CafeBabeGame
             FileInfo outputFile = null;
             string errorInfo = string.Empty;
             int numGames = 1;
-            bool gotNumGames = (args?.Length > 1) && int.TryParse(args[1], out numGames);
+            bool gotNumGames = (args?.Length > 1) && (int.TryParse(args[1], out numGames) || (args[1].StartsWith("/") &&
+                int.TryParse(args[1].AsSpan().Slice(1, args[1].Length - 1), out numGames)));
             numGames = gotNumGames && numGames > 1 ? numGames : 1;
-            string fileName = (args?.Length > 0 && !string.IsNullOrWhiteSpace(args[0])) ? args[0] : TheDefaultFileName;
+            string fileName;
+            string defaultFn = numGames > 1 ? TheDefaultFailureFile : TheDefaultFileName;
+            fileName = (args?.Length > 0 && !string.IsNullOrWhiteSpace(args[0])) ? args[0] : defaultFn;
+            if (fileName.StartsWith("/"))
+            {
+                fileName = fileName.Substring(1, fileName.Length - 1);
+            }
             try
             {
                 outputFile = new FileInfo(fileName);
@@ -509,44 +461,180 @@ namespace CafeBabeGame
             return (outputFile != null, errorInfo, outputFile, numGames);
 
         }
-       
-        private static Random RGen => TheRng.Value;
+        
+        #region For debugging failed results
+        //static CafeBabeResultStorage Deserialize([NotNull] FileInfo source)
+        //{
+        //    try
+        //    {
+        //        return SerializersDeserializers.DeserializeObjectFromFile<CafeBabeResultStorage>(source);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.Error.WriteLine("Unable to deserialize from file: [" + source.FullName + "].  Exception: [" + ex + "].");
+        //        throw;
+        //    }
+        //}
 
-        private static readonly ThreadLocal<Random> TheRng = new ThreadLocal<Random>(() => new Random());
+        //static void RevalidateResults([NotNull] CafeBabeResultStorage storage)
+        //{
+        //    Console.WriteLine("Revalidating results.");
+        //    string gameResult = GetTextResult();
+        //    Console.WriteLine("Game result: [" + gameResult + "].");
+        //    if (storage.GameResult.GameResult != null)
+        //        Console.WriteLine("Detail: [" + storage.GameResult.GameResult + "].");
+        //    Console.WriteLine("Validating....");
+
+        //    bool success = ValidateLog(storage.Buffer,
+        //        storage.GameResult.GameResult?.FinalArray ?? ReadOnlyArrayWrapper<UInt256>.Default);
+        //    if (!success)
+        //    {
+        //        Console.Error.WriteLine("Validation failed.");
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("Validation succeeded.");
+        //    }
+        //    string GetTextResult()
+        //    {
+        //        if (storage.GameResult.GameResult == null)
+        //        {
+        //            return "NO GAME RESULT";
+        //        }
+        //        if (storage.GameResult.GameResult.Value.Success)
+        //        {
+        //            return "SUCCESS";
+        //        }
+        //        if (storage.GameResult.GameResult.Value.Cancelled)
+        //        {
+        //            return "CANCELLED";
+        //        }
+        //        return "FAILURE";
+        //    }
+
+        //}
+
+        //static void DoSerializationTest()
+        //{
+        //    try
+        //    {
+        //        FileInfo target = new FileInfo("serialization_test_target.xml");
+        //        ReadOnlyArrayWrapper<UInt256> items = ReadOnlyArrayWrapper<UInt256>.CreateReadonlyArray(new[]
+        //        {
+        //            new UInt256(0xCAFE_BABE_CAFE_BABE, 0xCAFE_BABE_CAFE_BABE, 0xCAFE_BABE_CAFE_BABE,
+        //                0xCAFE_BABE_CAFE_BABE),
+        //            new UInt256(0xC0DE_D00D_FEA2_B00B, 0xC0DE_D00D_FEA2_B00B, 0xC0DE_D00D_FEA2_B00B,
+        //                0xC0DE_D00D_FEA2_B00B),
+        //        });
+        //        SerializersDeserializers.SerializeObjectToFile(items, target);
+        //        target.Refresh();
+        //        if (!target.Exists)
+        //            throw new FileNotFoundException("The specified file was not found indicating it was not created.",
+        //                target.FullName);
+
+        //        ReadOnlyArrayWrapper<UInt256> roundTripped =
+        //            SerializersDeserializers.DeserializeObjectFromFile<ReadOnlyArrayWrapper<UInt256>>(target);
+        //        bool success = roundTripped.SequenceEqual(items);
+        //        string results = success ?
+        //             "The serialization test succeeded: object successfully round-tripped."
+        //            : "The test failed because the deserialized contents are not identical to the serialized contents.";
+        //        if (success)
+        //            Console.WriteLine(results);
+        //        else
+        //            Console.Error.WriteLine(results);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.Error.WriteLine("Serialization test failed.  Exception contents: [" + ex + "].");
+        //        throw;
+        //    }
+
+        //} 
+        #endregion
+
         private const string TheDefaultFileName = "Cafe_Babe_Game_Results.txt";
+        private const string TheDefaultFailureFile = "Cafe_Babe_Game_Failure.xml";
         private static readonly BasicMonitorVault<Result> TheResults = new BasicMonitorVault<Result>(default, TimeSpan.FromMilliseconds(100));
+    }
 
-        [VaultSafe]
-        private readonly struct Result : IEquatable<Result>
+    [DataContract]
+    public sealed class CafeBabeResultStorage : IEquatable<CafeBabeResultStorage>
+    {
+        public static CafeBabeResultStorage CreateStorageObject(in Result r, [CanBeNull] string bufferContents) => new CafeBabeResultStorage(in r, bufferContents);
+
+        public ref readonly Result GameResult => ref _result;
+        [NotNull] public string Buffer => _buffer ?? string.Empty;
+        public DateTime Timestamp => _timestamp;
+
+        private CafeBabeResultStorage(in Result r, string buffer)
         {
-            public static implicit operator Result(DeadBeefCafeGameEndedEventArgs e)
-            {
-                if (e == null)
-                {
-                    return default;
-                }
-                return new Result(e.Results, e.ArrayText);
-            }
-
-            public DeadBeefCafeGameResult? GameResult => _result;
-            [NotNull] public string ArrayText => _finalArrayText ?? string.Empty;
-
-            public Result(DeadBeefCafeGameResult? res, string text)
-            {
-                _result = res ?? default;
-                _finalArrayText = text;
-            }
-
-            public static bool operator ==(in Result lhs, in Result rhs)
-                => lhs._result == rhs._result;
-            public static bool operator !=(in Result lhs, in Result rhs) => !(lhs == rhs);
-            public override int GetHashCode() => _result.GetHashCode();
-            public override bool Equals(object obj) => obj is Result r && r == this;
-            public bool Equals(Result r) => r == this;
-
-            private readonly DeadBeefCafeGameResult _result;
-            private readonly string _finalArrayText;
+            _result = r;
+            _buffer = buffer ?? string.Empty;
+            _timestamp = r.GameResult?.EndedAt ?? TimeStampSource.Now;
         }
+
+        public override string ToString() => "CafeBabeResultStorage of Game at [" + _timestamp.ToString("O") + "].";
+
+        public bool Equals(CafeBabeResultStorage other) =>
+            other != null && other._result == _result && other._timestamp == _timestamp;
+
+        public override int GetHashCode()
+        {
+            int hash = _timestamp.GetHashCode();
+            unchecked
+            {
+                hash = (hash * 397) ^ _result.GetHashCode();
+            }
+            return hash;
+        }
+
+        public override bool Equals(object obj) => Equals(obj as CafeBabeResultStorage);
+
+        public static bool operator ==(CafeBabeResultStorage lhs, CafeBabeResultStorage rhs)
+        {
+            if (ReferenceEquals(lhs, rhs)) return true;
+            if (ReferenceEquals(lhs, null)) return false;
+            return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(CafeBabeResultStorage lhs, CafeBabeResultStorage rhs) => !(lhs == rhs);
+
+        [DataMember] private readonly DateTime _timestamp;
+        [DataMember] private readonly string _buffer;
+        [DataMember] private readonly Result _result;
+    }
+
+    [DataContract]
+    [VaultSafe]
+    public readonly struct Result : IEquatable<Result>
+    {
+        public static implicit operator Result(DeadBeefCafeGameEndedEventArgs e)
+        {
+            if (e == null)
+            {
+                return default;
+            }
+            return new Result(e.Results, e.ArrayText);
+        }
+
+        public DeadBeefCafeGameResult? GameResult => _result;
+        [NotNull] public string ArrayText => _finalArrayText ?? string.Empty;
+
+        public Result(DeadBeefCafeGameResult? res, string text)
+        {
+            _result = res ?? default;
+            _finalArrayText = text;
+        }
+
+        public static bool operator ==(in Result lhs, in Result rhs)
+            => lhs._result == rhs._result;
+        public static bool operator !=(in Result lhs, in Result rhs) => !(lhs == rhs);
+        public override int GetHashCode() => _result.GetHashCode();
+        public override bool Equals(object obj) => obj is Result r && r == this;
+        public bool Equals(Result r) => r == this;
+
+        [DataMember] private readonly DeadBeefCafeGameResult _result;
+        [DataMember] private readonly string _finalArrayText;
     }
 
     sealed class HpTimeStampProvider : TimeStampProvider
@@ -554,10 +642,34 @@ namespace CafeBabeGame
         public static HpTimeStampProvider CreateInstance()
             => new HpTimeStampProvider();
 
-        public override DateTime Now => HpTimesStamps.TimeStampSource.Now;
+        public override DateTime Now => TimeStampSource.Now;
         public override void Calibrate() =>
-            HpTimesStamps.TimeStampSource.Calibrate();
+            TimeStampSource.Calibrate();
 
         private HpTimeStampProvider() { }
+    }
+
+    static class SerializersDeserializers
+    {
+        public static void SerializeObjectToFile<T>(T serializeMe, [NotNull] FileInfo target)
+        {
+            if (target == null) throw new ArgumentNullException(nameof(target));
+            DataContractSerializer serializer  = new DataContractSerializer(typeof(T));
+            {
+                using var sw = target.Create();
+                serializer.WriteObject(sw, serializeMe);
+            }
+            target.Refresh();
+        }
+
+        public static T DeserializeObjectFromFile<T>([NotNull] FileInfo source)
+        {
+            DataContractSerializer deserializer = new DataContractSerializer(typeof(T));
+            using var sr = source.Open(FileMode.Open);
+            XmlDictionaryReader reader =
+                XmlDictionaryReader.CreateTextReader(sr,
+                    new XmlDictionaryReaderQuotas() {MaxStringContentLength = (1_024 * 1_024 * 100)});
+            return (T) deserializer.ReadObject(reader, true);
+        }
     }
 }

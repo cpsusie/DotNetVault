@@ -24,6 +24,7 @@ using BvProtResAnalyzer = DotNetVault.UtilitySources.BvProtResAnalyzerFactorySou
 namespace DotNetVault
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    // ReSharper disable once InconsistentNaming
     internal class DotNetVaultAnalyzer : DiagnosticAnalyzer
     {
         #region Public Fields, Properties and Constants
@@ -31,6 +32,17 @@ namespace DotNetVault
         internal const string DiagnosticId_VaultSafeTypes = "DotNetVault_VaultSafe";
         internal const string DiagnosticId_UsingMandatory = "DotNetVault_UsingMandatory";
         internal const string DiagnosticId_UsingMandatory_Inline = "DotNetVault_UsingMandatory_DeclaredInline";
+        internal const string DotNetVault_UsingMandatory_NoCopyIllegalPass =
+            "DotNetVault_UsingMandatory_NoCopyIllegalPass";
+        internal const string DotNetVault_UsingMandatory_NoCopyIllegalPass_ExtMethod =
+            "DotNetVault_UsingMandatory_NoCopyIllegalPass_ExtMethod";
+        internal const string DotNetVault_UsingMandatory_NoLockedResourceWrappersAllowedInScope =
+            "DotNetVault_UsingMandatory_NoProtectedResourceWrappersAllowedInScope";
+        internal const string DotNetVault_UsingMandatory_NoCopyAssignment =
+            "DotNetVault_UsingMandatory_NoCopyAssignment";
+        internal const string DotNetVault_UsingMandatory_IrregularLockedResourceObjects_NotAllowedInScope =
+            "DotNetVault_UsingMandatory_IrregularLockedResourceObjects_NotAllowedInScope";
+
         internal const string DotNetVault_VsDelegateCapture = "DotNetVault_VsDelegateCapture";
         internal const string DotNetVault_VsTypeParams = "DotNetVault_VsTypeParams";
         internal const string DotNetVault_VsTypeParams_Method_Invoke = "DotNetVault_VsTypeParams_MethodInvoke";
@@ -41,20 +53,24 @@ namespace DotNetVault
         internal const string DotNetVault_UnjustifiedEarlyDispose = "DotNetVault_UnjustifiedEarlyDispose";
         internal const string DotNetVault_EarlyDisposeJustification = "DotNetVault_EarlyDisposeJustification";
         internal const string DotNetVault_NoExplicitByRefAlias = "DotNetVault_NoExplicitByRefAlias";
+
+        internal const string DotNetVault_OnlyOnRefStruct = "DotNetVault_OnlyOnRefStruct";
         // ReSharper restore InconsistentNaming
         #endregion        
 
         #region Public Methods
 
         /// <inheritdoc />
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Descriptors; 
-           
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Descriptors;
+
 
         /// <inheritdoc />
+#pragma warning disable RS1026 // Enable concurrent execution
         public override void Initialize(AnalysisContext context)
+
         {
 #if DEBUG
-         //   Debugger.Launch();
+            //   Debugger.Launch();
 #endif
             using var dummy =
                 EntryExitLog.CreateEntryExitLog(true, typeof(DotNetVaultAnalyzer), nameof(Initialize), context);
@@ -63,7 +79,9 @@ namespace DotNetVault
                 context.RegisterSyntaxNodeAction(AnalyzeRefExpressionForProtectedResource, SyntaxKind.RefExpression);
                 context.RegisterSymbolAction(AnalyzeTypeSymbolForVsTypeParams, SymbolKind.NamedType);
                 context.RegisterSymbolAction(AnalyzeNamedTypeSymbolForVaultSafety, SymbolKind.NamedType);
+                //  context.RegisterSymbolAction(AnalyzeTypeForNoCopyFields, SymbolKind.NamedType);
                 context.RegisterSyntaxNodeAction(AnalyzeInvocationForUmCompliance, SyntaxKind.InvocationExpression);
+                context.RegisterSymbolAction(AnalyzeTypeDeclarationForIllegalUsageOfRefStructAttribute, SymbolKind.NamedType);
                 context.RegisterSyntaxNodeAction(AnalyzeMethodInvokeForVsTpCompliance, SyntaxKind.InvocationExpression);
                 context.RegisterSyntaxNodeAction(AnalyzeObjectCreationForVsTpCompliance,
                     SyntaxKind.ObjectCreationExpression);
@@ -82,9 +100,46 @@ namespace DotNetVault
                 throw;
             }
         }
+
+
+
         #endregion
 
         #region Primary Analysis Operations
+        private void AnalyzeTypeDeclarationForIllegalUsageOfRefStructAttribute(SymbolAnalysisContext obj)
+        {
+            const string methodName = nameof(AnalyzeTypeDeclarationForIllegalUsageOfRefStructAttribute);
+            CancellationToken token = obj.CancellationToken;
+            CSharpCompilation compilation = (CSharpCompilation)obj.Compilation;
+            if (obj.Symbol is INamedTypeSymbol nts)
+            {
+                try
+                {
+                    if (!nts.IsRefLikeType)
+                    {
+                        var refStructAttribute = compilation.FindRefStructAttribute();
+                        token.ThrowIfCancellationRequested();
+                        Debug.Assert(refStructAttribute != null);
+                        if (DoesNamedTypeHaveAttribute(nts, refStructAttribute))
+                        {
+                            var diagnostic = Diagnostic.Create(NoRefStructAttrExceptOnRefStruct,
+                                nts.Locations.FirstOrDefault(), DiagnosticSeverity.Error, nts.Locations.Skip(1), null,
+                                nts.Name);
+                            obj.ReportDiagnostic(diagnostic);
+                        }
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    DebugLog.Log($"{methodName} operation was cancelled.");
+                }
+                catch (Exception ex)
+                {
+                    TraceLog.Log(ex);
+                    throw;
+                }
+            }
+        }
 
         private void AnalyzeMethodInvocationForEarlyReleaseWithoutJustification(SyntaxNodeAnalysisContext context)
         {
@@ -93,20 +148,26 @@ namespace DotNetVault
                 methodName, context);
             try
             {
+                CSharpCompilation compilation = (CSharpCompilation) context.Compilation;
+                if (compilation == null)
+                {
+                    TraceLog.Log($"In {methodName}, analysis context object supplied a null compilation.");
+                    return;
+                }
                 if (context.Node is InvocationExpressionSyntax ies)
                 {
                     EarlyReleaseReason? justification;
                     var earlyReleaseAnalyzer = EarlyReleaseAnalyzerFactorySource.Factory();
                     bool hasEarlyReleaseAttribute =
-                        earlyReleaseAnalyzer.IsEarlyReleaseCall(context.Compilation, ies, context.CancellationToken);
+                        earlyReleaseAnalyzer.IsEarlyReleaseCall(compilation, ies, context.CancellationToken);
                     DebugLog.Log($"Invocation expression {ies.ToString()} " +
                                  (hasEarlyReleaseAttribute ? "has" : "does not have") +
                                  $" the {typeof(EarlyReleaseAttribute).Name} attribute.");
                     if (hasEarlyReleaseAttribute)
                     {
                         context.CancellationToken.ThrowIfCancellationRequested();
-                        var justRes=
-                            earlyReleaseAnalyzer.GetEarlyReleaseJustification(context.Compilation, ies,
+                        var justRes =
+                            earlyReleaseAnalyzer.GetEarlyReleaseJustification(compilation, ies,
                                 context.CancellationToken);
                         DebugLog.Log("Early release justification: " +
                                      $"[{justRes.Reason?.ToString() ?? "NONE"}]");
@@ -124,13 +185,12 @@ namespace DotNetVault
                         {
                             //ERROR -- early dispose REQUIRES justification
                             var unjustifiedEarlyDisposeDx = Diagnostic.Create(UnjustifiedEarlyDisposeDiagnostic,
-                                justRes.InvocationLocation,   justRes.EnclosingMethodLocation.AsEnumerable(), ies.ToString(),
+                                justRes.InvocationLocation, justRes.EnclosingMethodLocation.AsEnumerable(), ies.ToString(),
                                 justRes.EnclosingMethodSymbol);
                             DebugLog.Log(unjustifiedEarlyDisposeDx.GetMessage());
                             context.ReportDiagnostic(unjustifiedEarlyDisposeDx);
                         }
                     }
-                    
                 }
             }
             catch (OperationCanceledException)
@@ -159,7 +219,7 @@ namespace DotNetVault
                 // ReSharper disable once ConditionIsAlwaysTrueOrFalse -- DEBUG vs RELEASE
                 if (noInvAttrib != null)
                 {
-                    if (context.Node.Kind() == SyntaxKind.InvocationExpression && 
+                    if (context.Node.Kind() == SyntaxKind.InvocationExpression &&
                         context.Node is InvocationExpressionSyntax ies)
                     {
                         var model = context.SemanticModel;
@@ -244,23 +304,21 @@ namespace DotNetVault
             }
         }
         
-
         private void AnalyzeAssignmentsForDelegateCompliance(OperationAnalysisContext context)
         {
             const string methodName = nameof(AnalyzeAssignmentsForDelegateCompliance);
             using var _ = EntryExitLog.CreateEntryExitLog(EnableEntryExitLogging, typeof(DotNetVaultAnalyzer), methodName, context);
             try
             {
-                IDelegateCreationOperation delegateCreationOp = (IDelegateCreationOperation) context.Operation;
+                IDelegateCreationOperation delegateCreationOp = (IDelegateCreationOperation)context.Operation;
                 string typeName = ExtractTypeName(delegateCreationOp);
                 IOperation target = delegateCreationOp.Target;
                 if (target != null && !string.IsNullOrWhiteSpace(typeName))
                 {
                     if (delegateCreationOp.Type is INamedTypeSymbol nts && nts.IsGenericType)
                     {
-                        INamedTypeSymbol madeFrom = nts.ConstructedFrom;
                         var vsTypAttribSymbol = FindVaultSafeTypeParamAttribute(context.Compilation);
-                        if (madeFrom != null && vsTypAttribSymbol != null)
+                        if (vsTypAttribSymbol != null)
                         {
                             TypeSymbolVsTpAnalysisResult analResult = AnalyzeTypeSymbolVsTpAnal(nts, vsTypAttribSymbol,
                                 context.Compilation, context.CancellationToken);
@@ -286,6 +344,7 @@ namespace DotNetVault
 
             static string ExtractTypeName(IDelegateCreationOperation op) => op?.Type?.MetadataName ?? string.Empty;
         }
+        
         private void AnalyzeRefExpressionForProtectedResource(SyntaxNodeAnalysisContext obj)
         {
             const string methodName = nameof(AnalyzeRefExpressionForProtectedResource);
@@ -294,10 +353,16 @@ namespace DotNetVault
             try
             {
                 var syntax = (RefExpressionSyntax)obj.Node;
+                var compilation = obj.Compilation;
+                if (compilation == null)
+                {
+                    TraceLog.Log($"In {methodName}, analysis context object supplied a null compilation.");
+                    return;
+                }
                 BvProtResAnalyzer analyzerUtil = BvProtResAnalyzerFactorySource.DefaultFactoryInstance();
                 obj.CancellationToken.ThrowIfCancellationRequested();
 
-                bool foundIllegalUsage = analyzerUtil.QueryContainsIllegalRefExpression(obj.Compilation, syntax,
+                bool foundIllegalUsage = analyzerUtil.QueryContainsIllegalRefExpression(compilation, syntax,
                     obj.SemanticModel, obj.CancellationToken);
                 if (foundIllegalUsage)
                 {
@@ -322,33 +387,39 @@ namespace DotNetVault
             using var _ = EntryExitLog.CreateEntryExitLog(EnableEntryExitLogging, typeof(DotNetVaultAnalyzer), methodName, context);
             try
             {
+                var compilation = context.Compilation;
+                if (compilation == null)
+                {
+                    TraceLog.Log($"In {methodName}, received a null compilation in analysis context.");
+                    return;
+                }
                 if (context.Node.Kind() == SyntaxKind.ObjectCreationExpression)
                 {
                     INamedTypeSymbol nts;
 
                     var model = context.SemanticModel;
-                    var compilation = context.Compilation;
+                   
                     var si = model.GetSymbolInfo(context.Node);
                     var vsTypAttribSymbol = FindVaultSafeTypeParamAttribute(compilation);
                     switch (si.Symbol)
                     {
                         case IErrorTypeSymbol ets:
-                        {
-                            var resolved = ets.ResolveErrorTypeSymbol(compilation);
-                            if (resolved is INamedTypeSymbol nt)
                             {
-                                nts = nt;
-                            }
-                            else
-                            {
-                                DebugLog.Log(
-                                    "Analyzing obj creat expr [{context.Node}] for vstp compliance, " +
-                                    "error type symbol {ets} could not be resolved.");
-                                return;
-                            }
+                                var resolved = ets.ResolveErrorTypeSymbol(compilation);
+                                if (resolved is INamedTypeSymbol nt)
+                                {
+                                    nts = nt;
+                                }
+                                else
+                                {
+                                    DebugLog.Log(
+                                        "Analyzing obj creat expr [{context.Node}] for vstp compliance, " +
+                                        "error type symbol {ets} could not be resolved.");
+                                    return;
+                                }
 
-                            break;
-                        }
+                                break;
+                            }
                         case INamedTypeSymbol nt:
                             nts = nt;
                             break;
@@ -363,7 +434,7 @@ namespace DotNetVault
                     if (nts.IsGenericType)
                     {
                         TypeSymbolVsTpAnalysisResult result = AnalyzeTypeSymbolVsTpAnal(nts, vsTypAttribSymbol,
-                            context.Compilation, context.CancellationToken);
+                            compilation, context.CancellationToken);
                         if (!result.Passes)
                         {
                             string msg = result.PrintDiagnosticInfo();
@@ -390,6 +461,7 @@ namespace DotNetVault
             using var _ = EntryExitLog.CreateEntryExitLog(EnableEntryExitLogging, typeof(DotNetVaultAnalyzer), methodName, context);
             try
             {
+                var compilation = (CSharpCompilation) context.Compilation;
                 var node = context.Node;
                 InvocationExpressionSyntax syntax = node as InvocationExpressionSyntax;
                 var usingStatementAnalyzer = UsingStatementAnalyzerUtilitySource.CreateStatementAnalyzer();
@@ -418,21 +490,455 @@ namespace DotNetVault
 
                     var semanticModel = context.SemanticModel;
                     var usingMandatoryAttributeFinder = UsingMandatoryAttributeFinderSource.GetDefaultAttributeFinder();
-                    if (usingMandatoryAttributeFinder.HasUsingMandatoryReturnTypeSyntax(syntax, semanticModel)) 
-                    { //Case Has Um Attribute
-                        bool isInlineDeclaration = usingStatementAnalyzer.IsPartOfInlineDeclUsingConstruct(syntax);
+                    if (usingMandatoryAttributeFinder.HasUsingMandatoryReturnTypeSyntax(syntax, semanticModel))
+                    {
+                        //Case Has Um Attribute
+                        (bool isInlineDeclaration, VariableDeclarationSyntax terminalParent) =
+                            usingStatementAnalyzer.IsPartOfInlineDeclUsingConstruct(syntax);
                         if (!isInlineDeclaration)
                         {
-                            var diagnostic = Diagnostic.Create(UsingMandatoryAttributeAssignmentMustBeToVariableDeclaredInline,
+                            var diagnostic = Diagnostic.Create(
+                                UsingMandatoryAttributeAssignmentMustBeToVariableDeclaredInline,
                                 node.GetLocation(), syntax.Expression);
                             //Generate diagnostic
                             context.ReportDiagnostic(diagnostic);
                         }
+                        else
+                        {
+                            context.CancellationToken.ThrowIfCancellationRequested();
+                            Debug.Assert(terminalParent != null);
+                            (var _, ITypeSymbol ts, VariableDeclaratorSyntax ins) =
+                                FindTypeInfo(terminalParent, context);
+                            context.CancellationToken.ThrowIfCancellationRequested();
+                            if (ts is INamedTypeSymbol protectedType && ins != null)
+                            {
+                                INamedTypeSymbol noCopyAttribute = context.Compilation.FindNoCopyAttribute();
+                                INamedTypeSymbol refStructAttribute = context.Compilation.FindRefStructAttribute();
+                                Debug.Assert(refStructAttribute != null);
+                                bool typeHasNoCopyAttribute = DoesNamedTypeHaveAttribute(protectedType, noCopyAttribute);
+                                if (typeHasNoCopyAttribute)
+                                {
+                                    (bool foundRelevantBlock, BlockSyntax bs, UsingStatementSyntax uss) =
+                                        usingStatementAnalyzer.FindBlockOrUsingStatement(syntax);
+                                    if (!foundRelevantBlock)
+                                    {
+                                        DebugLog.Log(
+                                            $"Expected to find block syntax or using statement related to expression {syntax}, but they were not found.");
+                                        return;
+                                    }
+
+
+                                    bool isBlockSyntax = bs != null;
+                                    SyntaxNode searchMe = isBlockSyntax ? (SyntaxNode) bs : uss;
+                                    var protectedSymbol =
+                                        semanticModel.GetDeclaredSymbol(ins, context.CancellationToken);
+                                    if (protectedSymbol != null)
+                                    {
+
+                                        //search for value copy operations on the right side
+                                        var rightSideOfAssingments = searchMe.DescendantNodes()
+                                            .OfType<AssignmentExpressionSyntax>()
+                                            .Where(aes => aes.Right is IdentifierNameSyntax)
+                                            .Select(aes => (IdentifierNameSyntax) aes.Right);
+                                        var illegalAssignments = (from rsoa in rightSideOfAssingments
+                                            let symb = semanticModel.GetSymbolInfo(rsoa, context.CancellationToken)
+                                            where true == symb.Symbol?.Equals(protectedSymbol,
+                                                SymbolEqualityComparer.Default)
+                                            select (symb, rsoa)).ToImmutableArray();
+
+                                        bool assignedFrom = illegalAssignments.Any();
+                                        if (assignedFrom)
+                                        {
+                                            //report any illegal value copies
+                                            foreach (var item in illegalAssignments)
+                                            {
+                                                var diagnostic = Diagnostic.Create(UsingMandatoryNoCopyAssignment,
+                                                    item.rsoa.GetLocation(),
+                                                    item.symb.Symbol?.Locations.IsDefault == false
+                                                        ? item.symb.Symbol.Locations
+                                                        : ImmutableArray<Location>.Empty, ts.Name,
+                                                    item.symb.Symbol?.Name ?? string.Empty);
+                                                context.ReportDiagnostic(diagnostic);
+                                            }
+                                        }
+
+                                        //search on left hand side for copy assignments
+                                        //and lhs is of same type as protected resource
+                                        IEnumerable<(IdentifierNameSyntax AssignmentTarget, ExpressionSyntax
+                                            RightHandSide)> lhsesToCheck =
+                                            from searchNode in searchMe.DescendantNodes()
+                                                .OfType<AssignmentExpressionSyntax>()
+                                            let lhs = searchNode.Left as IdentifierNameSyntax
+                                            let rhs = searchNode.Right
+                                            where ThrowIfCanc(context.CancellationToken) && lhs != null && rhs != null
+                                            let lhsTypeInfo =
+                                                semanticModel.GetTypeInfo(lhs, context.CancellationToken).ConvertedType
+                                                    as INamedTypeSymbol
+                                            where ThrowIfCanc(context.CancellationToken) &&
+                                                  SymbolEqualityComparer.Default.Equals(protectedType, lhsTypeInfo)
+                                            select (lhs, rhs);
+
+                                        var illegalLhsCopyAssignments = ImmutableArray
+                                            .CreateBuilder<(IdentifierNameSyntax AssignmentTarget, ExpressionSyntax
+                                                RightHandSide)>();
+                                        foreach ((IdentifierNameSyntax assignmentTarget,
+                                            ExpressionSyntax assignmentSource) in lhsesToCheck)
+                                        {
+                                            
+                                            InvocationExpressionSyntax ies = assignmentSource as InvocationExpressionSyntax;
+                                            bool isLegal = ies != null && usingMandatoryAttributeFinder
+                                                .HasUsingMandatoryReturnTypeSyntax(ies, semanticModel);
+                                            context.CancellationToken.ThrowIfCancellationRequested();
+                                            if (!isLegal)
+                                            {
+                                                illegalLhsCopyAssignments.Add((assignmentTarget, assignmentSource));
+                                            }
+                                        }
+
+                                        var badAssignments =
+                                            illegalLhsCopyAssignments.Count == illegalLhsCopyAssignments.Capacity
+                                                ? illegalLhsCopyAssignments.MoveToImmutable()
+                                                : illegalLhsCopyAssignments.ToImmutable();
+
+                                        foreach ((IdentifierNameSyntax assignmentTarget,
+                                            ExpressionSyntax assignmentSource) in badAssignments)
+                                        {
+                                            var diagnostic = Diagnostic.Create(UsingMandatoryNoCopyAssignment,
+                                                assignmentTarget.GetLocation(), ts.Name);
+                                            context.ReportDiagnostic(diagnostic);
+                                        }
+
+//search for standard method invocations other than by constant reference
+var invocationsWhereProtectedInArgumentList =
+                                            (from n in searchMe.DescendantNodes()
+                                                where n is InvocationExpressionSyntax
+                                                let ies = (InvocationExpressionSyntax) n
+                                                where ThrowIfCanc(context.CancellationToken)
+                                                from ArgumentSyntax arg in ies.ArgumentList.Arguments
+                                                let identifier = arg.Expression as IdentifierNameSyntax
+                                                where identifier != null
+                                                let symbolIn =
+                                                    semanticModel.GetSymbolInfo(identifier, context.CancellationToken)
+                                                where symbolIn.Symbol != null
+                                                where SymbolEqualityComparer.Default.Equals(symbolIn.Symbol,
+                                                    protectedSymbol)
+                                                select (arg, symbolIn.Symbol));
+
+                                        var illegalBcNotByConstRef = invocationsWhereProtectedInArgumentList
+                                            .Where(inv => inv.arg.RefKindKeyword.Kind() != SyntaxKind.InKeyword)
+                                            .ToImmutableArray();
+
+
+                                        //report illegal locked reosure method invocations for standard method.
+                                        foreach (var item in illegalBcNotByConstRef)
+                                        {
+                                            Diagnostic d = Diagnostic.Create(UsingMandatoryIllegalPass,
+                                                item.arg.GetLocation(), item.Symbol.Locations,
+                                                ts.Name, item.Symbol.Name);
+                                            context.ReportDiagnostic(d);
+                                        }
+
+                                        //Find method member access with 'dot methodinvocationexpression' with protectedResource being the item whose method 
+                                        //is being member-accessed
+                                        var memberAccessExpressionsWhereLhsIsLockedResource =
+                                            from n in searchMe.DescendantNodes().OfType<MemberAccessExpressionSyntax>()
+                                            where n.Kind() == SyntaxKind.SimpleMemberAccessExpression
+                                            let found = FindMemberAccessOperands(n)
+                                            where found.accessedObject != null && found.accessedMethod != null
+                                            let symbols = FindMatchingSymbols(ts, protectedSymbol, found.accessedObject,
+                                                found.accessedMethod, semanticModel, context.CancellationToken)
+                                            where symbols.accessedObjSymb != null && symbols.methodSymbol != null
+                                            select (n, found.accessedObject, found.accessedMethod,
+                                                symbols.accessedObjSymb,
+                                                symbols.methodSymbol);
+
+                                        //Narrow it down to member accesses that 1- are really extension-method invocations 
+                                        //and 2- break the rule because the this parameter is being passed by value or non-const reference
+                                        ImmutableArray<(IMethodSymbol IMethodSymbol, IMethodSymbol ReducedFrom,
+                                            IdentifierNameSyntax MethodIdentifier)
+                                        > illegalExtensionMethods =
+                                            (from val in memberAccessExpressionsWhereLhsIsLockedResource
+                                                let methSymb = val.methodSymbol
+                                                where methSymb?.IsExtensionMethod == true
+                                                let reduced = methSymb.ReducedFrom
+                                                where reduced != null
+                                                let methId = val.accessedMethod
+                                                let firstParam = reduced.Parameters.FirstOrDefault()
+                                                where firstParam != null && firstParam.RefKind != RefKind.In
+                                                select (methSymb, reduced, methId)).ToImmutableArray();
+                                        //emit diagnostic for such illegal by-value or by-non-const reference extension method invocation
+                                        //on protected resource
+                                        foreach (var item in illegalExtensionMethods)
+                                        {
+
+                                            // $"Illegal invocation of method [{item.MethodIdentifier}] which is an extension method invocation
+                                            // of [{item.ReducedFrom.Name}] declared at [{TextFromImmutLocArr(item.ReducedFrom.Locations)}]: the locked resource object [{protectedSymbol.Name}, declared at {TextFromImmutLocArr(protectedSymbol.Locations)}] of type [{ts.Name}] is passed {TextFromRefKind(item.ReducedFrom.Parameters.FirstOrDefault()?.RefKind ?? RefKind.None)}.  Consider updating the extension method signature to accept the first parameter by constant reference: (e.g. static void PrintLockedResource(this in LockedResource lr).";
+                                            Diagnostic d = Diagnostic.Create(UsingMandatoryIllegalPassExtMeth,
+                                                item.MethodIdentifier.GetLocation(),
+                                                item.ReducedFrom.Locations.Union(protectedSymbol.Locations),
+                                                item.MethodIdentifier, item.ReducedFrom.Name,
+                                                TextFromImmutLocArr(item.ReducedFrom.Locations), protectedSymbol,
+                                                TextFromImmutLocArr(protectedSymbol.Locations), ts.Name,
+                                                TextFromRefKind(
+                                                    item.ReducedFrom.Parameters.FirstOrDefault()?.RefKind ??
+                                                    RefKind.None));
+                                            context.ReportDiagnostic(d);
+                                            context.CancellationToken.ThrowIfCancellationRequested();
+                                        }
+
+                                        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                                        if (refStructAttribute != null && protectedType.IsRefLikeType(refStructAttribute) && compilation != null)
+                                        {
+                                            //Now the fun begins.  We are looking for any ref struct variables whose
+                                            //scope overlaps with the scope of local locked resource object that was obtained from
+                                            //the vault.  If any such scope-overlapping ref struct locals contain ... at any level of object nesting
+                                            //a (non-static ... ref structs can't be static fields anywho) field of the same type of the locked resource object,
+                                            //it is disallowed.
+
+                                            SemanticModel model = context.SemanticModel;
+                                            CancellationToken token = context.CancellationToken;
+
+                                            //Scan the locked resource object's scope (searchMe ... either a using statement or the enclosing scope of a using declaration)
+                                            //for locals that are ref structs.  This result, of course, will include the locked resource object, but since it can't recursively contain
+                                            //an field of its own type, that will not be a problem.  For each such ref struct local, find it's identifier syntax, its local symbol and it's type
+                                            IEnumerable<(IdentifierNameSyntax IdentifierSyntax, ILocalSymbol LocalSymbol, INamedTypeSymbol LocalSymbolType )> identifierNameSyntax = 
+                                                from item in searchMe.DescendantNodesAndSelf()
+                                                    .OfType<IdentifierNameSyntax>()
+                                                let symbolInfo = model.GetSymbolInfo(item, token)
+                                                where symbolInfo.Symbol is ILocalSymbol
+                                                let localSymbol = (ILocalSymbol) symbolInfo.Symbol
+                                                let symbolType = localSymbol.Type as INamedTypeSymbol 
+                                                where symbolType != null && ThrowIfCanc(token) &&
+                                                symbolType.IsRefLikeType(refStructAttribute)
+                                                select (item, localSymbol, symbolType);
+
+                                            IEnumerable<(SyntaxToken Identifier, ILocalSymbol LocalSymbol,
+                                                INamedTypeSymbol LocalSymbolType)> identifierTokens =
+                                                (from findTokenNode in searchMe.DescendantNodesAndSelf()
+                                                        .OfType<VariableDeclarationSyntax>()
+                                                    from declarator in findTokenNode.Variables
+                                                    let symbolInfo = model.GetDeclaredSymbol(declarator,
+                                                        context.CancellationToken)
+                                                    where symbolInfo is ILocalSymbol
+                                                    let localSymbol = (ILocalSymbol) symbolInfo
+                                                    let symbolType = localSymbol.Type as INamedTypeSymbol
+                                                    where symbolType != null && ThrowIfCanc(token) &&
+                                                          symbolType.IsRefLikeType(refStructAttribute)
+                                                    select (declarator.Identifier, localSymbol, symbolType));
+
+
+                                            IEnumerable<(SyntaxNodeOrToken Identifier, ILocalSymbol LocalSymbol,
+                                                INamedTypeSymbol LocalSymbolType)> merged = Merge(identifierTokens,
+                                                identifierNameSyntax, token);
+                                                         //Now we go through the results of the query above and look for ref structs that contain fields of the prohibited type 
+                                                         //(the locked resource object type).  We can eliminate from our recursive search any fields that are not ref structs 
+                                                         //because only ref structs can contain ref structs.  If we find a field of the locked resource type in any local variable
+                                                         //(as above, overlapping in scope with our LockedResource object), generate a compiler error.
+                                                         (SyntaxNodeOrToken badFieldHavingIdentifierSyntax, ILocalSymbol localSymbolWithBadField, INamedTypeSymbol typeOfBadFieldHavingLocal, IFieldSymbol badFieldSymbol) =
+                                                                                     (from item in merged
+                                                                                      where item.Identifier != null && item.LocalSymbol != null && item.LocalSymbolType != null
+                                                                                      let identifierWithBadField = item.Identifier
+                                                                                      let localInstanceOfIdentifierWithBadField = item.LocalSymbol
+                                                                                      let typeOfIdentifierWithBadField = item.LocalSymbolType
+                                                                                      let result =
+                                       FindRefStructFieldOfTypeInObjectMap(typeOfIdentifierWithBadField, //this func does the recursive exam
+                                           protectedType, token, refStructAttribute)
+                                                                                      where result.FoundMatchingRefTypeInObjectMap && result.FieldSymb != null
+                                                                                      select (identifierWithBadField, localInstanceOfIdentifierWithBadField, typeOfIdentifierWithBadField, result.FieldSymb)).FirstOrDefault();
+                                            Debug.Assert(
+                                                ((badFieldHavingIdentifierSyntax == null) ==
+                                                 (localSymbolWithBadField == null)) &&
+                                                ((typeOfBadFieldHavingLocal == null) == (localSymbolWithBadField == null) && ((typeOfBadFieldHavingLocal == null) == (badFieldSymbol == null))),
+                                                "All should be null or none.");
+                                            if (badFieldHavingIdentifierSyntax != null) 
+                                            {
+                                                //we found that a local overlapping in scope with the locked resource object ... 
+                                                //at some level of nesting ... contains a field of the locked resource object's type.  
+                                                //this is not allowed.
+
+                                                //find the syntax that declared our protected resource object local
+                                                VariableDeclaratorSyntax protectedResourceDeclaration =
+                                                    searchMe.DescendantNodesAndSelf().OfType<VariableDeclaratorSyntax>()
+                                                        .FirstOrDefault();
+                                                //get its location
+                                                Location syntaxLocation = protectedResourceDeclaration?.GetLocation() ??
+                                                                          searchMe.GetLocation();
+                                                //get the location of the field of the protected resource type in the 
+                                                //ref struct that overlaps in scope with the bad resource.
+                                                Location fieldLocation = badFieldSymbol.Locations.FirstOrDefault();
+
+                                                //join these locations together to match expectation of diagnostic's 
+                                                //factory function
+                                                IEnumerable<Location> moreLocations = syntaxLocation.AsEnumerable()
+                                                    .Concat(fieldLocation != null
+                                                        ? fieldLocation.AsEnumerable()
+                                                        : Enumerable.Empty<Location>());
+                                                
+                                                //Create diagnostic that will trigger compilation error
+                                                Diagnostic dx = Diagnostic.Create(
+                                                    UsingMandatoryNoLockedResourceWrappersAllowedInScope,
+                                                    localSymbolWithBadField.Locations.FirstOrDefault(),
+                                                    localSymbolWithBadField.Locations.Skip(1).Concat(moreLocations),
+                                                    localSymbolWithBadField.Name, typeOfBadFieldHavingLocal.Name, badFieldSymbol.Name,
+                                                    protectedType.Name,  protectedResourceDeclaration ?? searchMe);
+                                                DebugLog.Log(dx.ToString());
+                                                context.ReportDiagnostic(dx);
+                                                //emit diagnostic here.
+                                                //DebugLog.Log("Bad wrapper detected.  Bad local: [" +
+                                                //             localSymbolWithBadField +
+                                                //             "]; Type of Local: [" + typeOfBadFieldHavingLocal +
+                                                //             "]; Bad field: [" + badFieldSymbol +
+                                                //             "]; Prohibited Type: [" + nts + "].");
+                                            }
+
+                                            //Next step of the fun.  Examine all local declarations that don't have usings in them
+                                            IEnumerable<(LocalDeclarationStatementSyntax Declaration, bool HasUsingSyntax, SyntaxToken
+                                                IdentifierToken, EqualsValueClauseSyntax EqValClause)> scannedDeclarations  =
+                                                (from myNode in searchMe.DescendantNodes()
+                                                    .OfType<LocalDeclarationStatementSyntax>()
+                                                where ThrowIfCanc(context.CancellationToken)
+                                                let hasUsing = myNode.UsingKeyword != default
+                                                let varDecl = myNode.Declaration
+                                                let varTypeSyntax = varDecl.Type
+                                                where varTypeSyntax != null && ThrowIfCanc(context.CancellationToken)
+                                                let declaredType =
+                                                    model.GetTypeInfo(varTypeSyntax).ConvertedType as INamedTypeSymbol
+                                                where ThrowIfCanc(context.CancellationToken) &&
+                                                      SymbolEqualityComparer.Default.Equals(protectedType,
+                                                          declaredType)
+                                                let declaredVariables = varDecl.Variables
+                                                from declarator in declaredVariables
+                                                let identifierToken = declarator.Identifier
+                                                let init = declarator.Initializer
+                                                where ThrowIfCanc(context.CancellationToken) 
+                                                select (myNode, hasUsing, identifierToken, init));
+
+                                            IEnumerable<(UsingStatementSyntax Statement, SyntaxToken Identifier, EqualsValueClauseSyntax EqVal)> scannedUsingStatementSyntaxes =
+                                                (from someNode in searchMe.DescendantNodes()
+                                                        .OfType<UsingStatementSyntax>()
+                                                    let variableDeclaration = someNode.Declaration
+                                                    where variableDeclaration != null &&
+                                                          ThrowIfCanc(context.CancellationToken)
+                                                    let typeSyntax = variableDeclaration.Type
+                                                    where typeSyntax != null && ThrowIfCanc(context.CancellationToken)
+                                                    let typeInfo =
+                                                        model.GetTypeInfo(typeSyntax).ConvertedType as INamedTypeSymbol
+                                                    where SymbolEqualityComparer.Default.Equals(protectedType, typeInfo)
+                                                    let vDeclarator = variableDeclaration.Variables.FirstOrDefault()
+                                                    where vDeclarator != null && ThrowIfCanc(context.CancellationToken)
+                                                    let identifierToken = vDeclarator.Identifier
+                                                    let eqVClause = vDeclarator.Initializer
+                                                    where eqVClause != null && ThrowIfCanc(context.CancellationToken)
+                                                    select (someNode, identifierToken, eqVClause));
+
+                                            var illegalStatementBuilder = ImmutableArray
+                                                .CreateBuilder<(StatementSyntax IllegalDeclaration, SyntaxToken
+                                                    IdentifierToken)>();
+                                            foreach (var item in scannedDeclarations)
+                                            {
+                                                if (item.HasUsingSyntax)
+                                                {
+                                                    EqualsValueClauseSyntax eqValSyntax = item.EqValClause;
+                                                    bool legal = eqValSyntax?.Value is InvocationExpressionSyntax ies &&
+                                                                 usingMandatoryAttributeFinder
+                                                                     .HasUsingMandatoryReturnTypeSyntax(ies,
+                                                                         semanticModel);
+                                                    context.CancellationToken.ThrowIfCancellationRequested();
+                                                    if (!legal)
+                                                    {
+                                                        illegalStatementBuilder.Add((item.Declaration, item.IdentifierToken));
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    illegalStatementBuilder.Add(
+                                                        (item.Declaration, item.IdentifierToken));
+                                                }
+                                            }
+
+                                            foreach (var item in scannedUsingStatementSyntaxes)
+                                            {
+                                                bool legal = item.EqVal?.Value is InvocationExpressionSyntax ies &&
+                                                             usingMandatoryAttributeFinder
+                                                                 .HasUsingMandatoryReturnTypeSyntax(ies,
+                                                                     semanticModel);
+                                                context.CancellationToken.ThrowIfCancellationRequested();
+                                                if (!legal)
+                                                {
+                                                    illegalStatementBuilder.Add((item.Statement, item.Identifier));
+                                                }
+                                            }
+
+                                            var irregularDeclarations =
+                                                illegalStatementBuilder.Capacity == illegalStatementBuilder.Count
+                                                    ? illegalStatementBuilder.MoveToImmutable()
+                                                    : illegalStatementBuilder.ToImmutable();
+                                            DebugLog.Log("Illegal token count: [" + irregularDeclarations.Length + "].");
+
+                                            {
+                                                string lockedResourceString =
+                                                    protectedSymbol?.ToDisplayString() ?? string.Empty;
+
+                                                foreach ((StatementSyntax declaration, SyntaxToken identifier) in
+                                                    irregularDeclarations)
+                                                {
+                                                    context.CancellationToken.ThrowIfCancellationRequested();
+                                                    VariableDeclarationSyntax irregularlyDeclared;
+                                                    string tokenName = identifier.Text ?? string.Empty;
+                                                    switch (declaration)
+                                                    {
+                                                        case LocalDeclarationStatementSyntax lds:
+                                                            irregularlyDeclared = lds.Declaration;
+                                                            break;
+                                                        case UsingStatementSyntax ustatement:
+                                                            irregularlyDeclared = ustatement.Declaration;
+                                                            break;
+                                                        default:
+                                                            irregularlyDeclared = null;
+                                                            break;
+                                                    }
+
+                                                    if (irregularlyDeclared != null)
+                                                    {
+                                                        Location irregularlyDeclaredLocation = identifier.GetLocation();
+                                                        if (irregularlyDeclaredLocation != null)
+                                                        {
+                                                            var dx = Diagnostic.Create(
+                                                                NoIrregularLockedResourcesAllowedInScope,
+                                                                irregularlyDeclaredLocation, protectedSymbol.Locations,
+                                                                lockedResourceString, tokenName);
+                                                            DebugLog.Log(dx.ToString());
+                                                            context.ReportDiagnostic(dx);
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+
+                                            //foreach (var illegalDeclaration in scannedDeclarations)
+                                            //{
+                                            //    DebugLog.Log(
+                                            //            "Illegal declaration detected. Has using: ["+illegalDeclaration.HasUsingSyntax + "]; Declaration: [" +
+                                            //            illegalDeclaration + "]; Identifier: [" +
+                                            //            illegalDeclaration.IdentifierToken.Text + "].");
+                                            //}
+
+
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                DebugLog.Log(
+                                    $"Expected {nameof(ts)} to be of type {nameof(INamedTypeSymbol)} " +
+                                    $"and {nameof(ins)} to be non null.  {nameof(ts)} is of type " +
+                                    $"{ts?.GetType().Name ?? "NULL"} and {nameof(ins)}'s value is " +
+                                    $"{ins?.ToString() ?? string.Empty}.");
+                            }
+                        }
                     }
-                    
                 }
-
-
             }
             catch (OperationCanceledException)
             {
@@ -444,7 +950,119 @@ namespace DotNetVault
                 throw;
             }
 
-            
+            #region Local Helpers
+
+            static string TextFromRefKind(RefKind rk)
+            {
+                string ret;
+                switch (rk)
+                {
+                    case RefKind.None:
+                        ret = "by value";
+                        break;
+                    case RefKind.Ref:
+                        ret = "by mutable reference";
+                        break;
+                    case RefKind.Out:
+                        ret = "by write-mandatory 'out' mutable reference.";
+                        break;
+                    case RefKind.In:
+                        ret = "by constant reference.";
+                        break;
+                    default:
+                        TraceLog.Log("New and unexpected value to refkind enum: [" + rk + "] not account for in [" +
+                                     nameof(AnalyzeInvocationForUmCompliance) +
+                                     "] analyzer method -- will treat as pass by value.");
+                        ret = "by value";
+                        break;
+                }
+
+                return ret;
+            }
+
+            static string TextFromImmutLocArr(ImmutableArray<Location> locations)
+            {
+                const string defaultRet = "UKNOWN";
+                string ret;
+
+                if (!locations.IsDefaultOrEmpty)
+                {
+                    var first = locations.FirstOrDefault();
+                    ret = first != null ? first.ToString() : defaultRet;
+                }
+                else
+                {
+                    ret = defaultRet;
+                }
+
+                return ret;
+            }
+
+            static bool ThrowIfCanc(CancellationToken tkn)
+            {
+                tkn.ThrowIfCancellationRequested();
+                return true;
+            }
+            static (SymbolInfo Info, ITypeSymbol TypeSymbol, VariableDeclaratorSyntax NameSyntax) FindTypeInfo(VariableDeclarationSyntax n, SyntaxNodeAnalysisContext context)
+            {
+                var model = context.SemanticModel;
+                SymbolInfo x = model.GetSymbolInfo(n.Type);
+                ITypeSymbol sym = (ITypeSymbol)x.Symbol;
+                VariableDeclaratorSyntax identifier =
+                    n.ChildNodes().OfType<VariableDeclaratorSyntax>().FirstOrDefault();
+                Debug.Assert(sym != null && identifier != null);
+                return (x, sym, identifier);
+            }
+            static (ITypeSymbol accessedObjSymb, IMethodSymbol methodSymbol) FindMatchingSymbols(
+                ITypeSymbol protectedType, ISymbol protectedLocal,
+                IdentifierNameSyntax accesObjSyntax, IdentifierNameSyntax methName,
+                SemanticModel model, CancellationToken tkn)
+            {
+                ITypeSymbol tsForProtectedResource;
+                SymbolInfo siForAccessObj = model.GetSymbolInfo(accesObjSyntax, tkn);
+                tsForProtectedResource = SymbolEqualityComparer.Default.Equals(siForAccessObj.Symbol, protectedLocal) ? protectedType : null;
+                IMethodSymbol ms = tsForProtectedResource != null ? (model.GetSymbolInfo(methName, tkn).Symbol as IMethodSymbol) : null;
+                tsForProtectedResource = ms != null ? tsForProtectedResource : null;
+                Debug.Assert((ms == null) == (tsForProtectedResource == null));
+                return (tsForProtectedResource, ms);
+
+            }
+            static (IdentifierNameSyntax accessedObject, IdentifierNameSyntax accessedMethod)
+                FindMemberAccessOperands(MemberAccessExpressionSyntax maexsynt)
+            {
+                ImmutableArray<IdentifierNameSyntax> arr = maexsynt.ChildNodes()
+                    .OfType<IdentifierNameSyntax>().ToImmutableArray();
+                if (arr.Length == 2)
+                {
+                    return (arr[0], arr[1]);
+                }
+
+                return (null, null);
+            } 
+            #endregion
+        }
+
+        private IEnumerable<(SyntaxNodeOrToken Identifier, ILocalSymbol LocalSymbol, INamedTypeSymbol LocalSymbolType)> Merge(IEnumerable<(SyntaxToken Identifier, ILocalSymbol LocalSymbol, INamedTypeSymbol LocalSymbolType)> identifierTokens, IEnumerable<(IdentifierNameSyntax IdentifierSyntax, ILocalSymbol LocalSymbol, INamedTypeSymbol LocalSymbolType)> identifierNameSyntax, CancellationToken token)
+        {
+            HashSet<ILocalSymbol> symbols = new HashSet<ILocalSymbol>(SymbolEqualityComparer.Default);
+
+            foreach (var item in identifierTokens)
+            {
+                token.ThrowIfCancellationRequested();
+                if (item.LocalSymbol != null && item.Identifier != default && symbols.Add(item.LocalSymbol))
+                {
+                    yield return ((SyntaxNodeOrToken) item.Identifier, item.LocalSymbol, item.LocalSymbolType);
+                }
+            }
+
+            foreach (var item in identifierNameSyntax)
+            {
+                token.ThrowIfCancellationRequested();
+                if (item.LocalSymbol != null && item.IdentifierSyntax != null && symbols.Add(item.LocalSymbol))
+                {
+                    yield return ((SyntaxNodeOrToken)item.IdentifierSyntax, item.LocalSymbol, item.LocalSymbolType);
+                }
+            }
         }
 
         private void AnalyzeMethodInvokeForVsTpCompliance(SyntaxNodeAnalysisContext context)
@@ -453,68 +1071,76 @@ namespace DotNetVault
             using var _ = EntryExitLog.CreateEntryExitLog(EnableEntryExitLogging, typeof(DotNetVaultAnalyzer), methodName, context);
             try
             {
-                INamedTypeSymbol vaultSafeTpAttribSymbol = FindVaultSafeTypeParamAttribute(context.Compilation);
-                var node = context.Node;
-                if (node.IsKind(SyntaxKind.InvocationExpression))
+                CSharpCompilation compilation = (CSharpCompilation) context.Compilation;
+                if (compilation != null)
                 {
-                    if (node is InvocationExpressionSyntax ies)
+                    INamedTypeSymbol vaultSafeTpAttribSymbol = FindVaultSafeTypeParamAttribute(compilation);
+                    var node = context.Node;
+                    if (node.IsKind(SyntaxKind.InvocationExpression))
                     {
-                        var model = context.SemanticModel;
-                        var sym = model.GetSymbolInfo(ies);
-                        if (sym.Symbol is IMethodSymbol methSym)
+                        if (node is InvocationExpressionSyntax ies)
                         {
-                            if (methSym.IsGenericMethod && HasSubstitutedTypeSymbol(methSym))
+                            var model = context.SemanticModel;
+                            var sym = model.GetSymbolInfo(ies);
+                            if (sym.Symbol is IMethodSymbol methSym)
                             {
-                                (bool HasAnyVsTpAttributes, ImmutableArray<int> IndicesOfVsTps) scanResult =
-                                    ScanForVaultSafeTypeParamAttribs(methSym, vaultSafeTpAttribSymbol);
-                                if (scanResult.HasAnyVsTpAttributes)
+                                if (methSym.IsGenericMethod && HasSubstitutedTypeSymbol(methSym))
                                 {
-                                    var set = (
-                                        from idx in scanResult.IndicesOfVsTps
-                                        let symbol = methSym.TypeArguments[idx]
-                                        where symbol is INamedTypeSymbol || symbol is IArrayTypeSymbol ||
-                                              symbol is IDynamicTypeSymbol
-                                        select symbol).ToImmutableHashSet();
-                                    var vaultSafeAnalyzer = VaultSafeAnalyzerFactorySource.CreateDefaultAnalyzer();
-                                    var nonConformingSymbols =
-                                        set.Where(sym2 =>
-                                            {
-                                                bool ret;
-                                                switch (sym2)
-                                                {
-                                                    case INamedTypeSymbol nts:
-                                                        ret = !vaultSafeAnalyzer.IsTypeVaultSafe(nts,
-                                                            context.Compilation);
-                                                        break;
-                                                    case IArrayTypeSymbol _:
-                                                    case IDynamicTypeSymbol _:
-                                                        ret = true;
-                                                        break;
-                                                    default:
-                                                        ret = false;
-                                                        break;
-                                                }
-
-                                                return ret;
-                                            })
-                                            .ToImmutableArray();
-                                    if (nonConformingSymbols.Any())
+                                    (bool HasAnyVsTpAttributes, ImmutableArray<int> IndicesOfVsTps) scanResult =
+                                        ScanForVaultSafeTypeParamAttribs(methSym, vaultSafeTpAttribSymbol);
+                                    if (scanResult.HasAnyVsTpAttributes)
                                     {
+                                        var set = (
+                                            from idx in scanResult.IndicesOfVsTps
+                                            let symbol = methSym.TypeArguments[idx]
+                                            where symbol is INamedTypeSymbol || symbol is IArrayTypeSymbol ||
+                                                  symbol is IDynamicTypeSymbol
+                                            select symbol).ToImmutableHashSet();
+                                        var vaultSafeAnalyzer = VaultSafeAnalyzerFactorySource.CreateDefaultAnalyzer();
+                                        var nonConformingSymbols =
+                                            set.Where(sym2 =>
+                                                {
+                                                    bool ret;
+                                                    switch (sym2)
+                                                    {
+                                                        case INamedTypeSymbol nts:
+                                                            ret = !vaultSafeAnalyzer.IsTypeVaultSafe(nts,
+                                                                compilation);
+                                                            break;
+                                                        case IArrayTypeSymbol _:
+                                                        case IDynamicTypeSymbol _:
+                                                            ret = true;
+                                                            break;
+                                                        default:
+                                                            ret = false;
+                                                            break;
+                                                    }
 
-                                        var formatStringArgs = GetArgumentsForDiagnosticFormatString(methSym,
-                                            scanResult.IndicesOfVsTps, nonConformingSymbols);
-                                        LogDiagnosticFormatString(VsTp_MessageFormat_MethInv,
-                                            formatStringArgs.MethodName, formatStringArgs.IndexList,
-                                            formatStringArgs.NonConformingTypes);
-                                        context.ReportDiagnostic(Diagnostic.Create(
-                                            GenericMethodTypeArgumentMustBeVaultSafe, node.GetLocation(),
-                                            formatStringArgs.MethodName, formatStringArgs.IndexList,
-                                            formatStringArgs.NonConformingTypes));
+                                                    return ret;
+                                                })
+                                                .ToImmutableArray();
+                                        if (nonConformingSymbols.Any())
+                                        {
+
+                                            var formatStringArgs = GetArgumentsForDiagnosticFormatString(methSym,
+                                                scanResult.IndicesOfVsTps, nonConformingSymbols);
+                                            LogDiagnosticFormatString(VsTp_MessageFormat_MethInv,
+                                                formatStringArgs.MethodName, formatStringArgs.IndexList,
+                                                formatStringArgs.NonConformingTypes);
+                                            context.ReportDiagnostic(Diagnostic.Create(
+                                                GenericMethodTypeArgumentMustBeVaultSafe, node.GetLocation(),
+                                                formatStringArgs.MethodName, formatStringArgs.IndexList,
+                                                formatStringArgs.NonConformingTypes));
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                }
+                else
+                {
+                    TraceLog.Log($"{methodName} received a null compilation argument.");
                 }
             }
             catch (OperationCanceledException)
@@ -531,7 +1157,7 @@ namespace DotNetVault
                 GetArgumentsForDiagnosticFormatString(IMethodSymbol methodSymbol, ImmutableArray<int> indicesOfVsTps,
                     ImmutableArray<ITypeSymbol> nonConformingSymbols)
             {
-                string methName = methodSymbol.Name ?? string.Empty;
+                string methName = methodSymbol?.Name ?? string.Empty;
                 string indexList = indicesOfVsTps.ConvertToCommaSeparatedList();
                 string nonConformingTypes = nonConformingSymbols.ConvertToCommaSeparatedList(ncs => ncs.Name);
                 return (methName, indexList, nonConformingTypes);
@@ -544,7 +1170,7 @@ namespace DotNetVault
             using var _ = EntryExitLog.CreateEntryExitLog(EnableEntryExitLogging, typeof(DotNetVaultAnalyzer), methodName, context);
             try
             {
-                var namedTypeSymbol = (INamedTypeSymbol) context.Symbol;
+                var namedTypeSymbol = (INamedTypeSymbol)context.Symbol;
                 INamedTypeSymbol vaultSafeAttribSymbol = FindVaultSafeAttribute(context.Compilation);
 
                 // Find just those named type symbols with names containing lowercase letters.
@@ -579,7 +1205,7 @@ namespace DotNetVault
             using var _ = EntryExitLog.CreateEntryExitLog(EnableEntryExitLogging, typeof(DotNetVaultAnalyzer), methodName, context);
             try
             {
-                var namedTypeSymbol = (INamedTypeSymbol) context.Symbol;
+                var namedTypeSymbol = (INamedTypeSymbol)context.Symbol;
                 INamedTypeSymbol vaultSafeTpAttribSymbol = FindVaultSafeTypeParamAttribute(context.Compilation);
                 Debug.Assert(vaultSafeTpAttribSymbol != null && namedTypeSymbol != null);
                 Debug.WriteLine($"Evaluating {namedTypeSymbol} for vs type param attribs.");
@@ -602,7 +1228,7 @@ namespace DotNetVault
                 throw;
             }
         }
-
+        
         private void AnalyzeForIllegalUseOfNonVsProtectableResource(SyntaxNodeAnalysisContext context)
         {
             const string methodName = nameof(AnalyzeForIllegalUseOfNonVsProtectableResource);
@@ -617,7 +1243,7 @@ namespace DotNetVault
                 {
                     DebugLog.Log(
                         $"Unable to identify attribute [{typeof(NotVsProtectableAttribute).Name}].  " +
-                        $"Syntax node [{context.Node?.ToString() ?? "NULL NODE"}] cannot be evaluated for Illegal Use of " +
+                        $"Syntax node [{context.Node}] cannot be evaluated for Illegal Use of " +
                         $"Non Vs Protectable resource.");
                     return;
                 }
@@ -629,7 +1255,7 @@ namespace DotNetVault
                     INamedTypeSymbol returnedOrCreatedType;
 
                     //for reals:
-                    var vaultSymbol = context.Compilation.GetTypeByMetadataName("DotNetVault.Vaults.Vault`1");
+                    var vaultSymbol = context.Compilation?.GetTypeByMetadataName("DotNetVault.Vaults.Vault`1");
                     //for testing:
                     //var vaultSymbol =
                     //    context.Compilation.GetTypeByMetadataName("DotNetVault.Test.TestCases.FakeVault`1");
@@ -657,13 +1283,12 @@ namespace DotNetVault
                         var setOfBaseTypes = GetBaseSymbols(returnedOrCreatedType, context.CancellationToken);
                         IEnumerable<(INamedTypeSymbol Closed, INamedTypeSymbol Open)> symbols =
                             (from item in setOfBaseTypes
-                                let n = item as INamedTypeSymbol
-                                where n != null &&
-                                      n.ConstructedFrom?.Equals(vaultSymbol, SymbolEqualityComparer.Default) ==
-                                      true && ThrowOnToken(context.CancellationToken)
-                                let closed = n
-                                let open = n.ConstructedFrom
-                                select (closed, open));
+                             let n = item as INamedTypeSymbol
+                             where n != null && SymbolEqualityComparer.Default.Equals(n.ConstructedFrom, vaultSymbol) 
+                                             && ThrowOnToken(context.CancellationToken)
+                             let closed = n
+                             let open = n.ConstructedFrom
+                             select (closed, open));
 
                         var gotIt = symbols.FirstOrDefault();
 
@@ -674,7 +1299,7 @@ namespace DotNetVault
                             bool hasAttribute = DoesNamedTypeHaveAttribute(typeArgument, attribute);
                             // ReSharper disable once RedundantAssignment
                             string doesOrDoesnt = hasAttribute ? "has" : "does not have";
-                            Debug.WriteLine(
+                            DebugLog.Log(
                                 $"The type {typeArgument.Name} {doesOrDoesnt} the {attribute.Name} attribute.");
                             if (hasAttribute)
                             {
@@ -745,10 +1370,113 @@ namespace DotNetVault
                 return (builder.ToImmutable());
             }
         }
-
         #endregion
 
         #region Ancillary Methods
+        /// <summary>
+        /// Recursively examine the ref-struct denoted by <paramref name="nts"/> for any fields of the prohibited type,
+        /// denoted by <paramref name="forbiddenFieldType"/>.  <paramref name="nts"/> should be a ref struct.  <paramref name="forbiddenFieldType"/>
+        /// should be the type of the locked resource object (also a ref struct) whose scope overlaps with a local ref struct of <paramref name="nts"/>'s type.
+        ///
+        /// Non ref struct fields can be ignored: only ref structs can contain ref struct fields.
+        ///
+        /// Static fields can be ignored: ref structs cannot be stored in static memory
+        ///
+        /// <paramref name="refStructAttribute"/> is a type symbol referring to the <see cref="RefStructAttribute"/>. 
+        /// Currently, ref structs from the analyzer are loaded during testing from metadata.  Loading the types
+        /// from metadata seems to cause a bug in Roslyn where ref structs are not recognized as such.
+        /// The <see cref="RefStructAttribute"/> has therefore been applied to all ref-structs defined in the library
+        /// so that they can be recognized as ref structs .... when the analyzer analyzes types defined within itself.
+        /// I believe this is a testing artifact and ... if the bug is fixed, this may not be required.  
+        /// The parameter <paramref name="refStructAttribute"/> is used to identify ref structs defined in the analyzer itself. Thus if a
+        /// named type symbol's .IsRefLikeType property is true OR if it is decorated with the <seealso cref="RefStructAttribute"/>,
+        /// we conclude that that type is a ref struct.
+        ///
+        /// <paramref name="token"/> is a cancellation token the compiler can use to cancel this analysis.
+        /// </summary>
+        /// <returns>When the first (if any) such field is identified, returns true and the offending field symbol which will be of
+        /// the type denoted by <paramref name="forbiddenFieldType"/>.
+        ///
+        /// If no such is found, returns (false, null)</returns>
+        /// <remarks>It is the callers responsibility to ensure that the parameters submitted are non-null and are what they purport to be.</remarks>
+        private (bool FoundMatchingRefTypeInObjectMap, IFieldSymbol FieldSymb)
+            FindRefStructFieldOfTypeInObjectMap([NotNull] INamedTypeSymbol nts,
+                [NotNull] INamedTypeSymbol forbiddenFieldType, CancellationToken token, [NotNull] INamedTypeSymbol refStructAttribute)
+        {
+            Debug.Assert(nts != null && forbiddenFieldType != null && refStructAttribute != null);
+
+            bool foundIt;
+            IFieldSymbol offendingField;
+            if (nts.IsRefLikeType(refStructAttribute) && forbiddenFieldType.IsRefLikeType(refStructAttribute))
+            {
+                token.ThrowIfCancellationRequested();
+                //find all fields of ref struct type in nts
+                IEnumerable<(IFieldSymbol IFieldSymbol, INamedTypeSymbol TypeSymbol)> searchMe =
+                    EnumerateNonStaticRefStructFields(nts, refStructAttribute, token);
+
+                //iterate all such fields
+                foreach (var item in searchMe)
+                {
+                    token.ThrowIfCancellationRequested();
+                    //evaluate each field recursively to see if it (or any of ITS non-static ref-struct fields)
+                    //is of the forbidden type
+                    (foundIt, offendingField, _) = EvaluateRecursively(item.TypeSymbol, item.IFieldSymbol,
+                        refStructAttribute, forbiddenFieldType, token);
+                    Debug.Assert(foundIt == (offendingField != null),
+                        "found it symmetrically implies that the offending field is non-null.");
+                    if (foundIt)
+                    {
+                        return (true, offendingField); //stop as soon as it is found.
+                    }
+                }
+            }
+            //didn't find it
+            return (false, null);
+
+            static IEnumerable<(IFieldSymbol FieldSymbol, INamedTypeSymbol TypeSymbol)> EnumerateNonStaticRefStructFields(INamedTypeSymbol enumerateMyFields,
+                INamedTypeSymbol refStructAttribute, CancellationToken token)
+            {
+                Debug.Assert(enumerateMyFields != null && refStructAttribute != null && enumerateMyFields.IsRefLikeType(refStructAttribute), "nts should be a ref struct symbol");
+                return (from fieldSymbol in enumerateMyFields.GetMembers().OfType<IFieldSymbol>()
+                        where fieldSymbol?.IsStatic == false && ThrowIfCanc(token)
+                        let fieldType = fieldSymbol.Type as INamedTypeSymbol
+                        where fieldType != null && fieldType.IsRefLikeType(refStructAttribute)
+                        select (fieldSymbol, fieldType));
+            }
+
+            static (bool foundIt, IFieldSymbol FirstFoundForbiddenField, INamedTypeSymbol ForbiddenType)
+                EvaluateRecursively(INamedTypeSymbol evalMeRecursively, IFieldSymbol namedTypeField, INamedTypeSymbol refStructSymbol, INamedTypeSymbol forbiddenType, CancellationToken token)
+            {
+                token.ThrowIfCancellationRequested();
+                //check the supplied type itself to see if it is of the forbidden type.  If so, we are done -- we found an offending field
+                if (SymbolEqualityComparer.Default.Equals(evalMeRecursively, forbiddenType))
+                {
+                    return (true, namedTypeField, forbiddenType);
+                }
+
+                //now get the sub fields that are non-static ref structs (retrieving the field symbol and type symbol
+                var subFields = EnumerateNonStaticRefStructFields(evalMeRecursively, refStructSymbol, token).ToImmutableArray();
+
+                foreach (var subItemPair in subFields.Where(
+                    sif => sif.FieldSymbol != null && sif.TypeSymbol != null))
+                {
+                    //for each such sub field this function will call itself to evaluate the sub field
+                    return EvaluateRecursively(subItemPair.TypeSymbol, subItemPair.FieldSymbol, refStructSymbol,
+                        forbiddenType, token);
+                }
+                //There were not any non-static sub fields that were of ref struct type
+                return (false, null, null);
+            }
+
+            //helper used so compiler can cancel this operation in the middle of linq queries
+            static bool ThrowIfCanc(CancellationToken t)
+            {
+                t.ThrowIfCancellationRequested();
+                return true;
+            }
+
+        }
+
         // ReSharper disable UnusedMember.Local TODO -- consider removing
         private TypeSymbolVsTpAnalysisResult AnalyzeTypeSymbolVsTpAnal([NotNull] INamedTypeSymbol namedType,
             [NotNull] INamedTypeSymbol vsTpAttrib, [NotNull] Compilation compilation) =>
@@ -765,7 +1493,7 @@ namespace DotNetVault
 
         [UsedImplicitly]
         private static INamedTypeSymbol FindUsingMandatoryAttribute(Compilation compilation) =>
-            compilation?.GetTypeByMetadataName(typeof(UsingMandatoryAttribute).FullName);
+            compilation?.GetTypeByMetadataName(typeof(UsingMandatoryAttribute).FullName ?? string.Empty);
 
         private TypeSymbolVsTpAnalysisResult AnalyzeTypeSymbolVsTpAnal([NotNull] INamedTypeSymbol namedType,
             [NotNull] INamedTypeSymbol vsTpAttrib, [NotNull] Compilation compilation, CancellationToken token)
@@ -807,37 +1535,37 @@ namespace DotNetVault
                                 switch (currentNts.TypeArguments[idx])
                                 {
                                     case INamedTypeSymbol typeArgSymb:
-                                    {
-                                        var isVaultSafe = vaultSafetyAnalyzer.IsTypeVaultSafeAsync(typeArgSymb,
-                                            compilation, token).Result;
-                                        if (!isVaultSafe.Result)
                                         {
-                                            if (isVaultSafe.Error == null)
+                                            var isVaultSafe = vaultSafetyAnalyzer.IsTypeVaultSafeAsync(typeArgSymb,
+                                                compilation, token).Result;
+                                            if (!isVaultSafe.Result)
                                             {
-                                                var paramType = currentNts.TypeParameters[idx];
-                                                var offendingType = typeArgSymb;
-                                                failureTriplets.Add(
-                                                    new IndividualFailureTriplet(idx, paramType, offendingType));
+                                                if (isVaultSafe.Error == null)
+                                                {
+                                                    var paramType = currentNts.TypeParameters[idx];
+                                                    var offendingType = typeArgSymb;
+                                                    failureTriplets.Add(
+                                                        new IndividualFailureTriplet(idx, paramType, offendingType));
+                                                }
                                             }
+                                            break;
+                                        }
+                                    case IArrayTypeSymbol ats:
+                                        {
+                                            var paramType = currentNts.TypeParameters[idx];
+                                            var offendingType = ats;
+                                            failureTriplets.Add(
+                                                new IndividualFailureTriplet(idx, paramType, offendingType));
                                         }
                                         break;
-                                    }
-                                    case IArrayTypeSymbol ats:
-                                    {
-                                        var paramType = currentNts.TypeParameters[idx];
-                                        var offendingType = ats;
-                                        failureTriplets.Add(
-                                            new IndividualFailureTriplet(idx, paramType, offendingType));
-                                    }
-                                    break;
                                     case IDynamicTypeSymbol dts:
-                                    {
-                                        var paramType = currentNts.TypeParameters[idx];
-                                        var offendingType = dts;
-                                        failureTriplets.Add(
-                                            new IndividualFailureTriplet(idx, paramType, offendingType));
-                                    }
-                                    break;
+                                        {
+                                            var paramType = currentNts.TypeParameters[idx];
+                                            var offendingType = dts;
+                                            failureTriplets.Add(
+                                                new IndividualFailureTriplet(idx, paramType, offendingType));
+                                        }
+                                        break;
                                 }
                             }
 
@@ -897,6 +1625,8 @@ namespace DotNetVault
             return (indices.Any(), indices);
         }
 
+      
+
         private (bool HasAnyVsTpAttributes, ImmutableArray<int> IndicesOfVsTps) ScanForVaultSafeTypeParamAttribs(
             [NotNull] IMethodSymbol scanMe, [NotNull] INamedTypeSymbol vsTpCanonicalAttribute)
         {
@@ -935,7 +1665,7 @@ namespace DotNetVault
             }
             else if (matchingData != null && matchingAttrbClass != null)
             {
-                var syntaxTree = matchingData.ApplicationSyntaxReference.SyntaxTree;
+                var syntaxTree = matchingData.ApplicationSyntaxReference?.SyntaxTree;
                 if (syntaxTree != null)
                 {
                     var nodes = syntaxTree.GetRoot().DescendantNodes().OfType<TypeDeclarationSyntax>()
@@ -952,25 +1682,24 @@ namespace DotNetVault
                     bool hasArguments = attribInQuestion?.ArgumentList?.Arguments.Count == 1;
                     if (hasArguments)
                     {
-                        var firstArgument = attribInQuestion.ArgumentList?.Arguments[0];
-                        var firstArgumentExpression = firstArgument?.Expression;
-                        if (firstArgumentExpression != null)
+                        AttributeArgumentSyntax firstArgument = attribInQuestion.ArgumentList.Arguments[0];
+                        var firstArgumentExpression = firstArgument.Expression;
+                        switch (firstArgumentExpression.Kind())
                         {
-                            switch (firstArgumentExpression.Kind())
-                            {
-                                case SyntaxKind.TrueLiteralExpression:
-                                    ret = true;
-                                    break;
-                                case SyntaxKind.FalseLiteralExpression:
-                                    // ReSharper disable once RedundantAssignment (clarity of what is done by this case)
-                                    ret = false;
-                                    break;
-                                default:
-                                    var semanticModel = model.GetSemanticModel(syntaxTree);
-                                    var help = semanticModel.GetConstantValue(firstArgumentExpression);
-                                    ret = help.HasValue && help.Value is bool b && b;
-                                    break;
-                            }
+                            case SyntaxKind.TrueLiteralExpression:
+                                ret = true;
+                                break;
+                            case SyntaxKind.FalseLiteralExpression:
+                                // ReSharper disable once RedundantAssignment (clarity of what is done by this case)
+                                ret = false;
+                                break;
+                            default:
+#pragma warning disable RS1030 // Do not invoke Compilation.GetSemanticModel() method within a diagnostic analyzer (not sure there is any other choice)
+                                var semanticModel = model.GetSemanticModel(syntaxTree);
+#pragma warning restore RS1030 // Do not invoke Compilation.GetSemanticModel() method within a diagnostic analyzer
+                                var help = semanticModel.GetConstantValue(firstArgumentExpression);
+                                ret = help.HasValue && help.Value is bool b && b;
+                                break;
                         }
                     }
                 }
@@ -1029,7 +1758,7 @@ namespace DotNetVault
                     break;
             }
 
-         
+
         }
 
         static string ExtractName(ITypeSymbol ts)
@@ -1112,7 +1841,13 @@ namespace DotNetVault
                     .Add(NotDirectlyInvocableDiagnosticDescriptor)
                     .Add(UnjustifiedEarlyDisposeDiagnostic)
                     .Add(JustificationOfEarlyDispose)
-                    .Add(NoExplicitByRefAlias);
+                    .Add(NoExplicitByRefAlias)
+                    .Add(UsingMandatoryNoCopyAssignment)
+                    .Add(UsingMandatoryIllegalPass)
+                    .Add(UsingMandatoryIllegalPassExtMeth)
+                    .Add(NoRefStructAttrExceptOnRefStruct)
+                    .Add(UsingMandatoryNoLockedResourceWrappersAllowedInScope)
+                    .Add(NoIrregularLockedResourcesAllowedInScope);
             }
             catch (Exception ex)
             {
@@ -1121,22 +1856,73 @@ namespace DotNetVault
             }
         }
 
-       
+
         // ReSharper disable InconsistentNaming
         private static readonly LocalizableString Vst_Title = new LocalizableResourceString(nameof(Resources.AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Vst_MessageFormat = new LocalizableResourceString(nameof(Resources.AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Vst_Description = new LocalizableResourceString(nameof(Resources.AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
         private const string Category = "VaultSafety";
 
+        private const string OnlyOnRefStruct_Title =
+            "The " + nameof(RefStructAttribute) + " may only be applied to ref structs";
+        private const string OnlyOnRefStruct_MessageFormat =
+            "The type [{0}] is annotated with the " + nameof(RefStructAttribute) +
+            " attribute but is not a ref struct";
+        private const string OnlyOnRefStruct_Description =
+            "The " + nameof(RefStructAttribute) +
+            " attribute is intended to identify ref structs.  " +
+            "Annotating types that are not ref structs with this attribute is forbidden.";
+
         private const string ExplicitByRef_Illegal_Title =
-            "Explicitly access property of protected resource is forbidden.";
+            "Explicitly access property of protected resource is forbidden";
         private const string ExplicitByRef_Illegal_MessageFormat =
-            "Explicit by-reference aliasing of the LockedVaultObject's Value property is forbidden.";
+            "Explicit by-reference aliasing of the LockedVaultObject's Value property is forbidden";
         private const string ExplicitByRef_Description =
             "Access the Value property by reference as mediated by the LockedResourceObject.  Explicitly by-ref aliasing is " +
             "forbidden because that reference might outlive the lock and cause unsynchronized access to the protected resource.";
+
+        private const string UsingMandatory_IllegalCopyAssign_Title =
+            "Locked resources annotated with the " + nameof(NoCopyAttribute) + " and protected by a using statement may not be copied through assignment";
+        private const string UsingMandatory_IllegalCopyAssign_MessageFormat =
+            "The locked resource of type [{0}] named [{1}] may not be copy assigned";
+        private const string UsingMandatory_IllegalCopyAssign_Description =
+            "Copying a locked resource provides no value or usefulness and may allow unsynchronized access to the protected resource.";
+
+        private const string UsingMandatory_IrregularLockedResourceObjects_NotAllowedInScope_Title =
+            "No locked resource objects not subject to the using mandatory rules may be declared in overlapping scope with a protected locked resource object";
+        private const string UsingMandatory_IrregularLockedResourceObjects_NotAllowedInScope_MessageFormat =
+            "The locked resource object [{0}] may not be declared within overlapping scope with the protected locked resource object  [{1}]";
+        private const string UsingMandatory_IrregularLockedResourceObjects_NotAllowedInScope_Description =
+            "Locked resource objects that are not returned from an invocation annotating its return value as UsingMandatory may not appear in scope " +
+            "with locked resource objects, that are subject to UsingMandatory, and are of the same type.";
+
+
+        private const string UsingMandatory_NoProtectedResourceWrappersAllowedInScope_Title =
+            "No ref structs containing fields of the protected resource are allowed in the same scope as the protected resource";
+        private const string UsingMandatory_NoProtectedResourceWrappersAllowedInScope_MessageFormat =
+            "The local [{0}] (type: [{1}]), at some level of nesting, contains a field named [{2}] that is of locked resource type [{3}] and may not appear " +
+            "within the same scope as the protected resource ([{4}])";
+        private const string UsingMandatory_NoProtectedResourceWrappersAllowedInScope_Description =
+            "Ref structs containing fields of the same type as locked resource object are not allowed in the same scope as the locked resource object.";
+
+        private const string UsingMandatory_IllegalPass_Title =
+            "Locked resources annotated with the " + nameof(NoCopyAttribute) +
+            " and protected by a using statement may not be passed by value or non-constant reference";
+        private const string UsingMandatory_IllegalPass_MessageFormat =
+            "The locked resource of type [{0}] named [{1}] not be passed by value or by non-constant reference.  " +
+            "Consider using the 'in' keyword in both the called method signature and at each callsite.";
+        private const string UsingMandatory_IllegalPass_Description =
+            "Locked resources are designed to be short-lived objects and may have non-trivial copy times.  " +
+            "Thus, passing them to a method is only allowed by constant reference.  " +
+            "Use the 'in' keyword in the called method signature and at the callsite.";
+        private const string UsingMandatory_IllegalPass_ExtMeth_MessageFormat =
+            "Illegal invocation of method [{0}] which is an extension method invocation of [{1}] " +
+            "declared at [{2}]: the locked resource object [{3}, declared at {4}] of type [{5}] " +
+            "is passed {6}.  Consider updating the extension method signature to accept " +
+            "the first parameter by constant reference: " +
+            "(e.g. static void PrintLockedResource(this in LockedResource lr)).";
         
-        private const string UED_Title = "Invocation of early dispose method requires justification.";
+        private const string UED_Title = "Invocation of early dispose method requires justification";
         private const string UED_MessageFormat =
             "The method [{0}] is an early disposal method on a LockedResourceObject.  The enclosing method in which it is called [{1}]" +
             " does not provide any justification for the call.  There are two acceptable reasons for early dispose: " +
@@ -1150,27 +1936,27 @@ namespace DotNetVault
             "Accordingly, any method which calls a LockedResourceObject's early dispose method must document " +
             "the justification for it with the " + nameof(EarlyReleaseJustificationAttribute) + "attribute.";
 
-        private const string EDJ_Title = "Justification for early dispose of LockedResourceObject.";
+        private const string EDJ_Title = "Justification for early dispose of LockedResourceObject";
         private const string EDJ_MessageFormat =
             "The method call [{0}] is an early dispose method of a LockedResourceObject.  " +
             "It is called in method [{1}], which documents the justifcation for the call as: [{2}].  " +
             "Periodic review of this justification during code review is recommended and also" +
             "should establish that no further access to the LockedResourceObject is made in " +
-            "the enclosing method after the early dispose and that further access from client code is IMPOSSIBLE.";
+            "the enclosing method after the early dispose and that further access from client code is impossible.";
         private const string EDJ_Description =
-            "Documentation of Justification for Early Dispose of LockedResource Object";
-        
-        private const string Ndi_Title = "This method must not be invoked directly.";
+            "Documentation of Justification for Early Dispose of LockedResource Object.";
+
+        private const string Ndi_Title = "This method must not be invoked directly";
         private const string Ndi_Message_Format =
-            "The method [{0}] is annotated with the " + nameof(NoDirectInvokeAttribute) + " attribute and may not be invoked directly." ;
+            "The method [{0}] is annotated with the " + nameof(NoDirectInvokeAttribute) + " attribute and may not be invoked directly";
         private const string Ndi_Description = "Methods annotated with the " + nameof(NoDirectInvokeAttribute) + " attribute may not be invoked directly.";
 
         private const string Um_Inline_Title =
-            "Value returned from method invocation must be declared inline as part of using statement or declaration.";
-        private const string Um_Title = "Value returned from method invocation must be a part of using statement.";
-        private const string Um_MessageFormat = "Value returned by expression [{0}] is not guarded by using construct.";
+            "Value returned from method invocation must be declared inline as part of using statement or declaration";
+        private const string Um_Title = "Value returned from method invocation must be a part of using statement";
+        private const string Um_MessageFormat = "Value returned by expression [{0}] is not guarded by using construct";
         private const string Um_Inline_Message_Format =
-            "Value returned by expression [{0}] is not assigned to a variable declared inline.";
+            "Value returned by expression [{0}] is not assigned to a variable declared inline";
         private const string UsingMandatoryAttribute = nameof(UsingMandatoryAttribute);
         private const string Um_Description = "Values returned by methods annotated with the " +
                                               UsingMandatoryAttribute +
@@ -1180,7 +1966,7 @@ namespace DotNetVault
                                                      UsingMandatoryAttribute +
                                                      " if assigned, must be assigned to a variable declared inline.";
         private const string VsDelCapt_Title = "A delegate annotated with the " + nameof(NoNonVsCaptureAttribute) +
-                                               " attribute cannot access certain non-vault safe symbols.";
+                                               " attribute cannot access certain non-vault safe symbols";
         private const string VsDelCapt_MessageFormat = "The delegate is annotated with the " +
                                                        nameof(NoNonVsCaptureAttribute) +
                                                        " attribute but captures or references the following non-vault safe type{0}- [{1}]";
@@ -1190,7 +1976,7 @@ namespace DotNetVault
             "cannot refer to any static fields or properties that are not vault-safe.";
 
         private const string VsNotVsProtect_Title = "A type marked with the " + nameof(NotVsProtectableAttribute) +
-                                                 " attribute may not be a protected resource inside a vault.";
+                                                 " attribute may not be a protected resource inside a vault";
         private const string VsNotVsProtect_MessageFormat =
             "The type {0} has the {1} attribute.  It cannot be stored as a protected resource inside a vault.";
         private const string VsNotVsProtect_Description =
@@ -1198,9 +1984,9 @@ namespace DotNetVault
             " are considered VaultSafe for certain purposed.  They are not, however, eligible for protection inside a Vault.";
 
         //private const string VaultSafeTypeParamAttributeName = nameof(VaultSafeTypeParamAttribute);
-        private const string VsTp_Title = "The type argument must be vault-safe.";
+        private const string VsTp_Title = "The type argument must be vault-safe";
         private const string VsTp_MessageFormat =
-            "The type {0} or one of its ancestors requires a vault-safe type argument but the argument supplied is not vault-safe.";
+            "The type {0} or one of its ancestors requires a vault-safe type argument but the argument supplied is not vault-safe";
         private const string VsTp_MessageFormat_MethInv =
             "The generic method {0} requires vault-safety for the type arguments at the following indices: {1}.  The following types are not vault-safe: {2}.";
         private const string VsTp_MessageFormat_ObjCreate =
@@ -1217,6 +2003,32 @@ namespace DotNetVault
             "Generic delegates with type parameters annotated with the VaultSafeTypeParam attribute require that all arguments corresponding to those parameters be vault-safe.";
         // ReSharper restore InconsistentNaming
 
+        private static readonly DiagnosticDescriptor NoIrregularLockedResourcesAllowedInScope =
+            new DiagnosticDescriptor(DotNetVault_UsingMandatory_IrregularLockedResourceObjects_NotAllowedInScope,
+                UsingMandatory_IrregularLockedResourceObjects_NotAllowedInScope_Title,
+                UsingMandatory_IrregularLockedResourceObjects_NotAllowedInScope_MessageFormat, Category,
+                DiagnosticSeverity.Error, true,
+                UsingMandatory_IrregularLockedResourceObjects_NotAllowedInScope_Description);
+        private static readonly DiagnosticDescriptor NoRefStructAttrExceptOnRefStruct =
+            new DiagnosticDescriptor(DotNetVault_OnlyOnRefStruct, OnlyOnRefStruct_Title, OnlyOnRefStruct_MessageFormat,
+                Category, DiagnosticSeverity.Error, true, OnlyOnRefStruct_Description);
+        private static readonly DiagnosticDescriptor UsingMandatoryNoCopyAssignment = new DiagnosticDescriptor(
+            DotNetVault_UsingMandatory_NoCopyAssignment, UsingMandatory_IllegalCopyAssign_Title,
+            UsingMandatory_IllegalCopyAssign_MessageFormat, Category, DiagnosticSeverity.Error, true,
+            UsingMandatory_IllegalCopyAssign_Description);
+        private static readonly DiagnosticDescriptor UsingMandatoryIllegalPass = new DiagnosticDescriptor(
+            DotNetVault_UsingMandatory_NoCopyIllegalPass, UsingMandatory_IllegalPass_Title,
+            UsingMandatory_IllegalPass_MessageFormat, Category, DiagnosticSeverity.Error, true,
+            UsingMandatory_IllegalPass_Description);
+        private static readonly DiagnosticDescriptor UsingMandatoryIllegalPassExtMeth = new DiagnosticDescriptor(
+            DotNetVault_UsingMandatory_NoCopyIllegalPass_ExtMethod, UsingMandatory_IllegalPass_Title,
+            UsingMandatory_IllegalPass_ExtMeth_MessageFormat, Category, DiagnosticSeverity.Error, true,
+            UsingMandatory_IllegalPass_Description);
+        private static readonly DiagnosticDescriptor UsingMandatoryNoLockedResourceWrappersAllowedInScope
+            = new DiagnosticDescriptor(DotNetVault_UsingMandatory_NoLockedResourceWrappersAllowedInScope,
+                UsingMandatory_NoProtectedResourceWrappersAllowedInScope_Title,
+                UsingMandatory_NoProtectedResourceWrappersAllowedInScope_MessageFormat, Category,
+                DiagnosticSeverity.Error, true, UsingMandatory_NoProtectedResourceWrappersAllowedInScope_Description);
         private static readonly DiagnosticDescriptor NoExplicitByRefAlias =
             new DiagnosticDescriptor(DotNetVault_NoExplicitByRefAlias, ExplicitByRef_Illegal_Title,
                 ExplicitByRef_Illegal_MessageFormat, Category, DiagnosticSeverity.Error, true,
@@ -1263,17 +2075,18 @@ namespace DotNetVault
 
         #endregion
     }
-     
+
+
     internal static class StringConversionExtensions
     {
         //if converter is null, uses .ToString()   
         //e.g. array of ints -> "{1, 75, 3}", empty col -> "{ }"
-        internal static string ConvertToCommaSeparatedList<T>([NotNull] [ItemNotNull] this IReadOnlyList<T> items, 
+        internal static string ConvertToCommaSeparatedList<T>([NotNull][ItemNotNull] this IReadOnlyList<T> items,
             [CanBeNull] Func<T, string> converter = null)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
             if (items.Count < 1) return "{ }";
-            
+
             converter ??= t => t.ToString();
             StringBuilder sb = new StringBuilder("{");
             foreach (var item in items)

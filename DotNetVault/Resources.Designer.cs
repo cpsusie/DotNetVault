@@ -70,7 +70,7 @@ namespace DotNetVault {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type name &apos;{0}&apos; is annotated with the VaultSafe attribute but is not provably vault-safe..
+        ///   Looks up a localized string similar to Type name &apos;{0}&apos; is annotated with the VaultSafe attribute but is not provably vault-safe.
         /// </summary>
         public static string AnalyzerMessageFormat {
             get {
@@ -79,7 +79,7 @@ namespace DotNetVault {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Types annotated with the VaultSafe attribute must be vault-safe..
+        ///   Looks up a localized string similar to Types annotated with the VaultSafe attribute must be vault-safe.
         /// </summary>
         public static string AnalyzerTitle {
             get {
@@ -88,7 +88,15 @@ namespace DotNetVault {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to System.Collections.Immutable.ImmutableHashSet`1;System.Collections.Immutable.ImmutableList`1+Enumerator;System.Collections.Immutable.ImmutableQueue`1+Enumerator;System.Collections.Immutable.ImmutableArray`1+Enumerator;System.Collections.Immutable.ImmutableHashSet`1+Enumerator;System.Collections.Immutable.ImmutableSortedSet`1;System.Collections.Immutable.ImmutableDictionary`2+Enumerator;System.Collections.Immutable.ImmutableSortedDictionary`2+Enumerator;System.Collections.Immutable.ImmutableList`1;System.Col [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to System.Collections.Immutable.ImmutableHashSet`1;
+        ///System.Collections.Immutable.ImmutableList`1+Enumerator;
+        ///System.Collections.Immutable.ImmutableQueue`1+Enumerator;
+        ///System.Collections.Immutable.ImmutableArray`1+Enumerator;
+        ///System.Collections.Immutable.ImmutableHashSet`1+Enumerator;
+        ///System.Collections.Immutable.ImmutableSortedSet`1;
+        ///System.Collections.Immutable.ImmutableDictionary`2+Enumerator;
+        ///System.Collections.Immutable.ImmutableSortedDictionary`2+Enumerator;
+        ///System.Collections.Immutable.ImmutableL [rest of string was truncated]&quot;;.
         /// </summary>
         public static string condit_generic_whitelist {
             get {

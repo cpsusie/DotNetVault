@@ -118,6 +118,21 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="ExtensionMethodPbvTest" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\testcases\extensionmethodpbvtest.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="IllegalWrapperTestCase" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\testcases\illegalwrappertestcase.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="illegalwrappertestcase2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\testcases\illegalwrappertestcase2.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="illegalwrappertestcase3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\testcases\illegalwrappertestcase3.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="IllegalWrapperTestCase4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\testcases\illegalwrappertestcase4.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="NdiMixedWithNotInlineNotOkCaseThree" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\testcases\ndimixedwithnotinlinenotokcasethree.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
@@ -126,6 +141,18 @@
   </data>
   <data name="NdiNotOkTestTwo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\testcases\ndinotoktesttwo.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="NoCopyAttributeWithBadAssignment" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\TestCases\NoCopyAttributeWithBadAssignment.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="NoCopyBadAssignUsingStatement" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\testcases\nocopybadassignusingstatement.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="TestDeepIllegalWrapper" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\testcases\testdeepillegalwrapper.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="TestDeepWrapperActuallyOk" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\testcases\testdeepwrapperactuallyok.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="TestNdiOk" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\testcases\testndiok.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>

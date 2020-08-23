@@ -6,6 +6,16 @@ Synchronization Library and Static Analysis Tool for C# 8
 
     A full project description is included in "DotNetVault Description.pdf".  Source code, example projects, unit tests, stress test and quick start guide on GitHub.
 
+RELEASE NOTES VERSION 0.2.2.12-beta:
+
+    Fixed a Bug 92 where copying a protected resource into another ref-struct declared in a larger scope (of the same type or containing a field at any level of nesting in its graph) could result in unsynchronized access.  
+
+    Fix was accomplished by the addition of more analyzer rules and attributes that can trigger them.
+
+    Unit tests were added to validate the fix and code was added to the ExampleCodePlayground demonstrating Bug92.
+
+    A full description of Bug 92, the new attributes and analyzer rules is available now in "DotNetVault Description.pdf".
+
 RELEASE NOTES VERSION 0.2.2.1-beta:
 
     A BigValueListVault added, providing a vault protecting a list-like collection, especially suited for large value types. 
@@ -14,22 +24,8 @@ RELEASE NOTES VERSION 0.2.2.1-beta:
 
     "DotNetVault.Description.pdf" updated to reflect changes.
 
-RELEASE NOTES VERSION 0.2.1.22-beta
+RELEASE NOTES VERSION 0.2.1.22-beta:
 
      This release adds a ReadWriteStringBuffer vault that provides thread-safe readonly, upgradable readonly and writable access to a StringBuilder object.  It also (when binaries or source retrieved from GitHub) includes the "Clorton Game" which demonstrates usage of the readwrite vault and provides a stress test to validate its functionality.
 
      "DotNetVault.Description.pdf" updated to reflect changes.
-
-RELEASE NOTES VERSION 0.2.1.9-alpha 
-
-    This release contains MAJOR feature updates but is still considered unstable alpha.
-
-    Major new feature: vaults with varying underlying synchronization mechanisms.  You may now chose lock=free atomics (only mechanism before), the .NET standard Monitor.Enter (used by C# lock statement) or ReaderWriterLockSlim.  Because these vaults have a compatible (at compile-time) API, you can easily switch between synchronization mechanisms without any extensive refactoring required.  Also, the new vault based on ReaderWriterLock slim allows for shared readonly locks, upgradable readonly locks and exclusive read-write locks.  If you are coming from an old version of this project, you may need to refactor in some places as their are a significant number of small breaking changes.  It should, however, be a quick and painless process.
-    
-    Fixed Bug 76.  Illegal references to non-vault-safe types inside mutable vault's locked resource objects delegates where not being detected in the case of local functions or using anonymous function syntax. 
-
-    Fixed Bug 64.  Structs with fields containing immutable reference types as fields were being incorrectly identified as not being vault-safe when those fields were not read-only.  Since structs are value types and the type field is immutable, there is no danger of a data race when one retains a copy of such a protected resource after releasing a lock.  The analyzer was fixed to account for this.  Unit tests were added to confirm the fix and detect future regressions on this issue.  The Project description was updated to reflect this fix and explain Bug 64.
-
-    More unit tests.  There are now two unit test projects included.  The older one (DotNetVault.Test) tests the functionality of the built-in static analyzer.  The newer unit test project (VaultUnitTests) tests the functionality and synchronization mechanisms provided for the vaults.  It may also serve, in addition to the pre-existing sample code projects, as an introduction to this library.
-
-    Documentation (including "DotNetVault Description.pdf") updated to reflect changes.

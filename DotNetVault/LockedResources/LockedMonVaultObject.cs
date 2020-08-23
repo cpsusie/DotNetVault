@@ -17,6 +17,8 @@ namespace DotNetVault.LockedResources
     /// </summary>
     /// <typeparam name="TVault">The vault type</typeparam>
     /// <typeparam name="T">the resource type</typeparam>
+    [NoCopy]
+    [RefStruct]
     public readonly ref struct LockedMonVaultObject<TVault, [VaultSafeTypeParam] T> where TVault : MonitorVault<T>, IBasicVault<T>
     {
         internal static LockedMonVaultObject<TVault, T> CreateLockedResource([NotNull] TVault vault,

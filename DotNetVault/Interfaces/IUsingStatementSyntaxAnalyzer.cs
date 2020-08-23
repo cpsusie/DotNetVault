@@ -1,12 +1,14 @@
 ﻿using System;
 using JetBrains.Annotations;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace DotNetVault.Interfaces
 {
     internal interface IUsingStatementSyntaxAnalyzer<in TInvocationSyntax> : IUsingStatementSyntaxAnalyzer
     {
         bool IsPartOfUsingConstruct([NotNull] TInvocationSyntax syntax);
-        bool IsPartOfInlineDeclUsingConstruct([NotNull] TInvocationSyntax syntax);
+        (bool PartOfInlineDeclUsing, VariableDeclarationSyntax ParentNode) IsPartOfInlineDeclUsingConstruct([NotNull] TInvocationSyntax syntax);
     }
 
     internal interface IUsingStatementSyntaxAnalyzer

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Threading;
 using DotNetVault.ClortonGame;
 using DotNetVault.DeadBeefCafeBabeGame;
@@ -25,7 +26,7 @@ namespace VaultUnitTests
         [Fact]
         public void TestGame()
         {
-            
+            DeadBeefCafeGameEndedEventArgs endedEventArgs = null;
             using (var outputHelper = OrderedThreadSafeTestOutputHelper.CreateInstance())
             {
                 string gameLog = null;
@@ -51,7 +52,8 @@ namespace VaultUnitTests
                             (TimeStampSource.Now - startedAt).TotalMilliseconds);
                     }
 
-                    var endedEventArgs = _endedEventArgs.Value;
+                    
+                    endedEventArgs = _endedEventArgs.Value;
                     if (endedEventArgs != null)
                     {
                         
@@ -95,89 +97,152 @@ namespace VaultUnitTests
 
                 if (gameLog != null)
                 {
-                    Assert.True(ValidateLog(gameLog));
+                    Assert.True(ValidateLog(gameLog, endedEventArgs));
                 }
             }
         }
 
-        static bool ValidateLog(string gameLog)
+        static bool ValidateLog(string gameLog, DeadBeefCafeGameEndedEventArgs deadBeefCafeGameEndedEventArgs)
         {
 
-            if (string.IsNullOrWhiteSpace(gameLog))
+            if (string.IsNullOrWhiteSpace(gameLog) || deadBeefCafeGameEndedEventArgs == null)
             {
                 return false;
             }
             var arr = gameLog.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
 
             const string upTo = "0xDEAD_BEEF_CAFE_BABE_DEAD_BEEF_CAFE_BABE_DEAD_BEEF_CAFE_BABE_DEAD_BEEF_CAFE_BABE";
-            const string xVal =
-                "0xC0DE_D00D_FEA2_B00B_C0DE_D00D_FEA2_B00B_C0DE_D00D_FEA2_B00B_C0DE_D00D_FEA2_B00B";
             const string oVal =
+                "0xC0DE_D00D_FEA2_B00B_C0DE_D00D_FEA2_B00B_C0DE_D00D_FEA2_B00B_C0DE_D00D_FEA2_B00B";
+            const string xVal =
                 "0xFACE_C0CA_F00D_BAD0_FACE_C0CA_F00D_BAD0_FACE_C0CA_F00D_BAD0_FACE_C0CA_F00D_BAD0";
 
-            int xCount = 0;
-            int oCount = 0;
+            int expectedExes = -1;
+            int expectedOes = -1;
             var strings = (from str in arr
                            where str?.StartsWith("Logged at") == true && (str.Contains(upTo, StringComparison.OrdinalIgnoreCase) || str.Contains(xVal, StringComparison.OrdinalIgnoreCase) || str.Contains(oVal, StringComparison.OrdinalIgnoreCase))
                            select str.Split(' ', StringSplitOptions.RemoveEmptyEntries)).ToArray();
-
+            bool foundDeadBeef=false, foundCounts=false;
             int indexOfDeadBeef = -1;
             foreach (var item in strings.EnumerateWithIndices())
             {
-                if (item.Val.Length == 10)
+                switch (item.Val.Length)
                 {
-                    if (string.Equals(item.Val[6].Trim(), upTo, StringComparison.OrdinalIgnoreCase))
-                        indexOfDeadBeef = item.Index;
+                    case 23:
+                        if (string.Equals(item.Val[6].Trim(), upTo, StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (foundDeadBeef)
+                            {
+                                return false;
+                            }
+                            indexOfDeadBeef = item.Index;
+                            foundDeadBeef = true;
+                        }
+
+                        break;
+                    case 25:
+                        string xCt = item.Val[4];
+                        string oCt = item.Val[9];
+                        bool parsedOk = int.TryParse(oCt, out expectedOes) && int.TryParse(xCt, out expectedExes);
+                        if (!parsedOk)
+                        {
+                            return false;
+                        }
+                        foundCounts = true;
+                        break;
+                }
+
+                if (foundCounts && foundDeadBeef)
+                {
                     break;
                 }
             }
-
-
             
-            if (indexOfDeadBeef < 0 || indexOfDeadBeef >= strings.Length)
+            if (indexOfDeadBeef < 0 || indexOfDeadBeef >= strings.Length || expectedExes == -1 || expectedOes == -1)
             {
                 return false;
             }
 
-            var slice = strings.AsSpan().Slice(0, indexOfDeadBeef);
-            foreach (var str in slice)
+            
+            string deadBeef = strings[indexOfDeadBeef].Last();
+            bool gotIdx = int.TryParse(deadBeef, out int lastIdxToConsider);
+            if (!gotIdx)
             {
-                if (str.Length < 9)
-                    return false;
-
-                bool isEx = string.Equals(str[4].Trim(), xVal, StringComparison.OrdinalIgnoreCase);
-                bool isO = string.Equals(str[4].Trim(), oVal, StringComparison.OrdinalIgnoreCase);
-
-                if (isO == isEx)
+                return false;
+            }
+            var constants = new DeadBeefCafeBabeGameConstants();
+            var slice = deadBeefCafeGameEndedEventArgs.Results.FinalArray.AsSpan().Slice(0, lastIdxToConsider + 1);
+            int xCount=0;
+            int oCount=0;
+            int deadBeefCount=0;
+            foreach (ref readonly var value in slice)
+            {
+                if (value == constants.LookForNumber)
                 {
-                    return false;
+                    ++deadBeefCount;
                 }
-
-                bool parsedCount = int.TryParse(str[7], out int s);
-                if (!parsedCount)
+                else if (value == constants.XNumber)
                 {
-                    return false;
+                    ++xCount;
                 }
-
-                if (isEx)
+                else if (value == constants.ONumber)
                 {
-                    xCount += s;
+                    ++oCount;
                 }
                 else
                 {
-                    oCount += s;
+                    return false;
                 }
-
             }
 
-
-            int difference = xCount - oCount;
-            if (difference < 0)
+            int difference = Math.Abs(xCount - oCount);
+            if (difference == 0 || difference % 13 != 0)
             {
-                difference = 0 - difference;
+                return false;
             }
 
-            return difference % 13 == 0;
+            return deadBeefCount == 1 && xCount == expectedExes &&
+                   oCount == expectedOes;
+
+            //var slice = strings.AsSpan().Slice(0, indexOfDeadBeef);
+            //foreach (var str in slice)
+            //{
+            //    if (str.Length < 9)
+            //        return false;
+
+            //    bool isEx = string.Equals(str[4].Trim(), xVal, StringComparison.OrdinalIgnoreCase);
+            //    bool isO = string.Equals(str[4].Trim(), oVal, StringComparison.OrdinalIgnoreCase);
+
+            //    if (isO == isEx)
+            //    {
+            //        return false;
+            //    }
+
+            //    bool parsedCount = int.TryParse(str[7], out int s);
+            //    if (!parsedCount)
+            //    {
+            //        return false;
+            //    }
+
+            //    if (isEx)
+            //    {
+            //        xCount += s;
+            //    }
+            //    else
+            //    {
+            //        oCount += s;
+            //    }
+
+            //}
+
+
+            //int difference = xCount - oCount;
+            //if (difference < 0)
+            //{
+            //    difference = 0 - difference;
+            //}
+
+            //return difference % 13 == 0;
 
 
         }

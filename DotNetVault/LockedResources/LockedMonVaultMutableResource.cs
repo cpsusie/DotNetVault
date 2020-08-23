@@ -20,6 +20,8 @@ namespace DotNetVault.LockedResources
     /// <remarks>This implementation is returned from vaults that use  <seealso cref="System.Threading.Monitor"/> and sync objects for synchronization mechanism.
     /// <seealso cref="LockedVaultMutableResource{TVault,TResource}"/> which is the locked resource object for the <see cref="MutableResourceVault{T}"/>,
     /// a mutable resource vault that uses atomics for synchronization.</remarks>
+    [NoCopy]
+    [RefStruct]
     public readonly ref struct LockedMonVaultMutableResource<TVault, TResource> where TVault : MonitorVault<TResource>
     {
         #region Factory Method

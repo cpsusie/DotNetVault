@@ -24,5 +24,15 @@ namespace DotNetVault.ExtensionMethods
         [CanBeNull]
         public static INamedTypeSymbol FindNoDirectInvokeAttribute(this Compilation compilation) =>
             compilation?.GetTypeByMetadataName(typeof(NoDirectInvokeAttribute).FullName);
+        [CanBeNull]
+        public static INamedTypeSymbol FindNoCopyAttribute(this Compilation compilation) =>
+            compilation?.GetTypeByMetadataName(typeof(NoCopyAttribute).FullName);
+
+        [CanBeNull]
+        public static INamedTypeSymbol FindRefStructAttribute(this Compilation compilation)
+        {
+            string fullName = typeof(RefStructAttribute).FullName;
+            return !string.IsNullOrWhiteSpace(fullName) ? compilation?.GetTypeByMetadataName(fullName) : null;
+        }
     }
 }

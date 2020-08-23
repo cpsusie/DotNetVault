@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.Diagnostics;
+using System.Runtime.Serialization;
 using System.Text;
+using System.Threading;
 using DotNetVault.Logging;
 using JetBrains.Annotations;
 
@@ -9,6 +12,7 @@ namespace DotNetVault.DeadBeefCafeBabeGame
     /// <summary>
     /// When the game is finally ended, these args give you the full results.
     /// </summary>
+    [DataContract]
     public sealed class DeadBeefCafeGameEndedEventArgs : EventArgs
     {
         #region Properties
@@ -20,7 +24,24 @@ namespace DotNetVault.DeadBeefCafeBabeGame
         /// <summary>
         /// Textual representation of array.
         /// </summary>
-        [NotNull] public string ArrayText => _arrayStringRep.Value;
+        [NotNull]
+        public string ArrayText
+        {
+            get
+            {
+                string txt = _arrayStringRep;
+                if (txt == null)
+                {
+                    string rep = GetArrayString();
+                    Debug.Assert(rep != null);
+                    Interlocked.CompareExchange(ref _arrayStringRep, 
+                        rep, null);
+                    txt = _arrayStringRep;
+                }
+                Debug.Assert(_arrayStringRep != null);
+                return txt;
+            }
+        }
         #endregion
 
         #region CTOR
@@ -50,8 +71,22 @@ namespace DotNetVault.DeadBeefCafeBabeGame
         #endregion
 
         #region Methods
+
         /// <inheritdoc />
-        public override string ToString() => _stringRep.Value;
+        public override string ToString()
+        {
+            string txt = _stringRep;
+            if (txt == null)
+            {
+                string rep = GetStringRep();
+                Debug.Assert(rep != null);
+                Interlocked.CompareExchange(ref _stringRep, rep, null);
+                txt = _stringRep;
+            }
+            Debug.Assert(_stringRep != null);
+            return txt;
+        }
+
         #endregion
 
         #region Private Method
@@ -69,9 +104,10 @@ namespace DotNetVault.DeadBeefCafeBabeGame
             StringBuilder sb = new StringBuilder((arr.Length * (81 + 10)) + 75);
             sb.AppendLine();
             sb.AppendLine("Printing array: ");
-            for (int i = 0; i < arr.Length; ++i)
+            int idx = 0;
+            foreach (ref readonly var item in arr)
             {
-                sb.AppendLine("Element number " + (i + 1) + ":\t\t" + arr.ItemRef(i));
+                sb.AppendLine("Element number " + (++idx) + ":\t\t" + item);
             }
             sb.AppendLine("End printing array.");
             sb.AppendLine();
@@ -79,9 +115,9 @@ namespace DotNetVault.DeadBeefCafeBabeGame
         }
 
         #region Privates
-        private readonly DeadBeefCafeGameResult _result;
-        private readonly LocklessWriteOnce<string> _stringRep;
-        private readonly LocklessWriteOnce<string> _arrayStringRep;
+        [DataMember] private readonly DeadBeefCafeGameResult _result;
+        private volatile string _stringRep;
+        private volatile string _arrayStringRep;
         #endregion
     }
 }

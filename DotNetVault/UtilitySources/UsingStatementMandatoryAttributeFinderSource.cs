@@ -10,6 +10,89 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace DotNetVault.UtilitySources
 {
+    internal static class NoCopyAttributeFinderSource
+    {
+        public static INoCopyAttributeFinder CreateNoCopyAttributeFinder() => Factory();
+
+        public static bool SupplyAlternateFactory([NotNull] Func<INoCopyAttributeFinder> alternate)
+        {
+            if (alternate == null) throw new ArgumentNullException(nameof(alternate));
+
+            var old = Interlocked.CompareExchange(ref _factory, alternate, null);
+            return old == null;
+        }
+
+        internal static NoCopyAttributeFinder GetDefaultAttributeFinder() => new NoCopyAttributeFinder();
+
+        internal readonly struct NoCopyAttributeFinder : INoCopyAttributeFinder
+        {
+            public bool HasNoCopyReturnTypeSyntax(InvocationExpressionSyntax syntax, SemanticModel model)
+            {
+                if (syntax == null) throw new ArgumentNullException(nameof(syntax));
+                if (model == null) throw new ArgumentNullException(nameof(model));
+
+
+                bool ret;
+                var symbolInfo = model.GetSymbolInfo(syntax);
+                IMethodSymbol methSym = symbolInfo.Symbol as IMethodSymbol;
+                if (methSym == null && symbolInfo.CandidateReason == CandidateReason.OverloadResolutionFailure &&
+                    symbolInfo.CandidateSymbols.Any())
+                {
+                    methSym = symbolInfo.CandidateSymbols.OfType<IMethodSymbol>().FirstOrDefault();
+                }
+
+
+                if (methSym != null)
+                {
+                    INamedTypeSymbol noCopyAttributeSymbol =
+                        model.Compilation.GetTypeByMetadataName(typeof(NoCopyAttribute).FullName);
+                    if (noCopyAttributeSymbol != null)
+                    {
+                        var returnTypeAttributes = methSym.GetReturnTypeAttributes();
+                        var candidateAttributes = from attribData in returnTypeAttributes
+                                                  where attribData != null
+                                                  let attribDataClass = attribData.AttributeClass
+                                                  where attribDataClass.Equals(noCopyAttributeSymbol, SymbolEqualityComparer.Default) || (
+                                                        attribDataClass is IErrorTypeSymbol ets &&
+                                                        ets.CandidateReason == CandidateReason.NotAnAttributeType &&
+                                                        ets.CandidateSymbols.Any(sym => sym.Name.StartsWith(UsingMandatoryAttribute.ShortenedName)))
+                                                  select attribDataClass;
+                        ret = candidateAttributes.Any();
+                    }
+                    else
+                    {
+                        ret = false;
+                    }
+
+                }
+                else
+                {
+                    ret = false;
+                }
+
+                return ret;
+            }
+        }
+
+        private static Func<INoCopyAttributeFinder> Factory
+        {
+            get
+            {
+                Func<INoCopyAttributeFinder> factory = _factory;
+                if (factory == null)
+                {
+                    Func<INoCopyAttributeFinder> newFactory = () => GetDefaultAttributeFinder();
+                    Interlocked.CompareExchange(ref _factory, newFactory, null);
+                    factory = _factory;
+                    Debug.Assert(factory != null);
+                }
+                return factory;
+            }
+        }
+
+        private static volatile Func<INoCopyAttributeFinder> _factory;
+    }
+
     internal static class UsingMandatoryAttributeFinderSource
     {
         public static IUsingMandatoryAttributeFinder CreateUsingMandatoryAttributeFinder() => Factory();
