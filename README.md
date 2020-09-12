@@ -36,11 +36,17 @@ make changes without needing to extensively refactor your code.
 
 **Isolation of Protected Resources**: The need for programmer discipline is
 reduced:  
+		
 		1. programmers do not need to remember which mutexes protect which resources, 
+		
 		2. programmers cannot access the protected resource before they obtain the 
 		lock and cannot access any mutable state from the protected resource after 
-		releasing the lock, and 
-		3. static analysis rules enforced by compilation errors emitted from the
+		releasing the lock,
+		
+		3. for read-write vaults, if a readonly-lock is obtained, its readonly nature 
+		is enforced at compile time,
+		
+		4. static analysis rules enforced by compilation errors emitted from the
 		integrated Roslyn analyzer prevent references to mutable state from outside the
 		protected resource from becoming part of the protected resource and prevent the
 		leaking of references to mutable state inside the protected resource to the
@@ -71,11 +77,11 @@ releases in version two will hopefully be limited to documentation content updat
 of test code and demonstration code.  Bug fixes may also be released in Version 2 
 but no new features (except as needed to fix bugs) should be expected.  
 
-	Future development in Version 0.2 after it is released in non-beta form will
+Future development in Version 0.2 after it is released in non-beta form will
 be limited to the correction of bugs and other flaws and perhaps refactoring to 
 the extent it does not materially change behavior.
 
-	After Version 0.2, new features will be developed under 0.3.  These
+After Version 0.2, new features will be developed under 0.3.  These
 features currently center on taking advantage of Roslyn Analyzers which should be
 available with .NET 5. 
 
