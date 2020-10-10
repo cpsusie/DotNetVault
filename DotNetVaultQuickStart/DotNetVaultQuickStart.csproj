@@ -12,6 +12,10 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="linux pics\Program.cs" />
   </ItemGroup>
@@ -21,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNetVault" Version="0.2.2.12-beta" />
+    <PackageReference Include="DotNetVault" Version="0.2.4-alpha" />
     <PackageReference Include="HighPrecisionTimeStamps" Version="0.0.1-alpha" />
   </ItemGroup>
 

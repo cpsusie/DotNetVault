@@ -86,7 +86,10 @@ namespace ConsoleStressTest
             if (cancellationTokenObject is CancellationToken token && !_started.IsSet && !_terminated.IsSet &&
                 !_disposed.IsSet)
             {
-                const int nonYieldMax = 50;
+                // ReSharper disable once UnusedVariable
+                #pragma warning disable 219 
+                const int nonYieldMax = 50; //used in commented out code
+                #pragma warning restore 219
                 SetManagedThreadId();
                 try
                 {

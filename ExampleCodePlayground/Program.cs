@@ -13,6 +13,8 @@ namespace ExampleCodePlayground
     {
         static void Main()
         {
+            BigStructVaultExample.RunDemo();
+            /**
             //bug 92 is fixed code should not be run but exits to demonstrate analyzer operations
             //uncomment designated code to get various correct compiler errors
             //Console.WriteLine("BEGIN BUG 92 DEMO");
@@ -52,6 +54,7 @@ namespace ExampleCodePlayground
             //TestLegalUseOfWrapper();
             //TestBasicVaultOfNullableNotUnmanagedValueType();
             //TestNoBasicVaultForStringBuilder();
+            **/
         }
 
         public static void TestUriIsVs()

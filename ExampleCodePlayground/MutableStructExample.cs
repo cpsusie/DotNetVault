@@ -1,10 +1,16 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Linq;
 using DotNetVault.Attributes;
+using DotNetVault.RefReturningCollections;
 using DotNetVault.Vaults;
+using JetBrains.Annotations;
 using Rwlkres = DotNetVault.LockedResources.RwLockedResource<DotNetVault.Vaults.BasicReadWriteVault<ExampleCodePlayground.MutableStructExample>, ExampleCodePlayground.MutableStructExample>;
-namespace ExampleCodePlayground
+
+namespace ExampleCodePlayground 
 {
     static class UsingBigMutableStructExample
     {
@@ -14,7 +20,8 @@ namespace ExampleCodePlayground
             string final;
             {
                 using var upgrRoLock = TheRwVault.UpgradableRoLock();
-                Console.WriteLine("Upgradable demo ... Current value: [" + (upgrRoLock.Value.ToString() ?? string.Empty) + "].");
+                Console.WriteLine("Upgradable demo ... Current value: [" +
+                                  (upgrRoLock.Value.ToString() ?? string.Empty) + "].");
                 if (upgrRoLock.Value.Id != default)
                 {
                     using var rwLck = upgrRoLock.Lock();
@@ -33,13 +40,13 @@ namespace ExampleCodePlayground
             Console.WriteLine("Here is the value: [" + lck.Value + "].");
             Console.WriteLine("The value's name is: [" + lck.Value.Name + "].");
 
-            
+
             //Note that if you attempt to mutate value returned by readonly reference, it will have no effect
             //and might trigger a defensive copy!
 
             //FLAW# shouldnt be able to do this!
             lck.Value.UpdatePoint(new Point3d(1, 2, 3));
-            
+
             Console.WriteLine("X: [" + lck.Value.X + "], Y: [" + lck.Value.Y + "], Z: [" + lck.Value.Z + "].");
             Console.WriteLine("Value: [" + lck.Value + "].");
         }
@@ -86,7 +93,7 @@ namespace ExampleCodePlayground
             readonly get => _stamp;
             set => _stamp = value;
         }
-        
+
         public decimal X
         {
             readonly get => _point3d.X;
@@ -109,8 +116,9 @@ namespace ExampleCodePlayground
 
         public static bool operator ==(in MutableStructExample lhs, in MutableStructExample rhs)
             => lhs._id == rhs._id && lhs._stamp == rhs._stamp && lhs._point3d == rhs._point3d;
+
         public static bool operator !=(in MutableStructExample lhs, in MutableStructExample rhs) => !(lhs == rhs);
-       
+
         // NOTE the only time this is a problem for a VALUE type is when it serves as 
         // the hash function in for a set or dictionary based on hash codes.  It
         //can only be a problem if you can access the mutators of this value by
@@ -122,8 +130,10 @@ namespace ExampleCodePlayground
         //such values by mutable reference.
         [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
         public readonly override int GetHashCode() => _id.GetHashCode();
+
         public readonly override bool Equals(object other) => other is MutableStructExample mse && mse == this;
         public bool Equals(MutableStructExample other) => other == this;
+
         public override string ToString() =>
             "Id: [" + _id + "]; Stamp: [" + _stamp.ToString("O") + "]; Point: [" + _point3d + "].";
 
@@ -136,7 +146,7 @@ namespace ExampleCodePlayground
             _name = name ?? throw new ArgumentNullException(nameof(name));
         }
 
-        
+
         private Point3d _point3d;
         private DateTime _stamp;
         private Guid _id;
@@ -147,7 +157,7 @@ namespace ExampleCodePlayground
     public struct Point3d : IEquatable<Point3d>
     {
         //Note that auto implemented getters are implicitly readonly.
-        public decimal X {  get; set; }
+        public decimal X { get; set; }
 
         public decimal Y { get; set; }
 
@@ -162,6 +172,7 @@ namespace ExampleCodePlayground
 
         public static bool operator ==(in Point3d lhs, in Point3d rhs) =>
             lhs.X == rhs.X && lhs.Y == rhs.Y && lhs.Z == rhs.Z;
+
         public static bool operator !=(in Point3d lhs, in Point3d rhs) => !(lhs == rhs);
         public override readonly bool Equals(object other) => other is Point3d p3d && p3d == this;
         public readonly bool Equals(Point3d other) => other == this;
@@ -186,7 +197,111 @@ namespace ExampleCodePlayground
                 hash = (hash * 397) ^ Y.GetHashCode();
                 hash = (hash * 397) ^ Z.GetHashCode();
             }
+
             return hash;
         }
+    }
+
+
+    public interface IByRoRefEnumerator<T> : IEnumerator<T>
+    {
+        new ref readonly T Current { get; }
+    }
+    public interface IByRefEnumerator<T> : IByRoRefEnumerator<T>
+    {
+        new ref T Current { get; }
+    }
+
+    public interface IByRoRefEnumerable<T> : IEnumerable<T>
+    {
+        new IByRoRefEnumerator<T> GetEnumerator();
+    }
+
+    public interface IByRefEnumerable<T>: IByRoRefEnumerable<T>
+    {
+        new IByRefEnumerator<T> GetEnumerator();
+    }
+
+    public interface IByRoRefList<T> : IByRoRefEnumerable<T>
+    {
+        long Count { get; }
+
+        ref readonly T this[long index] { get; }
+    }
+
+    public interface IByRefList<T> : IByRoRefList<T>, IByRefEnumerable<T>
+    {
+        new IByRefEnumerator<T> GetEnumerator();
+
+        new ref T this[long index] { get; }
+    }
+
+    public sealed class ByRefArray<T> : IByRefList<T> where T : struct
+    {
+        public static ByRefArray<T> CreateByRefArray([JetBrains.Annotations.NotNull] IEnumerable<T> source) =>
+            new ByRefArray<T>((source ?? throw new ArgumentNullException(nameof(source))).ToArray());
+        public long Count => _wrapped.Length;
+        public ref T this[long index] => ref _wrapped[index];
+        ref readonly T IByRoRefList<T>.this[long index] => ref this[index];
+        public Enumerator GetEnumerator() => Enumerator.CreateEnumerator(this);
+        IByRoRefEnumerator<T> IByRoRefEnumerable<T>.GetEnumerator() => GetEnumerator();
+        IByRefEnumerator<T> IByRefList<T>.GetEnumerator() => GetEnumerator();
+        IByRefEnumerator<T> IByRefEnumerable<T>.GetEnumerator() => GetEnumerator();
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public sealed class Enumerator : IByRefEnumerator<T>
+        {
+            internal static Enumerator CreateEnumerator([JetBrains.Annotations.NotNull] ByRefArray<T> wrapMe) => new Enumerator(wrapMe);
+
+            public ref T Current => ref _current;
+            ref readonly T IByRoRefEnumerator<T>.Current => ref Current;
+            T IEnumerator<T>.Current => Current;
+            object IEnumerator.Current
+            {
+                get
+                {
+                    if (_index > -1 && _index < _wrapped.Length)
+                    {
+                        return _current;
+                    }
+                    throw new InvalidOperationException("The enumerator does not currently refer to a valid object.");
+                }
+            }
+
+            public bool MoveNext()
+            {
+                ++_index;
+                if (_index > -1 && _index < _wrapped.Length)
+                {
+                    _current = _wrapped[_index];
+                    return true;
+                }
+                return false;
+            }
+
+            public void Reset()
+            {
+                _index = -1;
+                _current = default;
+            }
+            
+            public void Dispose() {}
+
+            private Enumerator(ByRefArray<T> wrapMe)
+            {
+                _wrapped = (wrapMe ?? throw new ArgumentNullException(nameof(wrapMe)))._wrapped;
+                _current = default;
+                _index = -1;
+            }
+
+            private long _index;
+            [CanBeNull] private T _current;
+            [JetBrains.Annotations.NotNull] private readonly T[] _wrapped;
+        }
+
+        private ByRefArray(T[] toWrap) => _wrapped = toWrap ?? throw new ArgumentNullException(nameof(toWrap));
+
+        [JetBrains.Annotations.NotNull] private readonly T[] _wrapped;
     }
 }

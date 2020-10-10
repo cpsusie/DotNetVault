@@ -23,15 +23,16 @@ namespace CafeBabeGame
         {
             CgTimeStampSource.SupplyAlternateProvider(HpTimeStampProvider.CreateInstance());
             TimeStampSource.Calibrate();
-            (bool gotFileOk, string errorInfo, FileInfo outputFile, int numGames) = GetOutputFile(args);
+            (bool gotFileOk, string errorInfo, FileInfo outputFile, int numGames, TimeSpan timeout) = GetOutputFile(args);
             Debug.Assert((outputFile != null) == gotFileOk);
             if (gotFileOk)
             {
+                Console.WriteLine($"Going to play {numGames} CafeBabe games, each with a time limit of {timeout.TotalSeconds:F5} seconds.  Results will be written to file {outputFile?.FullName ?? "UNSPECIFIED"} ");
                 if (numGames > 1)
                 {
                     try
                     {
-                        PlayMultipleCafeBabeGames(numGames, outputFile);
+                        PlayMultipleCafeBabeGames(numGames, outputFile, timeout);
                     }
                     catch (Exception ex)
                     {
@@ -44,7 +45,7 @@ namespace CafeBabeGame
                 {
                     try
                     {
-                        PlayCafeBabeGame(outputFile);
+                        PlayCafeBabeGame(outputFile, timeout);
                     }
                     catch (Exception e)
                     {
@@ -63,7 +64,7 @@ namespace CafeBabeGame
 
         }
 
-        private static void PlayMultipleCafeBabeGames(int count, FileInfo failureOutputFile)
+        private static void PlayMultipleCafeBabeGames(int count, FileInfo failureOutputFile, TimeSpan gameTimeLimit)
         {
             if (count < 1) throw new ArgumentOutOfRangeException(nameof(count), count, "Parameter not positive.");
             StringBuilder allLog = new StringBuilder();
@@ -75,7 +76,7 @@ namespace CafeBabeGame
                     Result r;
                     using (GameFactory.CreateDeadBeefCafeGame(outputHelper, 3, CafeBabeGame_GameEnded))
                     {
-                        r = WaitForGameEndOrTimeout(TimeSpan.FromSeconds(3)) ?? default;
+                        r = WaitForGameEndOrTimeout(gameTimeLimit) ?? default;
                         if (r == default)
                         {
                             Console.Error.WriteLine(
@@ -175,7 +176,7 @@ namespace CafeBabeGame
             }
         }
 
-        static void PlayCafeBabeGame(FileInfo outputFile)
+        static void PlayCafeBabeGame(FileInfo outputFile, TimeSpan gameMaxTime)
         {
             Result result;
             string bufferContents;
@@ -185,7 +186,7 @@ namespace CafeBabeGame
                     GameFactory.CreateDeadBeefCafeGame(outputHelper, 3, CafeBabeGame_GameEnded);
                 Console.WriteLine("Concrete type of CafeBabe Game: [" + game.GetType().Name + "].");
                 
-                Result? temp = WaitForGameEndOrTimeout(TimeSpan.FromSeconds(3));
+                Result? temp = WaitForGameEndOrTimeout(gameMaxTime);
                 result = temp ?? default;
             }
 
@@ -390,9 +391,11 @@ namespace CafeBabeGame
         private static Result?  WaitForGameEndOrTimeout(TimeSpan maxWait)
         {
             maxWait = (maxWait <= TimeSpan.Zero) ? TimeSpan.FromSeconds(1) : maxWait;
-            DateTime quitAfter = TimeStampSource.Now + maxWait;
+            DateTime startedAt = TimeStampSource.Now;
+            TimeSpan elapsed = TimeStampSource.Now - startedAt;
             Result res = default;
-            while (res == default && TimeStampSource.Now <= quitAfter)
+            
+            while (res == default && elapsed <= maxWait)
             {
                 try
                 {
@@ -408,7 +411,17 @@ namespace CafeBabeGame
                 if (res == null)
                 {
                     Thread.Sleep(TimeSpan.FromMilliseconds(10));
+                    elapsed = TimeStampSource.Now - startedAt;
                 }
+            }
+
+            if (res == default)
+            {
+                Debug.Assert(elapsed > maxWait);
+                Console.Error.WriteLineAsync(
+                    "Game did not terminate within time limit.  " +
+                    $"Time limit: {maxWait.TotalMilliseconds:F3} milliseconds; Elapsed time: {elapsed.TotalMilliseconds:F3} milliseconds.  " +
+                    "Consider increasing the time limit.");
             }
             return res;
         }
@@ -426,9 +439,10 @@ namespace CafeBabeGame
             }
         }
 
-        static (bool Success, string ErrorMessage, FileInfo OutputFile, int NumGamges)
+        static (bool Success, string ErrorMessage, FileInfo OutputFile, int NumGamges, TimeSpan MaxGameLength)
             GetOutputFile(string[] args)
         {
+            TimeSpan maxGameLength = TimeSpan.FromSeconds(7.5);
             FileInfo outputFile = null;
             string errorInfo = string.Empty;
             int numGames = 1;
@@ -442,6 +456,10 @@ namespace CafeBabeGame
             {
                 fileName = fileName.Substring(1, fileName.Length - 1);
             }
+
+            maxGameLength = GetMaxGameLength(args, maxGameLength);
+            
+
             try
             {
                 outputFile = new FileInfo(fileName);
@@ -458,8 +476,23 @@ namespace CafeBabeGame
                             "]). Exception contents: [" + ex + "].";
             }
 
-            return (outputFile != null, errorInfo, outputFile, numGames);
+            return (outputFile != null, errorInfo, outputFile, numGames, maxGameLength);
 
+            static TimeSpan GetMaxGameLength(string[] args, TimeSpan fallback)
+            {
+                TimeSpan ret = fallback;
+                if (args?.Length > 2)
+                {
+                    ReadOnlySpan<char> timeStr = true == args[2]?.StartsWith("/") ? args[2].AsSpan().Slice(1, args[2].Length - 1) : args[2]?.Trim() ?? string.Empty;
+                    double millisecondsParsed;
+                    bool parsedThem = double.TryParse(timeStr, out millisecondsParsed) && !double.IsInfinity(millisecondsParsed) && !double.IsNaN(millisecondsParsed) && millisecondsParsed > 0;
+                    if (parsedThem)
+                    {
+                        ret = TimeSpan.FromMilliseconds(millisecondsParsed);
+                    }
+                }
+                return ret;
+            }
         }
         
         #region For debugging failed results

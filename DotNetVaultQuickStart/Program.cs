@@ -1,17 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Text;
 using System.Threading;
-using DotNetVault.Vaults;
 using DotNetVault.Attributes;
 using HpTimesStamps;
 using JetBrains.Annotations;
-
+//SpinLock methods:
+//    ATOMIC VAULTS: BUSY WAIT
+//    MONITOR AND RW Vaults: SAME AS LOCK
+//Lock methods:
+//    ATOMIC VAULTS: Sleep briefly between failed attempts to obtain resource
+//    MONITOR AND RW Vaults:
+//         Uses Monitor.Enter (monitor) with a (private) sync object to synchronize 
+//         Uses readwritelock slim to obtain a writeable lock
+//If you want to switch between monitor and atomic vaults during performance profiling (and, generally, using atomics you envision a busy wait
+//but short thread contention period, SpinLock methods should be preferred.
+//
+//You can switch from atomic vaults to monitor vaults by switching the alias in this and Dog.cs, you will also have to edit the factory method
+//used for the monitor vault (use of CTOR is identical for basic vaults).
+using BasicDogVault = DotNetVault.Vaults.BasicMonitorVault<DotNetVaultQuickStart.DogActionRecord>;
+//COMMENT OUT PRIOR LINE AND UNCOMMENT SUBSEQUENT LINE HERE AND IN DOG.CS TO USE AN ATOMIC BASIC VAULT (also in DOG.cs)
+//using BasicDogVault = DotNetVault.Vaults.BasicVault<DotNetVaultQuickStart.DogActionRecord>;
+//using MutableResDogVault = DotNetVault.Vaults.MutableResourceVault<System.Collections.Generic.SortedSet<DotNetVaultQuickStart.DogActionRecord>>;
+//UNCOMMENT OUT PRIOR LINE AND COMMENT SUBSEQUENT LINE TO USE ATOMIC MUTABLE RESOURCE VAULT
+using MutableResDogVault = DotNetVault.Vaults.MutableResourceMonitorVault<System.Collections.Generic.SortedSet<DotNetVaultQuickStart.DogActionRecord>>;
 namespace DotNetVaultQuickStart
 {
     class Program
     {
+        private const string ReadWriteDemoVaultOutputFilePath = "ReadWriteDemoVaultDemoOutput.txt";
+
         static void Main()
         {
             string tsMsg = TimeStampSource.IsHighPrecision
@@ -23,12 +43,28 @@ namespace DotNetVaultQuickStart
             DemonstrateBasicVault();
             Console.WriteLine();
             Console.WriteLine();
+            
             DemonstrateMutableResourceVault();
-            DateTime demoEnd = TimeStampSource.Now;
-            Console.WriteLine("Both demos completed ok.");
-            Console.WriteLine($"Elapsed milliseconds: [{(demoEnd - demoStart).TotalMilliseconds:F3}].");
+            Console.WriteLine();
+            Console.WriteLine();
 
+            Console.WriteLine("Begin ReadWriteVault demo.");
+            string res = ReadWriteVaultDemo.RunDemo(TimeSpan.FromDays(7.5));
+            FileInfo fi = new FileInfo(ReadWriteDemoVaultOutputFilePath);
+            {
+                using var sw = fi.CreateText();
+                sw.Write(res);
+            }
+            Console.WriteLine($"ReadWriteVault demo completed and log written to [{fi.FullName}].");
+            Console.WriteLine();
+            Console.WriteLine();
+
+            DateTime demoEnd = TimeStampSource.Now;
+            Console.WriteLine("All three demos completed ok.");
+            Console.WriteLine($"Elapsed milliseconds: [{(demoEnd - demoStart).TotalMilliseconds:F3}].");
         }
+
+        
 
         /// <summary>
         /// The basic vault is the easiest vault to use, but it is limited
@@ -56,7 +92,7 @@ namespace DotNetVaultQuickStart
             //Regardless, if you are going to dispose a vault, make sure that all threads that might be accessing 
             //it are finished ... or use the bool TryDispose(TimeSpan) method if you can't be sure... since we are joining
             //all threads before finishing, it doesn't matter here, so we will just use using on the vault.
-            using var actionVault = new BasicVault<DogActionRecord>();
+            using var actionVault = new BasicDogVault();
             List<Dog> dogs = new List<Dog>
             {
                 new BasicVaultDemoDog("Fido", 2, actionVault),
@@ -118,9 +154,13 @@ namespace DotNetVaultQuickStart
             //If you do not provide one, a default value will be used.
             string finalResults;
             //See comments in the BasicVault demonstration regarding disposing VAULTS
-            using (var mutableResourceVault =
-                MutableResourceVault<SortedSet<DogActionRecord>>.CreateAtomicMutableResourceVault(
-                    () => new SortedSet<DogActionRecord>(), TimeSpan.FromSeconds(1)))
+            using (var mutableResourceVault = 
+                    //Uncomment to use atomic vault (and comment next)
+                //MutableResDogVault.CreateAtomicMutableResourceVault(() => new SortedSet<DogActionRecord>(), 
+                  //  TimeSpan.FromMilliseconds(250)))
+                //Comment (and uncomment above to use atomic vault instead of monitor vault)
+                MutableResDogVault.CreateMonitorMutableResourceVault( //Timespan specifies default timeout for locks
+                  () => new SortedSet<DogActionRecord>(), TimeSpan.FromSeconds(1))) 
             {
                 List<Dog> dogs = new List<Dog>
                 {
@@ -166,6 +206,8 @@ namespace DotNetVaultQuickStart
             Console.WriteLine(Environment.NewLine + finalResults + Environment.NewLine);
             Console.WriteLine("FINISHED MutableResourceVault Demo");
         }
+
+        
 
         private static string ProcessResults([NotNull] ImmutableSortedSet<DogActionRecord> results)
         {

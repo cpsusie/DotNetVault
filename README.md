@@ -1,74 +1,123 @@
-DotNetVault
-===========
+# DotNetVault
 
-Synchronization Library and Static Analysis Tool for C\# 8
+## Synchronization Library and Static Analyzer for C\# 8.0+  
+**MAJOR NEW RELEASE (version 0.2.5.x)**
 
 DotNetVault takes its inspiration from the synchronization mechanisms provided
 by Rust language and the Facebook Folly C++ synchronization library. These
 synchronization mechanisms observe that the mutex should own the data they
 protect. You literally cannot access the protected data without first obtaining
 the lock. RAII destroys the lock when it goes out of scope – even if an
-exception is thrown or early return taken.
+exception is thrown or early return taken. DotNetVault provides mechanisms for 
+RAII-based thread synchronization and uses Roslyn analyzer to *add new rules to the
+C\# language* to actively prevent resources protected by its vaults from being used 
+in a thread-unsafe or non-synchronized way. You need not rely on convention or programmer
+discipline to ensure compliance: DotNetVault enforces compliance **at compile-time**.
 
-**Advantages:**
+### **Requirements**
+  
+* Environment targeting DotNet Framework 4.8+, DotNet Standard 2.0+ or DotNet Core 3.1+.  (For framework 4.8 and DotNet Standard 2.0, any projects using this library or its analyzer must be manually set to use C# 8.0.  This is unnecessary for DotNetCore 3.1+).  
+* A build environment that supports Roslyn Analyzers and capable of emitting compiler errors as prompted by analyzers. (Both Visual Studio Community 2019+ on Windows and Jetbrains Rider 2019.3.1+ on Amazon Linux have been extensively tested).  Visual Studio Code has also been tested but not extensively.  From testing, Visual Studio Code, with Roslyn Analyzers enabled, will emit compilation errors at build-time, but Intellisense identification of the errors was markedly inferior to the Intellisense available in Visual Studio and Rider.    
+* Installation of this library and its dependencies via NuGet.
 
-​ **Deadlock avoidance**: by default, all locks are timed. If the resource has
-already been obtained or you have accidentally changed the acquisition order of
-various locks somewhere in the code, you get a *TimeoutException*, allowing you
-to identify your mistake. In addition to being able to base termination of an
-acquisition attempt on timeout, you can also use a cancellation token to
-propagate the cancellation request.
+### **Advantages:**
 
-​ **RAII (Scope-based) Lock Acquisition and Release:** Locks are stack-only
-objects (ref structs) and the integrated Roslyn analyzer forces you to declare
-the lock inline in a using statement or declaration, or it will cause a
-compilation error. There is no danger of accidentally holding the lock open
-longer than its scope even in the presence of an exception or early return.
+#### **Easy to Change Underlying Synchronization Mechanisms**  
+DotNetVault uses a variety of different underlying synchronization mechanisms:
 
-**Incredible Flexibility to Change Underlying Synchronization Mechanism:**  
-Vaults are provided that use varied underyling mechanisms (Monitor Locks, 
-Atomic Exchanges, and ReaderWriterLockSlim).These vaults provide a common
-compile time API for their common functionality.  Thus, you can easily change 
-from a synchronization mechanism using Monitor.Enter (which is used by C#'s
-lock statement) to a mechanism based on lock free atomics or even 
-ReaderWriterLock.  This flexibility will allow you to profile code and 
-make changes without needing to extensively refactor your code.
+  * **Monitor + Sync object**  This is the most widely used thread synchronization mechanism
+  used in C\# code.  It is the mechanism used when you use the *lock* keyword such as 
+  
+    ```csharp
+    lock (_syncObj)
+    {
+        //Access protected resource
+    }
+    ```
+  * **Atomics**  You can also base your synchronization on lock-free interlocked exchanges using 
+  DotNetVault.
+  
+  * **ReaderWriterLockSlim** This synchronization mechanism allows for the possibility of read-only locks
+  which multiple threads can obtain concurrently as well as read-write locks which are exclusive.
+   (Upgradable read-only locks are also available.)  DotNetVault provides Vaults that use this as its 
+   underlying synchronization mechanism as well.  
+   
+All of the above synchronization mechanisms use different syntax to obtain and release locks.  If you use them
+directly, and decide to switch to (or try) a different mechanism, it will require extensive refactoring which may
+be prohibitively difficult to do correctly: and be equally difficult to switch back.  **DotNetVault simplifies the 
+required refactoring.**  All vaults expose a **common *compile-time* API.**  Simply change the type of vault protecting
+your resource (and perhaps update the constructor that instantiates the vault) and the underlying mechanism used 
+changes accordingly. (Of course, read-only locks are only available with vaults that use ReaderWriterLockSlim, 
+but if you are using read-only locks, the other mechanisms are inappropriate.)  
+   
+#### **Deadlock Avoidance**  
+  
+Deadlocks occur most frequently when you acquire successive locks in differing orders on different threads.  In large projects,
+it can be very difficult to ensure that locks are always obtained in the same order.  Errors typically manifest in your application 
+*silently* freezing up.  Moreover, it can be **very** difficult to reproduce certain deadlocks and the act of attaching a debugger
+with break points may change the behavior your customer is observing.  In short, these are very expensive problems to debug.
 
-**Isolation of Protected Resources**: The need for programmer discipline is
-reduced:  
-		
-		1. programmers do not need to remember which mutexes protect which resources, 
-		
-		2. programmers cannot access the protected resource before they obtain the 
-		lock and cannot access any mutable state from the protected resource after 
-		releasing the lock,
-		
-		3. for read-write vaults, if a readonly-lock is obtained, its readonly nature 
-		is enforced at compile time,
-		
-		4. static analysis rules enforced by compilation errors emitted from the
-		integrated Roslyn analyzer prevent references to mutable state from outside the
-		protected resource from becoming part of the protected resource and prevent the
-		leaking of references to mutable state inside the protected resource to the
-		outside.
+The way that DotNetVault helps you avoid deadlocks is by making all lock acquisitions timed by default.  You can, of course, do timed acquisition with the underlying primitives directly, but this is syntactically difficult (compare, for example, the untimed,  scope-based, release-guaranteed lock statement with its timed alternative using Monitor.TryEnter and a timeout).  The syntactic difficulties and lack of RAII, scope based acquisition and release easily leads to errors such as:  
 
-The ubiquity of shared mutable state in Garbage Collected languages like C\# can
-work at cross purposes to thread-safety. One approach to thread-safety in such
-languages is to elimate the use of mutable state. Because this is not always
-possible or even desireable, the synchronization mechanisms employed in C\#
-typically rely on programmer knowledge and discipline. DotNetVault uses
-Disposable Ref Structs together with custom language rules enforced by an
-integrated Roslyn analyzer to prevent unsynchronized sharing of protected
-resources. Locks cannot be held longer than their scope and, by default, will
-timeout. This enables deadlock-avoidance.
+* by forgetting to free it (perhaps due to early return or exception), 
+* not realizing it wasn't obtained successfully and, under this delusion, proceed to access the resource without synchronization
+* deciding not to use a timed acquisition because of the foregoing difficulties and thus running into the foregoing dreaded *deadlocks*.
 
-Try DotNetVault. There is a learning curve because it is restrictive about
-sharing protected resources. There are plenty of documents and example projects
-provided with the source code of this project that can ease you into that
-learning curve and demonstrate DotNetVault's suitability for use in highly
-complex concurrent code. Armed with the resources that DotNetVault provides, you
-will be able to approach concurrent programming, including use of shared mutable
-state, with a high degree of confidence.
+Using DotNetVault, ***all* access is subject to RAII, scoped-based lock acquisition and release**.  Failure to obtain a lock throws an exception --- there can be no mistake as to whether it is obtained.  When a locks scope ends, it is released.  By default, **all** lock acquisitions are timed -- you must explicitly and clearly use the differently and ominously named untimed acquisition methods if you wish to avoid the slight overhead imposed by timed acquisition. (Typically after using and heavily testing using the standard timed acquisition methods, ensuring there are no deadlocks, profiling and discovering a bottleneck caused by timed acquisition, and then switching to the untimed acquisition method in those identified bottlenecks.  It is **hard** to deadlock accidentally in DotNetVault.
+
+#### **RAII (Scope-based) Lock Acquisition and Release:**  
+
+Locks are stack-only objects (ref structs) and the integrated Roslyn analyzer forces you to declare the lock inline in a using statement or declaration, or it will cause a compilation error.  
+
+ * There is no danger of accidentally holding the lock open longer than its scope **even in the presence of an exception or early return.**
+ * There is no danger of being able to access the protected resource if the lock is not obtained.
+ * There is no danger of being able to access the protected resource after release.  
+ 
+#### **Enforcement of Read-Only Access When Lock is Read-Only**  
+
+  None of the synchronization primitives, when used directly, *prevents* access to the protected resource when it is not obtained. DotNetVault, as mentioned in numerous places, *actively prevents such unsynchronized access at **compile-time**.* ReaderWriterLockSlim is unique among the synchronization primitives employed by DotNetVault in allowing for multiple threads to hold *read-only* locks at the same time.  As the primitive cannot prevent access to the resource generally, it also cannot *validate that user code does not **mutate** the protected resource while holding a **read-only lock**.* DotNetVault not only prevents access to the underlying resource while the correct lock is not held, it also enforces that, while a **read-only lock** is held, the protected object **cannot be mutated**.  This is also enforced statically, **at compile-time**.
+
+#### **Isolation of Protected Resources**
+
+The need for programmer discipline is reduced:  
+1. programmers do not need to remember which mutexes protect which resources,  
+2. once a protected resource is in a vault, no reference to any mutable state of any object in the resources object graph can be accessed except when a stack-frame limited lock has been obtained: the static analyzer prevents it **at compile-time**.  
+3. programmers cannot access the protected resource before they obtain the lock and cannot access any mutable state from the protected resource after releasing the lock, and     
+4. static analysis rules prevent mutable state not protected by the vault from becoming part of the state of the protected resource.
+
+#### **Summary of Advantages**
+
+The ubiquity of shared mutable state in Garbage Collected languages like C\# can work at cross purposes to thread-safety. One approach to thread-safety in such languages is to eliminate the use of mutable state. Because this is not always possible or even desireable, the synchronization mechanisms employed in C\# typically rely on programmer knowledge and discipline. DotNetVault uses Disposable Ref Structs together with custom language rules enforced by an integrated Roslyn analyzer to prevent unsynchronized sharing of protected resources. Locks cannot be held longer than their scope and, by default, will timeout. This enables deadlock-avoidance.
+
+Try DotNetVault. There is a learning curve because it is restrictive about sharing protected resources. There are plenty of documents and example projects provided with the source code of this project that can ease you into that learning curve and demonstrate DotNetVault's suitability for use in highly complex concurrent code. Armed with the resources that DotNetVault provides, you
+will be able to approach concurrent programming, including use of shared mutable state, with a high degree of confidence.
+
+### **Resources For Learning To Use DotNetVault**
+
+#### **Quick Start Guides**
+
+1. A quick-start installation guide for installing the DotNetVault library and analyzer for use in Visual Studio 2019+ on Windows.
+2. A quick start installation guide for installing the DotNetVault library and analyzer for use in JetBrains Rider 2019.3.1+ (created on an Amazon Linux environment, presumably applicable to any platform supporting JetBrains Rider 2019.3.1+).
+3. A guided overview of the functionality of DotNetVault along with a test project available on Github in both source and compiled code.  
+  
+#### **Detailed Project Description**
+
+  An extensive document called "Project Description.pdf" *insert link* covers:  
+
+* vaults, 
+* locked resource objects, 
+* static analysis rules,
+* attributes that activate the static analyzer rules
+* rationale for the static analyzer rules
+* concept of vault-safety
+* effective design of easy-to-use and easy-to-isolate objects
+
+#### **Demo projects and Stress Test Projects**  
+(All are available on Github in both source code and compiled libraries / executables.)
+  
+* *An example code playground*: allows user to get used to the validation rules, provides sample code.  Also contains commented-out code (with explanations) that, if uncommented, will trigger various static-analyzer-based compilation errors.  
+* *"Laundry Machine" Stress Test:* This test (Windows-Only, because of WPF) demonstrates multi-threaded state machines using vaults to protected their mutable state flags.  There are three laundry state machines, each with their own threads.  Four robots (two loader and two unloader) also have their own threads and contend for access to the laundry machine.  The loaders grab dirty clothes, contend (vs other robots and the laundry machine thread itself) for access to the laundry machines in turn, when access is obtained they check if it is empty, if so, they load laundry, start the machine and then release access.  The unloaders (vs the loaders, the other unloader and the laundry machine threads itself) contend for access to the same laundry machines.  They search for a full laundry machines with clean clothes: once found, they unload the laundry and place it in the clean bin.  The stress test ends when all the laundry articles are in the clean bin.  This shows multi-threaded state machine interaction using synchronized mutable state.
+* *Clorton Game:* A console-based stress test (can run on any platform supporting .NET Core 3.1+) demonstrating 
 
 **Development Roadmap**: 
 	As of version 0.2.2.12-beta, Version 0.2 is feature complete 
@@ -77,11 +126,11 @@ releases in version two will hopefully be limited to documentation content updat
 of test code and demonstration code.  Bug fixes may also be released in Version 2 
 but no new features (except as needed to fix bugs) should be expected.  
 
-Future development in Version 0.2 after it is released in non-beta form will
+	Future development in Version 0.2 after it is released in non-beta form will
 be limited to the correction of bugs and other flaws and perhaps refactoring to 
 the extent it does not materially change behavior.
 
-After Version 0.2, new features will be developed under 0.3.  These
+	After Version 0.2, new features will be developed under 0.3.  These
 features currently center on taking advantage of Roslyn Analyzers which should be
 available with .NET 5. 
 

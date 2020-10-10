@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CafeBabeGame": {
+      "commandName": "Project",
+      "commandLineArgs": "/cafebabe_res.txt /10 "
+    }
+  }
+}

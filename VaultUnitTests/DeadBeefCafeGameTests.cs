@@ -39,7 +39,7 @@ namespace VaultUnitTests
 
                     IDeadBeefCafeGameFactory cafeBabeFactory = new DeadBeefCafeGameFactorySource().FactoryInstance;
 
-                    TimeSpan maxWait = TimeSpan.FromSeconds(2);
+                    TimeSpan maxWait = TimeSpan.FromSeconds(7.5);
                     using var cafeBabeGame =
                         cafeBabeFactory.CreateDeadBeefCafeGame(outputHelper, 3, CafeBabeGame_GameEnded);
                     DateTime startedAt = TimeStampSource.Now;

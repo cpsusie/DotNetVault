@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 
 namespace DotNetVaultQuickStart
 {
+    
     [VaultSafe]
     public readonly struct DogActionRecord : IEquatable<DogActionRecord>, IComparable<DogActionRecord>
     {

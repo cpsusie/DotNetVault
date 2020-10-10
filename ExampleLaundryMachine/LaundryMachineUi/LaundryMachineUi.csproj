@@ -9,12 +9,12 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNetVault" Version="0.2.2.12-beta" />
+    <PackageReference Include="DotNetVault" Version="0.2.4-alpha" />
   </ItemGroup>
 
   <ItemGroup>
