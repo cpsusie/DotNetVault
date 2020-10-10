@@ -42,7 +42,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNetVault" Version="0.2.4-alpha" />
+    <PackageReference Include="DotNetVault" Version="0.2.4.1-alpha" />
     <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" />
   </ItemGroup>
 </Project>

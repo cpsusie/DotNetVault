@@ -13,8 +13,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		DotNetVault Description.docx = DotNetVault Description.docx
 		DotNetVault Description.pdf = DotNetVault Description.pdf
-		DotNetVault Quick Start Guide Linux Rider 2019.3.1 -- (Amazon Linux).pdf = DotNetVault Quick Start Guide Linux Rider 2019.3.1 -- (Amazon Linux).pdf
-		DotNetVault Quick Start Guide Windows Vs 2019.pdf = DotNetVault Quick Start Guide Windows Vs 2019.pdf
 		DotNetVault.sln.DotSettings = DotNetVault.sln.DotSettings
 		license.txt = license.txt
 		README.md = README.md
@@ -51,23 +49,5 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {546FB336-1819-465C-B157-F33FC17E6577}
-	EndGlobalSection
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://cjmscrews.visualstudio.com/
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = DotNetVault\\DotNetVault.csproj
-		SccProjectName1 = DotNetVault
-		SccLocalPath1 = DotNetVault
-		SccProjectUniqueName2 = DotNetVault.Vsix\\DotNetVault.Vsix.csproj
-		SccProjectName2 = DotNetVault.Vsix
-		SccLocalPath2 = DotNetVault.Vsix
-		SccProjectUniqueName3 = DotNetVault.Test\\DotNetVault.Test.csproj
-		SccProjectName3 = DotNetVault.Test
-		SccLocalPath3 = DotNetVault.Test
-		SccProjectUniqueName4 = VaultUnitTests\\VaultUnitTests.csproj
-		SccProjectName4 = VaultUnitTests
-		SccLocalPath4 = VaultUnitTests
 	EndGlobalSection
 EndGlobal

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Threading;
@@ -18,7 +19,14 @@ namespace DotNetVault.Vaults
     /// It also provides sort and find functions that accept struct-based compares that compare parameters received by read-only reference.
     /// </summary>
     /// <typeparam name="TItem">The type of item held in the protected list.  It must be a vault-safe
-    /// value type that is <see cref="IEquatable{T}"/> and <see cref="IComparable{T}"/></typeparam>
+    /// value type that is <see cref="IEquatable{T}"/> and <see cref="IComparable{T}"/>  The scenarios tested
+    /// have assumed if <see cref="Comparer{T}"/> returns 0 upon a call to its <see cref="Comparer{T}.Compare"/> method,
+    /// then an <see cref="EqualityComparer{T}"/> will return true for those objects upon a call to its <see cref="EqualityComparer{T}.Equals(T, T)"/> method
+    /// will return true and a calls to <see cref="EqualityComparer{T}.GetHashCode(T)"/> will return the same value for both of them.
+    /// In short, it assumes that values that Compare to Zero are indistinguishable.  These are assumptions I held when designing the specialized binary search
+    /// and sort methods for this vault's protected collection.  There may be no problem if these assumptions do not hold (particularly if no sorting or binary
+    /// search functionality is employed) -- but I make no guarantees as to that: it was not envisioned by the design.
+    /// </typeparam>
     public sealed class ReadWriteValueListVault<[VaultSafeTypeParam] TItem> 
         : ReadWriteListVault<TItem, BigValueList<TItem>>
             where TItem : struct, IEquatable<TItem>, IComparable<TItem>
