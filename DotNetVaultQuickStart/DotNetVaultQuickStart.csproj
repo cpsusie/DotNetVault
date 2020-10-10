@@ -31,6 +31,7 @@
 
   <ItemGroup>
     <Folder Include="dotnet_vault_install_vs2019_win\" />
+    <Folder Include="dotnetvault_install_rider2019.3.1_linux\" />
   </ItemGroup>
 
 </Project>
