@@ -68,5 +68,5 @@
     
         ![](https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/DotNetVaultQuickStart/dotnet_vault_install_vs2019_win/pic_6.png?raw=true)  
     
- 6. Congratulations, you have successfully built an application using DotNetVault.  Next, we will look at a QuickStart application that shows the very basics of what can be done with this library and its integrated static analyzer.   
+ 6. Congratulations, you have successfully built an application using DotNetVault.  Next, we will look at a QuickStart application that shows the very basics of what can be done with this library and its integrated static analyzer.  Move on to the [functionality tour](https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/DotNetVaultQuickStart/DotNetVault%20Quick%20Start%20Functionality%20Tour%20%E2%80%93%20JetBrains%20Rider%20(Amazon%20Linux).md) next.  
  

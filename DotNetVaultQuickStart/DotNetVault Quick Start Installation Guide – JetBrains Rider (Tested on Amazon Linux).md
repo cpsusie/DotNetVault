@@ -89,4 +89,4 @@ JetBrains.Annotations.dll  LinuxDotNetVaultSetup.deps.json  LinuxDotNetVaultSetu
 **Hello from thread 1, DotNetVault!  Hello from thread 2, DotNetVault!**    
 [CORP\cpsusie@a-3fz49v9t6b1rq netcoreapp3.1]$   
   
-    * Congratuations, you have successfully setup a project to use the DotNetVault library and static analyzer.  As a next step, consider the *Functionality Tour* to jump right into using this library.  For more detailed information, you may consult the latest version of *[Project Description.pdf](https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/DotNetVault%20Description.pdf)*.
+    * Congratuations, you have successfully setup a project to use the DotNetVault library and static analyzer.  As a next step, consider the *[Functionality Tour](https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/DotNetVaultQuickStart/DotNetVault%20Quick%20Start%20Functionality%20Tour%20%E2%80%93%20JetBrains%20Rider%20(Amazon%20Linux).md)* to jump right into using this library.  For more detailed information, you may consult the latest version of *[Project Description.pdf](https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/DotNetVault%20Description.pdf)*.
