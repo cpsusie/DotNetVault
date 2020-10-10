@@ -29,4 +29,8 @@
     <PackageReference Include="HighPrecisionTimeStamps" Version="0.0.1-alpha" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="dotnet_vault_install_vs2019_win\" />
+  </ItemGroup>
+
 </Project>
