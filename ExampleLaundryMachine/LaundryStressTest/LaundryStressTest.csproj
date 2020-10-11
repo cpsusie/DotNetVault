@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNetVault" Version="0.2.4-alpha" />
+    <PackageReference Include="DotNetVault" Version="0.2.5" />
   </ItemGroup>
 
   <ItemGroup>
