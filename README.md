@@ -122,49 +122,36 @@ it upgrades to a writable lock and writes the value 0xDEAD_BEEF_CAFE_BABE_DEAD_B
 * *[Console Stress Test](https://github.com/cpsusie/DotNetVault/tree/v0.2.5.x/ConsoleStressTest)* This stress-test and demonstration console application is simple and straightforward.  Although not as interesting as the *Clorton Game* and *Cáfe Babe Game*, it may be more accessible to gain a very basic overview of how vaults can be used.
 * *Unit Testing Projects*- This project includes two unit testing projects.  The [first contains unit tests](https://github.com/cpsusie/DotNetVault/tree/v0.2.5.x/DotNetVault.Test) that focus on testing the operation of this project's static analyzer and may be useful if you are interested in learning how Roslyn Analyzers work.  The analyzer code itself is found [here](https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/DotNetVault/DotNetVaultAnalyzer.cs) and may also be useful for learning purposes.  The [other unit tests](https://github.com/cpsusie/DotNetVault/tree/v0.2.5.x/VaultUnitTests) validate the correctness of the library functionality (i.e. the vaults and locked resource objects) and perform some stress testing as well.
 * Explaining how to debug the analyzer itself is beyond the scope of this document.  Essentially, one must use the *[vsix](https://github.com/cpsusie/DotNetVault/tree/v0.2.5.x/DotNetVault.Vsix)* project to launch a second special instance of visual studio that is running a debug build of the analyzers and has appropriate breakpoints set.  Then in the other instance, you can load the project that causes the issue you wish to debug.  This, obviously, is not for the faint-of-heart.  An important thing to note is that you **should not use the vsix extension project to install DotNetVault for normal use: analyzers imported via a vsix extension are incapable of causing compilation errors and this project depends heavily on compile-time analysis to ensure code is correct**.  To install DotNetVault for normal use, **use the nuget package**.    
+  
+#### Guide To Using Large Value Types  
+In older versions of C\# we were cautioned against using large value types and value types with mutable state.  Recent changes to the C# language The ability to pass or return structs by reference or readonly reference and the *readonly* specifier (as applied to structs, struct properties, struct property get accessors and struct methods) work together to greatly mitigate prior concerns about the use of large structs.  Moreover, the readonly specifier allows specification of which methods and properties (if any) might mutate the value of a struct, making it easier to deal with mutable structs without defensive copying.  For isolating shared mutable state, however, particularly for use within a read-write or basic vault, large mutable value types are **ideal**.  For that reason, this project provides a [guide document](https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/Advantages%20of%20Using%20Large%20Mutable%20Structs.pdf) for how to design large immutable value types in general as well as how to design large mutable value types as a shared state repository for usage with a ReadWrite vault. If you have trouble reading the pdf with your browser or otherwise desire, the document can be downloaded [here](https://github.com/cpsusie/DotNetVault/raw/v0.2.5.x/Advantages%20of%20Using%20Large%20Mutable%20Structs.pdf).
 
-**Development Roadmap**: 
-	As of version 0.2.2.12-beta, Version 0.2 is feature complete 
-and with luck will be released in its first non-beta version soon. Any further
-releases in version two will hopefully be limited to documentation content updates, cleanup
-of test code and demonstration code.  Bug fixes may also be released in Version 2 
-but no new features (except as needed to fix bugs) should be expected.  
+### **Development Roadmap** 
 
-	Future development in Version 0.2 after it is released in non-beta form will
-be limited to the correction of bugs and other flaws and perhaps refactoring to 
-the extent it does not materially change behavior.
+#### *Release History*
 
-	After Version 0.2, new features will be developed under 0.3.  These
-features currently center on taking advantage of Roslyn Analyzers which should be
-available with .NET 5. 
+The last official release was version [0.1.5.4](https://github.com/cpsusie/DotNetVault/releases/tag/v0.1.5.4), available as a Nuget package [here](https://www.nuget.org/packages/DotNetVault/0.1.5.4).  Since then, **many** features have been added to DotNetVault.  All of these features were included in the feature-complete beta version  [0.2.2.12-beta](https://github.com/cpsusie/DotNetVault/releases/tag/v0.2.2.12-beta), available as a Nuget package [here](https://www.nuget.org/packages/DotNetVault/0.2.2.12-beta).   The following list is a non-exhaustive summary of these new features:  
+* Upgrading to new versions of Roslyn libraries, immutable collections and other minor dependency upgrades
+* Changing some of the formatting of analyzer diagnostics to comply with Roslyn authors' recommendations
+* Adding Monitor Vaults (using Monitor.Enter + sync object) as the synchronization mechanism
+* Adding ReadWrite Vaults (using ReaderWriterLockSlim) as their synchronization mechanism
+* Fixing flawed static analyzer rules
+* Adding new analyzer rules to close encountered loopholes in the ruleset that potentially allowed unsynchronized access to protected resource objects
+* Unit tests as appropriate for new functionality
+* Creation of quick start installation guides with test projects
+* Not including project pdfs in the released package but instead providing an md document and a txt document with links to those documents in the github repository
+* Significant updates to the formatting and content of project markdown documents
+* Adding Source Link and releasing a symbol package along with the nuget package for this project
+* Writing many test projects and demonstration projects to verify functionality, stress test and profile performance of the vaults
+* Adding a document serving as a guide to using large mutable value types generally and as a repository for shared mutable state  
 
-See **DotNetVault Description.pdf** for full description of this project.
+#### *Version / Branch 0.2.5.x*
 
-RELEASE NOTES VERSION 0.2.2.12-beta:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Fixed a Bug 92 where copying a protected resource into another ref-struct declared in a larger scope (of the same type or containing a field at any level of nesting in its graph) could result in unsynchronized access.  
+No major new features will be added to version 0.2.5.  Development will remain open in the [0.2.5 branch](https://github.com/cpsusie/DotNetVault/tree/v0.2.5.x) primarily for refinements, bug fixes and documentation updates.  Versions 0.2.5+ will continue to support .NET Framework 4.8, .NET Standard 2.0+ and .NET Core 3.1+ but will not make use of any features from the upcoming Version 5 of the unified DotNet framework.  If you are not upgrading your projects to .NET 5, continue to use releases numbered 0.2 but make no upgrade to any package versioned 0.3+.  The first official release will likely be quickly followed up by minor releases fixing aesthetic problems, documentation, update of links etc.  Making upgrades between the first *official* 0.2.5+ release and the first *stable official* release thereafter will not (to the extent possible) affect behavior of the library.  Analyzer behavior will be updated only to close any encountered loopholes (or minor textual or formatting changes).
 
-    Fix was accomplished by the addition of more analyzer rules and attributes that can trigger them.
+#### Future Features
 
-    Unit tests were added to validate the fix and code was added to the ExampleCodePlayground demonstrating Bug92.
-
-    A full description of Bug 92, the new attributes and analyzer rules is available now in **DotNetVault Description.pdf**.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-RELEASE NOTES VERSION 0.2.2.1-beta:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    A BigValueListVault added, providing a vault protecting a list-like collection, especially suited for large value types. 
-
-    Unit tests added, including a stress test called Cafe Babe game.  The Cafe Babe game is a unit test and stand-alone console-driven stress testing utility.
-
-    "DotNetVault.Description.pdf" updated to reflect changes.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-RELEASE NOTES VERSION 0.2.1.22-beta
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- This is a beta release.  Current stable release is 0.1.5.4.
- 
- This release adds a ReadWriteStringBuffer vault that provides thread-safe readonly, upgradable readonly and writable access to a StringBuilder object.  It also (when binaries or source retrieved from GitHub) includes the "Clorton Game" which demonstrates usage of the readwrite vault and provides a stress test to validate its functionality.
-
- "DotNetVault.Description.pdf" updated to reflect changes.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+All (non-trivial) future feature development will occur in the [master branch](https://github.com/cpsusie/DotNetVault/tree/master) of this project.  They will be released starting at version 0.3+.  It is likely that the next version of DotNetVault will be targetting the upcoming unified framework version 5.0+ and not support prior versions of DotNet.  The primary focus of development will be the code generation capabilities of the Roslyn platform planned for release with .NET version 5.0+.  It is hoped to allow development and (to some extent) automated generation of customized vaults and their locked resource objects for users of this library.
 
 
+See **[DotNetVault Description.pdf](https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/DotNetVault%20Description.pdf)** which serves as the most complete design document for this project.

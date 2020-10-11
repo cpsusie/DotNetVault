@@ -22,40 +22,55 @@
 
   <PropertyGroup>
     <PackageId>DotNetVault</PackageId>
-    <PackageVersion>0.2.4.2-alpha</PackageVersion>
+    <PackageVersion>0.2.5.0</PackageVersion>
     <Authors>Christopher Susie</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/cpsusie/DotNetVault</PackageProjectUrl>
     <RepositoryUrl>https://github.com/cpsusie/DotNetVault</RepositoryUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>
+      Synchronization Library and Static Analysis Tool for C# 8
+
       DotNetVault is a library and static code analysis tool that makes managing shared mutable state in multi-threaded applications more manageable and less error prone.  It also provides a common abstraction over several commonly used synchronization mechanisms, allowing you to change from one underlying type to another (such as from lock free synchronization to mutex/monitor lock based) without needing to refactor your code. Where errors do still occur, they are easier to locate and identify.
 
-      It provides an abstraction over several different underlying synchronization mechanisms: lock-free synchronization using atomics, Monitor.Enter (i.e. C# lock(syncObj) {}) and ReaderWriterLockSlim. Because the common functionality shared by vaults providing these varied underlying mechanism is exposed by a common (compile-time) API, it is easier than ever to experiment with changing the underlying mechanism without need for much code refactoring.  Simply change the type of vault you instantiate to one that uses the synchronization mechanism you desire.
+      The project description (a detailed design document) can be read here: https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/DotNetVault%20Description.pdf.
 
-      A full project description is included in "DotNetVault Description.pdf".  Source code, example projects, unit tests, stress test and quick start guide on GitHub.
-</Description>
+      A quick start guide for installation (Windows, Vs 2019+) can be found here: https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/DotNetVaultQuickStart/DotNetVault%20Quick%20Start%20Installation%20Guide%20Visual%20Studio%202019%20(Windows%2010).md .
+
+      A quick start guide for installation (Tested on Amazon Linux, Rider 2019.3.1+) can be found here: https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/DotNetVaultQuickStart/DotNetVault%20Quick%20Start%20Installation%20Guide%20Visual%20Studio%202019%20(Windows%2010).md .
+
+      A guided tour / quick start guide for this project's functionality can be found here: https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/DotNetVaultQuickStart/DotNetVault%20Quick%20Start%20Functionality%20Tour%20%E2%80%93%20JetBrains%20Rider%20(Amazon%20Linux).md#dotnetvault-quick-start-functionality-tour--jetbrains-rider-201931-amazon-linux 
+    </Description>
     <PackageReleaseNotes>
-      RELEASE NOTES VERSION 0.2.2.12-beta:
+      RELEASE NOTES VERSION 0.2.5.0:
 
-      Fixed a Bug 92 where copying a protected resource into another ref-struct declared in a larger scope (of the same type or containing a field at any level of nesting in its graph) could result in unsynchronized access.
+      The last official release was version [0.1.5.4](https://github.com/cpsusie/DotNetVault/releases/tag/v0.1.5.4),
+      available as a Nuget package (https://www.nuget.org/packages/DotNetVault/0.1.5.4).  Since then, **many** features have been added to DotNetVault:
 
-      Fix was accomplished by the addition of more analyzer rules and attributes that can trigger them.
-
-      Unit tests were added to validate the fix and code was added to the ExampleCodePlayground demonstrating Bug92.
-
-      A full description of Bug 92, the new attributes and analyzer rules is available now in "DotNetVault Description.pdf".
+      * Upgrading to new versions of Roslyn libraries, immutable collections and other minor dependency upgrades
+      * Changing some of the formatting of analyzer diagnostics to comply with Roslyn authors' recommendations
+      * Adding Monitor Vaults (using Monitor.Enter + sync object) as the synchronization mechanism
+      * Adding ReadWrite Vaults (using ReaderWriterLockSlim) as their synchronization mechanism
+      * Fixing flawed static analyzer rules
+      * Adding new analyzer rules to close encountered loopholes in the ruleset that potentially allowed unsynchronized access to protected resource objects
+      * Unit tests as appropriate for new functionality
+      * Creation of quick start installation guides with test projects
+      * Not including project pdfs in the released package but instead providing an md document and a txt document with links to those documents in the github repository
+      * Significant updates to the formatting and content of project markdown documents
+      * Adding Source Link and releasing a symbol package along with the nuget package for this project
+      * Writing many test projects and demonstration projects to verify functionality, stress test and profile performance of the vaults
+      * Adding a document serving as a guide to using large mutable value types generally and as a repository for shared mutable state
     </PackageReleaseNotes>
     <Copyright>Copyright © 2019-2020 CJM Screws, LLC</Copyright>
     <PackageTags>DotNetVault, analyzers, synchronization, thread-safety, threadsafe, deadlock, deadlock-prevention</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <LangVersion>8.0</LangVersion>
-    <Version>0.2.4.2</Version>
+    <Version>0.2.5.0</Version>
     <AssemblyName>DotNetVault</AssemblyName>
     <RootNamespace>DotNetVault</RootNamespace>
     <Company>CJM Screws, LLC</Company>
-    <AssemblyVersion>0.2.4.2</AssemblyVersion>
-    <FileVersion>0.2.4.2</FileVersion>
+    <AssemblyVersion>0.2.5.0</AssemblyVersion>
+    <FileVersion>0.2.5.0</FileVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
