@@ -22,7 +22,7 @@
 
   <PropertyGroup>
     <PackageId>DotNetVault</PackageId>
-    <PackageVersion>0.2.5.0</PackageVersion>
+    <PackageVersion>0.2.5.1</PackageVersion>
     <Authors>Christopher Susie</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/cpsusie/DotNetVault</PackageProjectUrl>
@@ -42,6 +42,12 @@
       A guided tour / quick start guide for this project's functionality can be found here: https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/DotNetVaultQuickStart/DotNetVault%20Quick%20Start%20Functionality%20Tour%20%E2%80%93%20JetBrains%20Rider%20(Amazon%20Linux).md#dotnetvault-quick-start-functionality-tour--jetbrains-rider-201931-amazon-linux 
     </Description>
     <PackageReleaseNotes>
+      RELEASE NOTES VERSION 0.2.5.1:
+      
+      Resolved broken links displayed on project's NuGet page.
+
+      Fixed problem with license on NuGet.
+
       RELEASE NOTES VERSION 0.2.5.0:
 
       The last official release was version [0.1.5.4](https://github.com/cpsusie/DotNetVault/releases/tag/v0.1.5.4),
