@@ -13,7 +13,7 @@ namespace ConsoleStressTest
     class Program
     {
         static Program() => TheResultText = new LocklessWriteOnce<string>();
-
+        //test comment
         static void Main(string [] args)
         {
             var getArgumentsRes = StressTestArgs.CreateArguments(args);
