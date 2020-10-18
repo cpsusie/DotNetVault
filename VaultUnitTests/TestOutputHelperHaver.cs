@@ -6,12 +6,12 @@ namespace VaultUnitTests
 {
     public abstract class TestOutputHelperHaver
     {
-        [NotNull] public ITestOutputHelper TestOutputHelper { get; }
+        [NotNull] public ITestOutputHelper Helper { get; }
 
         protected TestOutputHelperHaver([NotNull] ITestOutputHelper helper)
         {
             if (helper == null) throw new ArgumentNullException(nameof(helper));
-            TestOutputHelper = helper;
+            Helper = helper;
         }
     }
 }

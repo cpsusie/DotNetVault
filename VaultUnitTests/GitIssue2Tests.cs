@@ -13,10 +13,27 @@ namespace VaultUnitTests
     using MutResMonV = MutableResourceMonitorVault<StringBuilder>;
     using BscMonV = BasicMonitorVault<string>;
 
-    public sealed class GitIssue2Tests  : TestOutputHelperHaver
+    public sealed class GitIssue2Tests  : OutputHelperAndFixtureHavingTests<GitIssueTwoTestFixture>
     {
-        public GitIssue2Tests([NotNull] ITestOutputHelper helper)
-            : base(helper) { }
+        public GitIssue2Tests([NotNull] ITestOutputHelper helper, [NotNull] GitIssueTwoTestFixture fixture)
+            : base(helper, fixture) { }
+
+        [Fact]
+        public void RunFixtureTest()
+        {
+            Fixture.AppendToVault("Hello, world!");
+            Fixture.AppendToVault("  How are you today?");
+            Helper.WriteLine($"Current count: {Fixture.GetCount()}!");
+            Fixture.AppendToVault($"{Environment.NewLine} FIZZ BUZZ BAM BOOZLE!");
+            (bool extracted, string contents) = Fixture.ExtractContentsAndClearIfCountGreaterThanThen(9);
+            Helper.WriteLine(extracted ? "extracted and cleared" : "did not extract or clear");
+            if (extracted)
+            {
+                Helper.WriteLine($"Extracted contents: [{contents}]");
+            }
+            Helper.WriteLine($"Count post potential extraction: {Fixture.GetCount()}");
+            Helper.WriteLine("Done!");
+        }
 
         [Fact]
         public void TestRwSbVault()
@@ -25,7 +42,7 @@ namespace VaultUnitTests
             string output;
             SbVault vault = new SbVault(TimeSpan.FromMilliseconds(250), () => new StringBuilder());
             {
-                using var roLck = vault.UpgradableRoLockBlockUntilAcquired();
+                using var roLck = vault.UpgradableRoLock();
                 if (roLck.Length == 0)
                 {
                     using var writeLock = roLck.LockBlockUntilAcquired();
@@ -44,7 +61,7 @@ namespace VaultUnitTests
             Guid output;
             GuidVault vault = new GuidVault();
             {
-                using var roLck = vault.UpgradableRoLockBlockUntilAcquired();
+                using var roLck = vault.UpgradableRoLock();
                 if (roLck.Count == 0)
                 {
                     using var writeLock = roLck.LockWaitForever();
@@ -63,7 +80,7 @@ namespace VaultUnitTests
             string output;
             RwStrVault vault = new RwStrVault(string.Empty ,TimeSpan.FromMilliseconds(250));
             {
-                using var roLck = vault.UpgradableRoLockBlockUntilAcquired();
+                using var roLck = vault.UpgradableRoLock();
                 if (roLck.Value.Length == 0)
                 {
                     using var writeLock = roLck.LockWaitForever();
