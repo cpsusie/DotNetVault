@@ -36,16 +36,18 @@ namespace VaultUnitTests
         }
 
         [Fact]
-        public void TestRwSbVault()
+        public void TestRwSbVaultNormalForever()
         {
             const string text = "Foobar";
             string output;
             SbVault vault = new SbVault(TimeSpan.FromMilliseconds(250), () => new StringBuilder());
             {
+                //using var roLck = vault.UpgradableRoLockBlockUntilAcquired();
                 using var roLck = vault.UpgradableRoLock();
                 if (roLck.Length == 0)
                 {
                     using var writeLock = roLck.LockBlockUntilAcquired();
+                    //using var writeLock = roLck.Lock();
                     writeLock.Append("Foobar");
                 }
                 output = roLck.ToString();
@@ -54,17 +56,77 @@ namespace VaultUnitTests
         }
 
         [Fact]
-        public void TestGuidVault()
+        public void TestRwSbVaultForeverNormal()
+        {
+            const string text = "Foobar";
+            string output;
+            SbVault vault = new SbVault(TimeSpan.FromMilliseconds(250), () => new StringBuilder());
+            {
+                using var roLck = vault.UpgradableRoLockBlockUntilAcquired();
+                //using var roLck = vault.UpgradableRoLock();
+                if (roLck.Length == 0)
+                {
+                    //using var writeLock = roLck.LockBlockUntilAcquired();
+                    using var writeLock = roLck.Lock();
+                    writeLock.Append("Foobar");
+                }
+                output = roLck.ToString();
+            }
+            Assert.True(text == output);
+        }
+        [Fact]
+        public void TestRwSbVaultForeverForever()
+        {
+            const string text = "Foobar";
+            string output;
+            SbVault vault = new SbVault(TimeSpan.FromMilliseconds(250), () => new StringBuilder());
+            {
+                using var roLck = vault.UpgradableRoLockBlockUntilAcquired();
+                //using var roLck = vault.UpgradableRoLock();
+                if (roLck.Length == 0)
+                {
+                    using var writeLock = roLck.LockBlockUntilAcquired();
+                    //using var writeLock = roLck.Lock();
+                    writeLock.Append("Foobar");
+                }
+                output = roLck.ToString();
+            }
+            Assert.True(text == output);
+        }
+        [Fact]
+        public void TestRwSbVaultNormalNormal()
+        {
+            const string text = "Foobar";
+            string output;
+            SbVault vault = new SbVault(TimeSpan.FromMilliseconds(250), () => new StringBuilder());
+            {
+                //using var roLck = vault.UpgradableRoLockBlockUntilAcquired();
+                using var roLck = vault.UpgradableRoLock();
+                if (roLck.Length == 0)
+                {
+                    //using var writeLock = roLck.LockBlockUntilAcquired();
+                    using var writeLock = roLck.Lock();
+                    writeLock.Append("Foobar");
+                }
+                output = roLck.ToString();
+            }
+            Assert.True(text == output);
+        }
+
+        [Fact]
+        public void TestGuidVaultNormalNormal()
         {
             
             Guid expected = Guid.NewGuid();
             Guid output;
             GuidVault vault = new GuidVault();
             {
+                //using var roLck = vault.UpgradableRoLockBlockUntilAcquired();
                 using var roLck = vault.UpgradableRoLock();
                 if (roLck.Count == 0)
                 {
-                    using var writeLock = roLck.LockWaitForever();
+                    //using var writeLock = roLck.LockWaitForever();
+                    using var writeLock = roLck.Lock();
                     writeLock.Add(in expected);
                 }
 
@@ -74,16 +136,140 @@ namespace VaultUnitTests
         }
 
         [Fact]
-        public void TestStrVault()
+        public void TestGuidVaultNormalForever()
+        {
+
+            Guid expected = Guid.NewGuid();
+            Guid output;
+            GuidVault vault = new GuidVault();
+            {
+                //using var roLck = vault.UpgradableRoLockBlockUntilAcquired();
+                using var roLck = vault.UpgradableRoLock();
+                if (roLck.Count == 0)
+                {
+                    using var writeLock = roLck.LockWaitForever();
+                    //using var writeLock = roLck.Lock();
+                    writeLock.Add(in expected);
+                }
+
+                output = roLck[0];
+            }
+            Assert.True(expected == output);
+        }
+
+        [Fact]
+        public void TestGuidVaultForeverNormal()
+        {
+
+            Guid expected = Guid.NewGuid();
+            Guid output;
+            GuidVault vault = new GuidVault();
+            {
+                using var roLck = vault.UpgradableRoLockBlockUntilAcquired();
+                //using var roLck = vault.UpgradableRoLock();
+                if (roLck.Count == 0)
+                {
+                    //using var writeLock = roLck.LockWaitForever();
+                    using var writeLock = roLck.Lock();
+                    writeLock.Add(in expected);
+                }
+
+                output = roLck[0];
+            }
+            Assert.True(expected == output);
+        }
+
+        [Fact]
+        public void TestGuidVaultForeverForever()
+        {
+
+            Guid expected = Guid.NewGuid();
+            Guid output;
+            GuidVault vault = new GuidVault();
+            {
+                using var roLck = vault.UpgradableRoLockBlockUntilAcquired();
+                //using var roLck = vault.UpgradableRoLock();
+                if (roLck.Count == 0)
+                {
+                    using var writeLock = roLck.LockWaitForever();
+                    //using var writeLock = roLck.Lock();
+                    writeLock.Add(in expected);
+                }
+
+                output = roLck[0];
+            }
+            Assert.True(expected == output);
+        }
+
+        [Fact]
+        public void TestStrVaultNormalForever()
         {
             const string text = "Foobar";
             string output;
             RwStrVault vault = new RwStrVault(string.Empty ,TimeSpan.FromMilliseconds(250));
             {
                 using var roLck = vault.UpgradableRoLock();
+                //using var roLck = vault.UpgradableRoLockBlockUntilAcquired();
                 if (roLck.Value.Length == 0)
                 {
                     using var writeLock = roLck.LockWaitForever();
+                    writeLock.Value += text;
+                }
+                output = roLck.Value;
+            }
+            Assert.True(text == output);
+        }
+
+        [Fact]
+        public void TestStrVaultForeverNormal()
+        {
+            const string text = "Foobar";
+            string output;
+            RwStrVault vault = new RwStrVault(string.Empty, TimeSpan.FromMilliseconds(250));
+            {
+                //using var roLck = vault.UpgradableRoLock();
+                using var roLck = vault.UpgradableRoLockBlockUntilAcquired();
+                if (roLck.Value.Length == 0)
+                {
+                    using var writeLock = roLck.Lock();
+                    writeLock.Value += text;
+                }
+                output = roLck.Value;
+            }
+            Assert.True(text == output);
+        }
+
+        [Fact]
+        public void TestStrVaultForeverForever()
+        {
+            const string text = "Foobar";
+            string output;
+            RwStrVault vault = new RwStrVault(string.Empty, TimeSpan.FromMilliseconds(250));
+            {
+                //using var roLck = vault.UpgradableRoLock();
+                using var roLck = vault.UpgradableRoLockBlockUntilAcquired();
+                if (roLck.Value.Length == 0)
+                {
+                    using var writeLock = roLck.LockWaitForever();
+                    writeLock.Value += text;
+                }
+                output = roLck.Value;
+            }
+            Assert.True(text == output);
+        }
+
+        [Fact]
+        public void TestStrVaultNormalNormal()
+        {
+            const string text = "Foobar";
+            string output;
+            RwStrVault vault = new RwStrVault(string.Empty, TimeSpan.FromMilliseconds(250));
+            {
+                using var roLck = vault.UpgradableRoLock();
+                //using var roLck = vault.UpgradableRoLockBlockUntilAcquired();
+                if (roLck.Value.Length == 0)
+                {
+                    using var writeLock = roLck.Lock();
                     writeLock.Value += text;
                 }
                 output = roLck.Value;
