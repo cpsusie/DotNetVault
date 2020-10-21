@@ -294,7 +294,7 @@ namespace DotNetVault.Vaults
                 void Upgrade(TimeSpan? ts, CancellationToken tkn) =>
                     CreateInternalLockedResource(owner, ts, tkn, AcquisitionMode.ReadWrite);
 
-                void UpgradeForever() => CreateInternalLockedResourceBlockForever(owner, mode);
+                void UpgradeForever() => CreateInternalLockedResourceBlockForever(owner, AcquisitionMode.ReadWrite);
             }
 
             /// <summary>
