@@ -5,7 +5,7 @@
   
      ![](https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/DotNetVaultQuickStart/dotnet_vault_install_vs2019_win/pic_1.png?raw=true)
 
-3. Right click on your project and chose “Manage NuGet packages”.  Click on the Browse option, select “Include Prerelease”, enter “cpsusie dotnetvault” into the search block, select DotNetVault, then click “Install”.  
+3. Right click on your project and chose “Manage NuGet packages”.  Click on the Browse option, enter “dotnetvault” into the search block, select DotNetVault, then click “Install”.  
 
      ![](https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/DotNetVaultQuickStart/dotnet_vault_install_vs2019_win/pic_2.png?raw=true)
        
