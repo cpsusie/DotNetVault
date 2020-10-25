@@ -1,10 +1,14 @@
-﻿  RELEASE NOTES VERSION 0.2.5.1:
+﻿RELEASE NOTES VERSION 0.2.5.3:
+
+      * Fixed problem with SourceLink not working correctly.
+      * Fixed bug (Issue #2) that would throw a recursion exception sometimes when, using certain combinations of overloads, acquiring upgradable readonly locks then upgrading them would throw a lock recursion exception.
+      * Update the quick start functionality tour and installation guides to use pictures reflecting more recent versions.  
+
+RELEASE NOTES VERSION 0.2.5.1:
       
-      No significant changes to code in this release.
-
-      Resolved broken links displayed on project's NuGet page.
-
-      Fixed problem with license on NuGet. 
+      * No significant changes to code in this release.
+      * Resolved broken links displayed on project's NuGet page.
+      * Fixed problem with license on NuGet. 
 
 RELEASE NOTES VERSION 0.2.5.0:
 
