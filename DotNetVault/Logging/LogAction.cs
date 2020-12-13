@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using DotNetVault.TimeStamps;
 using JetBrains.Annotations;
 
 namespace DotNetVault.Logging
@@ -14,7 +15,7 @@ namespace DotNetVault.Logging
 
         public LogAction(string text)
         {
-            TimeStamp = DateTime.Now;
+            TimeStamp = DnvTimeStampProvider.MonoLocalNow;
             Text = text ?? string.Empty;
             ThreadId = Thread.CurrentThread.ManagedThreadId;
         }
@@ -24,7 +25,7 @@ namespace DotNetVault.Logging
             if (ex == null) throw new ArgumentNullException(nameof(ex));
 
             Text = ex.ToString();
-            TimeStamp = DateTime.Now;
+            TimeStamp = DnvTimeStampProvider.MonoLocalNow;
             ThreadId = Thread.CurrentThread.ManagedThreadId;
         }
 

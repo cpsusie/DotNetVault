@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Threading;
 using DotNetVault.Attributes;
+using DotNetVault.TimeStamps;
 using DotNetVault.ToggleFlags;
 using JetBrains.Annotations;
 using TTwoStepDisposeFlag = DotNetVault.DisposeFlag.TwoStepDisposeFlag;
@@ -459,7 +460,7 @@ namespace DotNetVault.Vaults
                 bool timedOut;
                 Debug.Assert(timeout != null || token != CancellationToken.None || justOnce);
 
-                DateTime? quitAfter = DateTime.Now + timeout;
+                DateTime? quitAfter = DnvTimeStampProvider.MonoLocalNow + timeout;
                 TimeSpan ownerSleepInterval = owner.SleepInterval;
                 TimeSpan sleepFor = ownerSleepInterval > TimeSpan.Zero && ownerSleepInterval < timeout ? ownerSleepInterval : FallbackSleepInterval;
                 do
@@ -475,7 +476,7 @@ namespace DotNetVault.Vaults
                         cancel = token.IsCancellationRequested;
                     }
 
-                } while (!justOnce && !cancel && acquiredPtr == null && (quitAfter == null || DateTime.Now <= quitAfter));
+                } while (!justOnce && !cancel && acquiredPtr == null && (quitAfter == null || DnvTimeStampProvider.MonoLocalNow <= quitAfter));
 
                 if (acquiredPtr != null)
                 {

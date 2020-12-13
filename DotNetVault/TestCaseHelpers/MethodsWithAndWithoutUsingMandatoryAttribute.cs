@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using DotNetVault.Attributes;
+using DotNetVault.TimeStamps;
 using JetBrains.Annotations;
 #pragma warning disable 1591 //NEED TO BE PUBLIC FOR UNIT TESTING PURPOSES (NOT SURE WHY)
 
@@ -12,17 +13,14 @@ namespace DotNetVault.TestCaseHelpers
     public static class MethodsWithAndWithoutUsingMandatoryAttribute
     {
         [return: UsingMandatory]
-        public static RefStructsRoxor CreateDisposableRefStruct()
-        {
-            return RefStructsRoxor.CreateRefStruct();
-        }
+        public static RefStructsRoxor CreateDisposableRefStruct() => RefStructsRoxor.CreateRefStruct();
 
         public static void DoStuff()
         {
-            var dt = Generate(() => DateTime.Now);
-            if (dt < DateTime.Now) throw new Exception();
+            var dt = Generate(() => DnvTimeStampProvider.MonoLocalNow);
+            if (dt < DnvTimeStampProvider.MonoLocalNow) throw new Exception();
 
-            DoStuff<StringBuilder, DateTime>(() => DateTime.Now);
+            DoStuff<StringBuilder, DateTime>(() => DnvTimeStampProvider.MonoLocalNow);
         }
 
         public static void DoStuff<TFirst, TSecond>( Func<TSecond> make) where TFirst : new()
@@ -34,10 +32,7 @@ namespace DotNetVault.TestCaseHelpers
             Console.WriteLine(gen);
         }
 
-        public static T Generate<[VaultSafeTypeParam] T>(Func<T> value)
-        {
-            return value();
-        }
+        public static T Generate<[VaultSafeTypeParam] T>(Func<T> value) => value();
 
         public static bool DoStuffWithStruct()
         {
@@ -67,20 +62,14 @@ namespace DotNetVault.TestCaseHelpers
             return wasValid && !wasDisposedAtFirst && !isValidAfterDispose && isDisposedAfterDispose;
         }
 
-        public static T NeedsToReturnVaultSafeParams<[VaultSafeTypeParam] T>(Func<T> genFunc)
-        {
-            return genFunc();
-        }
+        public static T NeedsToReturnVaultSafeParams<[VaultSafeTypeParam] T>(Func<T> genFunc) => genFunc();
     }
 
     public sealed class NeedsAVaultSafeParam<[VaultSafeTypeParam] T>
     {
         public string FullTypeName { get; }
 
-        public NeedsAVaultSafeParam()
-        {
-            FullTypeName = typeof(T).FullName;
-        }
+        public NeedsAVaultSafeParam() => FullTypeName = typeof(T).FullName;
     }
 
 
@@ -101,10 +90,7 @@ namespace DotNetVault.TestCaseHelpers
         public bool IsDisposed => _flag?.IsSet == true;
         
         // ReSharper disable once UnusedParameter.Local
-        private RefStructsRoxor(bool _)
-        {
-            _flag = new SetOnceFlag();
-        }
+        private RefStructsRoxor(bool _) => _flag = new SetOnceFlag();
 
         public void Dispose()
         {

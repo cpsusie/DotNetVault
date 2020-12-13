@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using DotNetVault.Attributes;
 using DotNetVault.Exceptions;
+using DotNetVault.TimeStamps;
 using JetBrains.Annotations;
 using Locker = System.Threading.ReaderWriterLockSlim;
 using TToggleFlag = DotNetVault.Logging.SetOnceValFlag;
@@ -457,7 +458,7 @@ namespace DotNetVault.Vaults
                 Debug.Assert(timeout != null || token != CancellationToken.None);
 
 
-                DateTime? quitAfter = DateTime.Now + timeout;
+                DateTime? quitAfter = DnvTimeStampProvider.MonoLocalNow + timeout;
                 TimeSpan ownerSleepInterval = owner.SleepInterval;
                 TimeSpan sleepFor = ownerSleepInterval > TimeSpan.Zero && ownerSleepInterval < timeout
                     ? ownerSleepInterval
@@ -467,7 +468,7 @@ namespace DotNetVault.Vaults
                 {
                     if (token != CancellationToken.None)
                     {
-                        while (!gotLock && !cancel && (quitAfter == null || DateTime.Now <= quitAfter))
+                        while (!gotLock && !cancel && (quitAfter == null || DnvTimeStampProvider.MonoLocalNow <= quitAfter))
                         {
                             gotLock = EnterLock(mode, locker, sleepFor);
                             if (!gotLock)

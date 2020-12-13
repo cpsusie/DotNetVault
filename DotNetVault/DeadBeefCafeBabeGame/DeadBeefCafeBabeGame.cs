@@ -5,6 +5,7 @@ using System.Threading;
 using DotNetVault.ClortonGame;
 using DotNetVault.Logging;
 using DotNetVault.TestCaseHelpers;
+using DotNetVault.TimeStamps;
 using DotNetVault.Vaults;
 using JetBrains.Annotations;
 
@@ -54,8 +55,8 @@ namespace DotNetVault.DeadBeefCafeBabeGame
                     game.GameEnded += handler;
                 }
                 game.Begin();
-                DateTime quitAfter = DateTime.Now + TimeSpan.FromMilliseconds(5000);
-                while (!game.EverStarted && DateTime.Now <= quitAfter)
+                DateTime quitAfter = DnvTimeStampProvider.MonoLocalNow + TimeSpan.FromMilliseconds(5000);
+                while (!game.EverStarted && DnvTimeStampProvider.MonoLocalNow <= quitAfter)
                 {
                     Thread.Sleep(1);
                 }

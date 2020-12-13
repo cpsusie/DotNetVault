@@ -6,6 +6,7 @@ using System.Threading;
 using DotNetVault.Interfaces;
 using DotNetVault.Logging;
 using DotNetVault.TestCaseHelpers;
+using DotNetVault.TimeStamps;
 using DotNetVault.Vaults;
 using JetBrains.Annotations;
 using TimeStampSource = DotNetVault.ClortonGame.CgTimeStampSource;
@@ -142,8 +143,8 @@ namespace DotNetVault.ClortonGame
                 }
 
                 g.Begin();
-                DateTime quitAfter = DateTime.Now + TimeSpan.FromMilliseconds(5000);
-                while (!g.EverStarted && DateTime.Now <= quitAfter)
+                DateTime quitAfter = DnvTimeStampProvider.Now + TimeSpan.FromMilliseconds(5000);
+                while (!g.EverStarted && DnvTimeStampProvider.MonoLocalNow <= quitAfter)
                 {
                     Thread.Sleep(1);
                 }

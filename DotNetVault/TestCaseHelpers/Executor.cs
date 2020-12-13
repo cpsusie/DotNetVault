@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Threading;
 using DotNetVault.Logging;
+using DotNetVault.TimeStamps;
 using JetBrains.Annotations;
 
 namespace DotNetVault.TestCaseHelpers
@@ -48,7 +49,7 @@ namespace DotNetVault.TestCaseHelpers
         
         protected Executor([NotNull] string namePrefix)
         {
-            string threadName = $"{namePrefix}_{(Interlocked.Increment(ref _sThreadCount))}";
+            string threadName = $"{namePrefix}_{(Interlocked.Increment(ref s_sThreadCount))}";
             _t = new Thread(ThreadLoop){IsBackground = true, Name = threadName};
         }
 
@@ -75,8 +76,8 @@ namespace DotNetVault.TestCaseHelpers
         {
             _startRequested.SetOrThrow();
             _t.Start(_cts.Token);
-            DateTime quitAt = DateTime.Now + TimeSpan.FromMilliseconds(500);
-            while (!Started && DateTime.Now <= quitAt)
+            DateTime quitAt = DnvTimeStampProvider.MonoLocalNow + TimeSpan.FromMilliseconds(500);
+            while (!Started && DnvTimeStampProvider.MonoLocalNow <= quitAt)
             {
                 Thread.Sleep(1);
             }
@@ -153,13 +154,13 @@ namespace DotNetVault.TestCaseHelpers
         }
 
         [NotNull] private readonly BlockingCollection<Action> _collection = new BlockingCollection<Action>(new ConcurrentQueue<Action>());
-        private SetOnceValFlag _startRequested = default;
-        private SetOnceValFlag _faulted=default;
-        private SetOnceValFlag _terminated=default;
-        private SetOnceValFlag _started=default;
-        private SetOnceValFlag _disposed =default;
+        private SetOnceValFlag _startRequested;
+        private SetOnceValFlag _faulted;
+        private SetOnceValFlag _terminated;
+        private SetOnceValFlag _started;
+        private SetOnceValFlag _disposed;
         [NotNull] private readonly CancellationTokenSource _cts = new CancellationTokenSource();
         [NotNull] private readonly Thread _t;
-        private static long _sThreadCount;
+        private static long s_sThreadCount;
     }
 }

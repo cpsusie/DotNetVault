@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading;
 using DotNetVault.Attributes;
+using DotNetVault.TimeStamps;
 using JetBrains.Annotations;
 
 namespace DotNetVault.Logging
@@ -24,7 +25,7 @@ namespace DotNetVault.Logging
         /// <returns>A disposable entry exit log</returns>
         public static EntryExitLog CreateEntryExitLog([NotNull] Type callingType,
             [NotNull] string callingMethod, params object[] arr) =>
-            new EntryExitLog(false, callingType, callingMethod, DateTime.Now, arr);
+            new EntryExitLog(false, callingType, callingMethod, DnvTimeStampProvider.MonoLocalNow, arr);
 
         /// <summary>
         /// Entry exit log
@@ -36,7 +37,7 @@ namespace DotNetVault.Logging
         /// <returns>A disposable entry exit log</returns>
         public static EntryExitLog CreateEntryExitLog(bool always, [NotNull] Type callingType,
             [NotNull] string callingMethod, params object[] arr) =>
-            new EntryExitLog(always, callingType, callingMethod, DateTime.Now, arr);
+            new EntryExitLog(always, callingType, callingMethod, DnvTimeStampProvider.MonoLocalNow, arr);
 
         private EntryExitLog(bool always, [NotNull] Type callingType, [NotNull] string callingMethod,
             DateTime openingTimeStamp, object [] arr)
@@ -83,7 +84,7 @@ namespace DotNetVault.Logging
             {
                 try
                 {
-                    DateTime ts = DateTime.Now;
+                    DateTime ts = DnvTimeStampProvider.MonoLocalNow;
                     DebugLog.Log(
                         $"<---At [{ts:O}], EXITED thread#:id# [{_threadId}:{_entryNum}], Duration {(ts - _ts).TotalMilliseconds:F3} milliseconds.");
                 }
@@ -119,7 +120,7 @@ namespace DotNetVault.Logging
                 {
                     try
                     {
-                        DateTime ts = DateTime.Now;
+                        DateTime ts = DnvTimeStampProvider.MonoLocalNow;
                         TraceLog.Log(
                             $"<---At [{ts:O}], EXITED thread#:id# [{_threadId}:{_entryNum}], Duration {(ts - _ts).TotalMilliseconds:F3} milliseconds.");
                     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using DotNetVault.Logging;
+using DotNetVault.TimeStamps;
 using JetBrains.Annotations;
 
 namespace DotNetVault.ClortonGame
@@ -61,7 +62,7 @@ namespace DotNetVault.ClortonGame
             internal static TimeStampProvider CreateInstance() => new DateTimeNowWrapper();
 
             // ReSharper disable once MemberHidesStaticFromOuterClass
-            public override DateTime Now => DateTime.Now;
+            public override DateTime Now => DnvTimeStampProvider.Now;
             
             // ReSharper disable once MemberHidesStaticFromOuterClass
             public override void Calibrate() { }

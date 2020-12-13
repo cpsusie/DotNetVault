@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Threading;
 using DotNetVault.Attributes;
+using DotNetVault.TimeStamps;
 using DotNetVault.Vaults;
 using JetBrains.Annotations;
 using TToggleFlag = DotNetVault.ToggleFlags.ToggleFlag;
@@ -325,7 +326,7 @@ namespace DotNetVault
                 else
                 {
                     alreadyHeldThreadId = null;
-                    DateTime? quitAfter = DateTime.Now + timeout;
+                    DateTime? quitAfter = DnvTimeStampProvider.MonoLocalNow + timeout;
                     TimeSpan ownerSleepInterval = owner.SleepInterval;
                     TimeSpan sleepFor = ownerSleepInterval > TimeSpan.Zero && ownerSleepInterval < timeout
                         ? ownerSleepInterval
@@ -336,7 +337,7 @@ namespace DotNetVault
                     {
                         if (token != CancellationToken.None)
                         {
-                            while (!gotLock && !cancel && (quitAfter == null || DateTime.Now <= quitAfter))
+                            while (!gotLock && !cancel && (quitAfter == null || DnvTimeStampProvider.MonoLocalNow <= quitAfter))
                             {
                                 Monitor.TryEnter(owner._syncObject, sleepFor, ref gotLock);
                                 if (!gotLock)
