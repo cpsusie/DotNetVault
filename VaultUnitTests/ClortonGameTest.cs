@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using DotNetVault.ClortonGame;
-using HpTimesStamps;
+using HpTimeStamps;
 using JetBrains.Annotations;
 using Xunit;
 using Xunit.Abstractions;

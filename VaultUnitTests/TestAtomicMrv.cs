@@ -111,7 +111,7 @@ namespace VaultUnitTests
             var shouldBeNull = Interlocked.CompareExchange(ref _ex, ex, null);
             if (shouldBeNull == null)
             {
-                _ts = HpTimesStamps.TimeStampSource.Now;
+                _ts = HpTimeStamps.TimeStampSource.Now;
             }
             else
             {
@@ -124,7 +124,7 @@ namespace VaultUnitTests
             var shouldBeNull = Interlocked.CompareExchange(ref _ex, BadException, null);
             if (shouldBeNull == null)
             {
-                _ts = HpTimesStamps.TimeStampSource.Now;
+                _ts = HpTimeStamps.TimeStampSource.Now;
             }
             else
             {
@@ -157,10 +157,10 @@ namespace VaultUnitTests
 
         public DateTime SetOrThrow()
         {
-            HpTimesStamps.TimeStampSource.Calibrate();
+            HpTimeStamps.TimeStampSource.Calibrate();
             if (TrySet())
             {
-                return HpTimesStamps.TimeStampSource.Now;
+                return HpTimeStamps.TimeStampSource.Now;
             }
             throw new InvalidOperationException();
         }

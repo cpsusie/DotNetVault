@@ -6,13 +6,13 @@ using System.Diagnostics;
 using System.Threading;
 using DotNetVault.ClortonGame;
 using DotNetVault.DeadBeefCafeBabeGame;
-using HpTimesStamps;
 using JetBrains.Annotations;
 using Xunit;
 using Xunit.Abstractions;
 using System.Linq;
 using System.Linq.Expressions;
 using DotNetVault.ExtensionMethods;
+using HpTimeStamps;
 
 namespace VaultUnitTests
 {

@@ -54,8 +54,8 @@ namespace DotNetVault
             int hash = IndexOfTypeParameter;
             unchecked
             {
-                hash = (hash * 397) ^ (TypeParameterWithVsTpAttrib?.GetHashCode() ?? 0);
-                hash = (hash * 397) ^ (OffendingNonVaultSafeTypeArgument?.GetHashCode() ?? 0);
+                hash = (hash * 397) ^ (TypeParameterWithVsTpAttrib != null ? SymbolEqualityComparer.Default.GetHashCode(TypeParameterWithVsTpAttrib) : 0 );
+                hash = (hash * 397) ^ (OffendingNonVaultSafeTypeArgument != null ? SymbolEqualityComparer.Default.GetHashCode(OffendingNonVaultSafeTypeArgument) : 0);
             }
             return hash;
         }

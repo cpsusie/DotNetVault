@@ -11,6 +11,7 @@
   </PropertyGroup>
 
    <ItemGroup>
+    <PackageReference Include="HighPrecisionTimeStamps" Version="0.1.0" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
 
@@ -108,7 +109,9 @@
     <EmbeddedResource Remove="Resources\**" />
     <None Remove="bin\**" />
     <None Remove="Resources\**" />
+    <Content Remove="C:\Users\Christopher Susie\.nuget\packages\highprecisiontimestamps\0.1.0\contentFiles\any\netstandard2.0\Readme.md" />
     <None Remove="license.txt" />
+    <None Remove="README.md" />
     <None Include="..\license.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
@@ -124,9 +127,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.7.0" PrivateAssets="all" />
+    <PackageReference Include="JetBrains.Annotations" Version="2020.3.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.8.0" PrivateAssets="all" />
     <PackageReference Update="NETStandard.Library" PrivateAssets="all" />
   </ItemGroup>
 
@@ -147,11 +150,6 @@
   </ItemGroup>
   <ItemGroup>
    <None Update="readme.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <Pack>True</Pack>
-      <Visible>True</Visible>
-    </None>
-    <None Update="README.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Pack>True</Pack>
       <Visible>True</Visible>

@@ -43,7 +43,7 @@ namespace DotNetVault
 
         public override int GetHashCode()
         {
-            int hash = NamedOrConstructedType?.GetHashCode() ?? 0;
+            int hash = NamedOrConstructedType != null ? SymbolEqualityComparer.Default.GetHashCode(NamedOrConstructedType) : 0;
             unchecked
             {
                 return (hash * 397) ^ NonConformingResults.GetHashCode();

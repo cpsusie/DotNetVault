@@ -136,7 +136,7 @@ namespace VaultUnitTests
 
             static void DoThreadTwo(VaultType bv, StartToken tkn, ExceptionReceptor receptor, CancellationToken token)
             {
-                HpTimesStamps.TimeStampSource.Calibrate();
+                HpTimeStamps.TimeStampSource.Calibrate();
                 while (!tkn.IsSet) { }
                 try
                 {
@@ -230,7 +230,7 @@ namespace VaultUnitTests
 
             static void DoThreadTwo(VaultType bv, StartToken tkn, ExceptionReceptor receptor, CancellationToken token)
             {
-                HpTimesStamps.TimeStampSource.Calibrate();
+                HpTimeStamps.TimeStampSource.Calibrate();
                 while (!tkn.IsSet) { }
                 try
                 {
@@ -292,7 +292,7 @@ namespace VaultUnitTests
 
             static void DoThreadTwo(VaultType bv, StartToken tkn, ExceptionReceptor receptor, CancellationToken token)
             {
-                HpTimesStamps.TimeStampSource.Calibrate();
+                HpTimeStamps.TimeStampSource.Calibrate();
                 while (!tkn.IsSet) { }
                 try
                 {

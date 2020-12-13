@@ -1044,7 +1044,9 @@ var invocationsWhereProtectedInArgumentList =
 
         private IEnumerable<(SyntaxNodeOrToken Identifier, ILocalSymbol LocalSymbol, INamedTypeSymbol LocalSymbolType)> Merge(IEnumerable<(SyntaxToken Identifier, ILocalSymbol LocalSymbol, INamedTypeSymbol LocalSymbolType)> identifierTokens, IEnumerable<(IdentifierNameSyntax IdentifierSyntax, ILocalSymbol LocalSymbol, INamedTypeSymbol LocalSymbolType)> identifierNameSyntax, CancellationToken token)
         {
+#pragma warning disable RS1024 // Compare symbols correctly
             HashSet<ILocalSymbol> symbols = new HashSet<ILocalSymbol>(SymbolEqualityComparer.Default);
+#pragma warning restore RS1024 // Compare symbols correctly
 
             foreach (var item in identifierTokens)
             {
@@ -1095,7 +1097,7 @@ var invocationsWhereProtectedInArgumentList =
                                             let symbol = methSym.TypeArguments[idx]
                                             where symbol is INamedTypeSymbol || symbol is IArrayTypeSymbol ||
                                                   symbol is IDynamicTypeSymbol
-                                            select symbol).ToImmutableHashSet();
+                                            select symbol).ToImmutableHashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
                                         var vaultSafeAnalyzer = VaultSafeAnalyzerFactorySource.CreateDefaultAnalyzer();
                                         var nonConformingSymbols =
                                             set.Where(sym2 =>
@@ -1498,7 +1500,10 @@ var invocationsWhereProtectedInArgumentList =
         private TypeSymbolVsTpAnalysisResult AnalyzeTypeSymbolVsTpAnal([NotNull] INamedTypeSymbol namedType,
             [NotNull] INamedTypeSymbol vsTpAttrib, [NotNull] Compilation compilation, CancellationToken token)
         {
-            HashSet<INamedTypeSymbol> typeSet = new HashSet<INamedTypeSymbol>();
+            IEqualityComparer<INamedTypeSymbol> comp = SymbolEqualityComparer.Default;
+#pragma warning disable RS1024 // Compare symbols correctly
+            HashSet<INamedTypeSymbol> typeSet = new HashSet<INamedTypeSymbol>(comp);
+#pragma warning restore RS1024 // Compare symbols correctly
             if (namedType.IsGenericType)
             {
                 typeSet.Add(namedType);

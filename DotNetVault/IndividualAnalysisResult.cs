@@ -46,7 +46,7 @@ namespace DotNetVault
 
         public override int GetHashCode()
         {
-            int hash = ActualTypeWithViolation?.GetHashCode() ?? 0;
+            int hash = ActualTypeWithViolation != null ? SymbolEqualityComparer.Default.GetHashCode(ActualTypeWithViolation) : 0;
             unchecked
             {
                 return (hash * 397) ^ FailureTriplets.Length;

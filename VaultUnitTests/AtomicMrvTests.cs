@@ -132,7 +132,7 @@ namespace VaultUnitTests
             Helper.WriteLine($"Timeout thrown after {(receptor.Ts - startedAt).TotalMilliseconds:F3} milliseconds.");
             static void DoThreadOne(VaultType bmv, StartToken tkn)
             {
-                HpTimesStamps.TimeStampSource.Calibrate();
+                HpTimeStamps.TimeStampSource.Calibrate();
                 while (!tkn.IsSet) { }
 
                 using var lck = bmv.Lock();
@@ -142,7 +142,7 @@ namespace VaultUnitTests
 
             static void DoThreadTwo(VaultType bv, StartToken tkn, ExceptionReceptor receptor)
             {
-                HpTimesStamps.TimeStampSource.Calibrate();
+                HpTimeStamps.TimeStampSource.Calibrate();
                 while (!tkn.IsSet) { }
                 Thread.Sleep(TimeSpan.FromMilliseconds(250));
                 try
@@ -205,7 +205,7 @@ namespace VaultUnitTests
 
             static void DoThreadTwo(VaultType bv, StartToken tkn, ExceptionReceptor receptor, CancellationToken token)
             {
-                HpTimesStamps.TimeStampSource.Calibrate();
+                HpTimeStamps.TimeStampSource.Calibrate();
                 while (!tkn.IsSet) { }
                 try
                 {
@@ -265,7 +265,7 @@ namespace VaultUnitTests
 
             static void DoThreadTwo(VaultType bv, StartToken tkn, ExceptionReceptor receptor, CancellationToken token)
             {
-                HpTimesStamps.TimeStampSource.Calibrate();
+                HpTimeStamps.TimeStampSource.Calibrate();
                 while (!tkn.IsSet) { }
                 try
                 {
@@ -323,7 +323,7 @@ namespace VaultUnitTests
 
             static void DoThreadTwo(VaultType bv, StartToken tkn, ExceptionReceptor receptor, CancellationToken token)
             {
-                HpTimesStamps.TimeStampSource.Calibrate();
+                HpTimeStamps.TimeStampSource.Calibrate();
                 while (!tkn.IsSet) { }
                 try
                 {
