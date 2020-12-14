@@ -42,9 +42,14 @@
 
       A guided tour / quick start guide for this project's functionality can be found here: https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/Quick_Start_Functionality_Tour.md 
     </Description>
-    <PackageReleaseNotes>
-
-      RELEASE NOTES VERSION 0.2.5.3:
+    <PackageReleaseNotes>RELEASE NOTES VERSION 0.2.5.4:
+      * Update dependencies.
+      * Add dependency to High-Precision-Timestamps v0.1.0.0
+      * Use monotonic DateTimes from High-Precision-Timestamps to compute durations and timeouts
+      * Rename VaultSafeWhiteList.txt to vaultsafe
+      .txt
+      
+RELEASE NOTES VERSION 0.2.5.3:
 
       * Fixed problem with SourceLink not working correctly.
       * Fixed bug (Issue #2) that would throw a recursion exception sometimes when, using certain combinations of overloads, acquiring upgradable readonly locks then upgrading them would throw a lock recursion exception.
@@ -68,7 +73,7 @@
       * Adding Source Link and releasing a symbol package along with the nuget package for this project
       * Writing many test projects and demonstration projects to verify functionality, stress test and profile performance of the vaults
       * Adding a document serving as a guide to using large mutable value types generally and as a repository for shared mutable state
-    </PackageReleaseNotes>
+</PackageReleaseNotes>
     <Copyright>Copyright © 2019-2020 CJM Screws, LLC</Copyright>
     <PackageTags>DotNetVault, analyzers, synchronization, thread-safety, threadsafe, deadlock, deadlock-prevention</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
@@ -79,7 +84,8 @@
     <Company>CJM Screws, LLC</Company>
     <AssemblyVersion>0.2.5.3</AssemblyVersion>
     <FileVersion>0.2.5.3</FileVersion>
-    <PackageLicenseFile>license.txt</PackageLicenseFile>
+    <PackageLicenseFile></PackageLicenseFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -112,15 +118,11 @@
     <Content Remove="C:\Users\Christopher Susie\.nuget\packages\highprecisiontimestamps\0.1.0\contentFiles\any\netstandard2.0\Readme.md" />
     <None Remove="license.txt" />
     <None Remove="README.md" />
-    <None Include="..\license.txt">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
   </ItemGroup>
 
  
   <ItemGroup>
-    <AdditionalFiles Include="VaultSafeWhiteList.txt">
+    <AdditionalFiles Include="vaultsafewhitelist.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Pack>True</Pack>
     </AdditionalFiles>

@@ -22,7 +22,7 @@ namespace DotNetVault.Attributes
     /// when changes are made to the type outside the ambit of your own protection, the lack of vault-safety
     /// will not be detected.
     ///
-    /// If the class is OUTSIDE your control, you should instead add its namespace-qualified-name to the VaultSafeWhiteList.txt
+    /// If the class is OUTSIDE your control, you should instead add its namespace-qualified-name to the vaultsafewhitelist.txt
     /// file.
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]

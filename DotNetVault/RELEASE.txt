@@ -1,4 +1,10 @@
-﻿RELEASE NOTES VERSION 0.2.5.3:
+﻿RELEASE NOTES VERSION 0.2.5.4:
+      * Update dependencies.
+      * Add dependency to High-Precision-Timestamps v0.1.0.0
+      * Use monotonic DateTimes from High-Precision-Timestamps to compute durations and timeouts
+      * Rename VaultSafeWhiteList.txt to vaultsafewhitelist.txt
+
+RELEASE NOTES VERSION 0.2.5.3:
 
       * Fixed problem with SourceLink not working correctly.
       * Fixed bug (Issue #2) that would throw a recursion exception sometimes when, using certain combinations of overloads, acquiring upgradable readonly locks then upgrading them would throw a lock recursion exception.

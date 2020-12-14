@@ -2,7 +2,6 @@
 using DotNetVault.Interfaces;
 using DotNetVault.Logging;
 using DotNetVault.UtilitySources;
-using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
@@ -10,6 +9,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -18,6 +18,7 @@ using DiagnosticVerifier = DotNetVault.Test.Verifiers.DiagnosticVerifier;
 namespace DotNetVault.Test
 {
     [TestClass]
+    [SuppressMessage("ReSharper", "LocalizableElement")]
     public class VaultSafeAnalysisTests
     {
         [TestMethod]
@@ -93,7 +94,21 @@ namespace DotNetVault.Test
             Assert.IsTrue(Analyzer.IsTypeVaultSafe(defVsResult.TypeSymbol, defVsResult.Compilation));
             Assert.IsTrue(Analyzer.IsTypeVaultSafe(doggyPairRes.TypeSymbol, doggyPairRes.Compilation));
         }
-        
+
+        [TestMethod]
+        public void LoadDiagnosticDescriptorsText()
+        {
+            const int numDescriptors = 19;
+            var descriptors = DotNetVaultAnalyzer.DiagnosticDescriptors;
+            Assert.IsTrue(numDescriptors == descriptors.Length);
+            foreach (var descriptor in descriptors)
+            {
+                Console.WriteLine($"Descriptor Id: {descriptor.Id}, Title: {descriptor.Title}," +
+                                  $" Descriptor Category: {descriptor.Category}, " +
+                                  $"Descriptor description: {descriptor.Description}.");
+            }
+
+        }
         [TestMethod]
         public void TestSimpleNegativeCases()
         {
@@ -118,7 +133,7 @@ namespace DotNetVault.Test
         }
 
         public static (bool Success, CSharpCompilation Compilation, INamedTypeSymbol TypeSymbol, Exception Error) ExtractTypeInfo(
-            [NotNull] string source, [NotNull] string metaDataName)
+            [JetBrains.Annotations.NotNull] string source, [JetBrains.Annotations.NotNull] string metaDataName)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (metaDataName == null) throw new ArgumentNullException(nameof(metaDataName));

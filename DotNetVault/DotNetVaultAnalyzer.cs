@@ -59,7 +59,7 @@ namespace DotNetVault
         #endregion        
 
         #region Public Methods
-
+        internal static ImmutableArray<DiagnosticDescriptor> DiagnosticDescriptors => TheDiagnosticDescriptors.Value;
         /// <inheritdoc />
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Descriptors;
 
