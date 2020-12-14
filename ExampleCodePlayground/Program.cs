@@ -112,7 +112,7 @@ namespace ExampleCodePlayground
         static void TestNoBasicVaultForStringBuilder()
         {
             BasicVault<string> bv = new BasicVault<string>("Hi mom", TimeSpan.FromSeconds(2));
-            //BasicVault<StringBuilder> bv = new BasicVault<StringBuilder>(new StringBuilder("Hi mom"), TimeSpan.FromSeconds(2));
+            //BasicVault<StringBuilder> bv1 = new BasicVault<StringBuilder>(new StringBuilder("Hi mom"), TimeSpan.FromSeconds(2));
             using var l = bv.SpinLock();
             Console.WriteLine(l.Value.ToString());
         }
@@ -125,7 +125,7 @@ namespace ExampleCodePlayground
             ImmutableArray<StringBuilder> immutSb = sb.ToImmutableArray();
             ImmutableArray<DateTime> immut = datesAndTimes.ToImmutableArray();
             var wrapper = VsArrayWrapper<DateTime>.CreateArrayWrapper(datesAndTimes);
-            // var wrapper2 = VsArrayWrapper<StringBuilder>.CreateArrayWrapper(sb);
+           // var wrapper2 = VsArrayWrapper<StringBuilder>.CreateArrayWrapper(sb);
 
             //NOT OK -- is "considered" vault safe but isn't allowed as a protected resource
             //BasicVault<VsArrayWrapper<DateTime>> v = new BasicVault<VsArrayWrapper<DateTime>>(wrapper);

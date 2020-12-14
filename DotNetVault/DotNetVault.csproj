@@ -11,7 +11,10 @@
   </PropertyGroup>
 
    <ItemGroup>
-    <PackageReference Include="HighPrecisionTimeStamps" Version="0.1.0" />
+    <PackageReference Include="HighPrecisionTimeStamps" Version="0.1.0">
+      <GeneratePathProperty>true</GeneratePathProperty>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
 
@@ -23,7 +26,7 @@
 
   <PropertyGroup>
     <PackageId>DotNetVault</PackageId>
-    <PackageVersion>0.2.5.4-alpha</PackageVersion>
+    <PackageVersion>0.2.5.7-alpha</PackageVersion>
     <Owners>CJM Screws, LLC</Owners>
     <Authors>Christopher Susie</Authors>
     <PackageProjectUrl>https://github.com/cpsusie/DotNetVault</PackageProjectUrl>
@@ -42,7 +45,7 @@
 
       A guided tour / quick start guide for this project's functionality can be found here: https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/Quick_Start_Functionality_Tour.md 
     </Description>
-    <PackageReleaseNotes>RELEASE NOTES VERSION 0.2.5.5:
+    <PackageReleaseNotes>RELEASE NOTES VERSION 0.2.5.8:
       * Update dependencies.
       * Add dependency to High-Precision-Timestamps v0.1.0.0
       * Use monotonic DateTimes from High-Precision-Timestamps to compute durations and timeouts
@@ -145,6 +148,7 @@ RELEASE NOTES VERSION 0.2.5.3:
 
   <ItemGroup>
     <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
+    <None Include="$(OutputPath)\HighPrecisionTimeStamps.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="true" />
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="lib/netstandard2.0/" Visible="true" />
     <None Include="$(OutputPath)\$(AssemblyName).xml" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="true" />
@@ -157,5 +161,11 @@ RELEASE NOTES VERSION 0.2.5.3:
       <Visible>True</Visible>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Include\" />
+  </ItemGroup>
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="xcopy  &quot;$(ProjectDir)Include\HighPrecisionTimeStamps.dll&quot; &quot;$(TargetDir)&quot; /Y" />
+  </Target>
 
 </Project>
