@@ -8,9 +8,9 @@ namespace ClortonGameDemo
         public static HpTimeStampProvider CreateInstance() 
             => new HpTimeStampProvider();
 
-        public override DateTime Now => HpTimesStamps.TimeStampSource.Now;
+        public override DateTime Now => HpTimeStamps.TimeStampSource.Now;
         public override void Calibrate() =>
-            HpTimesStamps.TimeStampSource.Calibrate();
+            HpTimeStamps.TimeStampSource.Calibrate();
 
         private HpTimeStampProvider() { }
     }
