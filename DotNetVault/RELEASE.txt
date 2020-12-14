@@ -1,4 +1,11 @@
-﻿RELEASE NOTES VERSION 0.2.5.4:
+﻿RELEASE NOTES VERSION 0.2.5.8:
+      * Update dependencies.
+      * Add dependency to High-Precision-Timestamps v0.1.0.0
+      * Use monotonic DateTimes from High-Precision-Timestamps to compute durations and timeouts
+      * Rename VaultSafeWhiteList.txt to vaultsafe
+      .txt
+
+RELEASE NOTES VERSION 0.2.5.4:
       * Update dependencies.
       * Add dependency to High-Precision-Timestamps v0.1.0.0
       * Use monotonic DateTimes from High-Precision-Timestamps to compute durations and timeouts
