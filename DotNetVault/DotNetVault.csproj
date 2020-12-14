@@ -23,7 +23,7 @@
 
   <PropertyGroup>
     <PackageId>DotNetVault</PackageId>
-    <PackageVersion>0.2.5.3</PackageVersion>
+    <PackageVersion>0.2.5.4-alpha</PackageVersion>
     <Owners>CJM Screws, LLC</Owners>
     <Authors>Christopher Susie</Authors>
     <PackageProjectUrl>https://github.com/cpsusie/DotNetVault</PackageProjectUrl>
@@ -42,7 +42,7 @@
 
       A guided tour / quick start guide for this project's functionality can be found here: https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/Quick_Start_Functionality_Tour.md 
     </Description>
-    <PackageReleaseNotes>RELEASE NOTES VERSION 0.2.5.4:
+    <PackageReleaseNotes>RELEASE NOTES VERSION 0.2.5.5:
       * Update dependencies.
       * Add dependency to High-Precision-Timestamps v0.1.0.0
       * Use monotonic DateTimes from High-Precision-Timestamps to compute durations and timeouts
@@ -78,12 +78,12 @@ RELEASE NOTES VERSION 0.2.5.3:
     <PackageTags>DotNetVault, analyzers, synchronization, thread-safety, threadsafe, deadlock, deadlock-prevention</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <LangVersion>8.0</LangVersion>
-    <Version>0.2.5.3</Version>
+    <Version>0.2.5.4</Version>
     <AssemblyName>DotNetVault</AssemblyName>
     <RootNamespace>DotNetVault</RootNamespace>
     <Company>CJM Screws, LLC</Company>
-    <AssemblyVersion>0.2.5.3</AssemblyVersion>
-    <FileVersion>0.2.5.3</FileVersion>
+    <AssemblyVersion>0.2.5.4</AssemblyVersion>
+    <FileVersion>0.2.5.4</FileVersion>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
