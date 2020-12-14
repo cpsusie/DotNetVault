@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using DotNetVault.Attributes;
-using HpTimesStamps;
+using HpTimeStamps;
 using JetBrains.Annotations;
 //SpinLock methods:
 //    ATOMIC VAULTS: BUSY WAIT

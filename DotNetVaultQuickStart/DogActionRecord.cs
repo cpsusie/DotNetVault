@@ -1,6 +1,6 @@
 ﻿using System;
 using DotNetVault.Attributes;
-using HpTimesStamps;
+using HpTimeStamps;
 using JetBrains.Annotations;
 
 namespace DotNetVaultQuickStart

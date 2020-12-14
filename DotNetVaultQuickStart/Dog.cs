@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using HpTimesStamps;
+using HpTimeStamps;
 using JetBrains.Annotations;
 //SpinLock methods:
 //    ATOMIC VAULTS: BUSY WAIT

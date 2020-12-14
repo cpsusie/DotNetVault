@@ -1,5 +1,5 @@
 ﻿using System;
-using HpTimesStamps;
+using HpTimeStamps;
 
 namespace DotNetVaultQuickStart
 {

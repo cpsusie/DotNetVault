@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading;
 using DotNetVault.Exceptions;
 using DotNetVault.Vaults;
-using HpTimesStamps;
+using HpTimeStamps;
 using JetBrains.Annotations;
 
 namespace DotNetVaultQuickStart

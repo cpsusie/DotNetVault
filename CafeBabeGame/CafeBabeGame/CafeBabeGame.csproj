@@ -13,8 +13,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNetVault" Version="0.2.5.3" />
-    <PackageReference Include="HighPrecisionTimeStamps" Version="0.0.1-alpha" />
+    <PackageReference Include="DotNetVault" Version="0.2.5.7-alpha" />
+    <PackageReference Include="HighPrecisionTimeStamps" Version="0.1.0" />
+    <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
   </ItemGroup>
 
 </Project>

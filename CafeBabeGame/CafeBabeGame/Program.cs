@@ -10,7 +10,7 @@ using DotNetVault.Attributes;
 using DotNetVault.ClortonGame;
 using DotNetVault.DeadBeefCafeBabeGame;
 using DotNetVault.Vaults;
-using HpTimesStamps;
+using HpTimeStamps;
 using JetBrains.Annotations;
 
 namespace CafeBabeGame
