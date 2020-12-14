@@ -26,7 +26,7 @@
 
   <PropertyGroup>
     <PackageId>DotNetVault</PackageId>
-    <PackageVersion>0.2.5.7-alpha</PackageVersion>
+    <PackageVersion>0.2.5.8</PackageVersion>
     <Owners>CJM Screws, LLC</Owners>
     <Authors>Christopher Susie</Authors>
     <PackageProjectUrl>https://github.com/cpsusie/DotNetVault</PackageProjectUrl>
@@ -81,12 +81,12 @@ RELEASE NOTES VERSION 0.2.5.3:
     <PackageTags>DotNetVault, analyzers, synchronization, thread-safety, threadsafe, deadlock, deadlock-prevention</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <LangVersion>8.0</LangVersion>
-    <Version>0.2.5.4</Version>
+    <Version>0.2.5.8</Version>
     <AssemblyName>DotNetVault</AssemblyName>
     <RootNamespace>DotNetVault</RootNamespace>
     <Company>CJM Screws, LLC</Company>
-    <AssemblyVersion>0.2.5.4</AssemblyVersion>
-    <FileVersion>0.2.5.4</FileVersion>
+    <AssemblyVersion>0.2.5.8</AssemblyVersion>
+    <FileVersion>0.2.5.8</FileVersion>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
