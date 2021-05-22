@@ -585,6 +585,13 @@ namespace DotNetVault.Test
         }
 
         [TestMethod]
+        public void NullableEnumNotHeldAgainstTest_1()
+        {
+            var test = ResourceFiles.Issue8TestCases.Issue8_TestCases;
+            VerifyCSharpDiagnostic(test);
+        }
+
+        [TestMethod]
         public void EventArgsOkTest()
         {
             var test = ResourceFiles.NullableNotHeldAgainstTests.EventArgsOkTest;

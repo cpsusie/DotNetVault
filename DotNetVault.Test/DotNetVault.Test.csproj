@@ -51,6 +51,7 @@
     <Compile Remove="TestCases\ImmutableCollectionIsVaultSafe.cs" />
     <Compile Remove="TestCases\ImmutableStructIsVaultSafe.cs" />
     <Compile Remove="TestCases\ImmutableStructIsVsUnmanaged.cs" />
+    <Compile Remove="TestCases\Issue8_TestCases.cs" />
     <Compile Remove="TestCases\MethodInvokeSyntaxTests.cs" />
     <Compile Remove="TestCases\MethodInvokeSyntaxTests_2.cs" />
     <Compile Remove="TestCases\NdiMixedWithNotInlineNotOkCaseThree.cs" />
@@ -142,6 +143,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>EarlyReleaseTestCases.resx</DependentUpon>
     </Compile>
+    <Compile Update="ResourceFiles\Issue8TestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Issue8TestCases.resx</DependentUpon>
+    </Compile>
     <Compile Update="ResourceFiles\NdiTestCases.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -232,6 +238,10 @@
     <EmbeddedResource Update="ResourceFiles\EarlyReleaseTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>EarlyReleaseTestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ResourceFiles\Issue8TestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Issue8TestCases.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="ResourceFiles\NdiTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>
