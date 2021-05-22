@@ -608,8 +608,8 @@ namespace DotNetVault
                                             context.ReportDiagnostic(diagnostic);
                                         }
 
-//search for standard method invocations other than by constant reference
-var invocationsWhereProtectedInArgumentList =
+                                        //search for standard method invocations other than by constant reference
+                                        var invocationsWhereProtectedInArgumentList =
                                             (from n in searchMe.DescendantNodes()
                                                 where n is InvocationExpressionSyntax
                                                 let ies = (InvocationExpressionSyntax) n
