@@ -26,7 +26,7 @@
 
   <PropertyGroup>
     <PackageId>DotNetVault</PackageId>
-    <PackageVersion>0.2.5.8</PackageVersion>
+    <PackageVersion>0.2.5.9</PackageVersion>
     <Owners>CJM Screws, LLC</Owners>
     <Authors>Christopher Susie</Authors>
     <PackageProjectUrl>https://github.com/cpsusie/DotNetVault</PackageProjectUrl>
@@ -45,7 +45,12 @@
 
       A guided tour / quick start guide for this project's functionality can be found here: https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/Quick_Start_Functionality_Tour.md 
     </Description>
-    <PackageReleaseNotes>RELEASE NOTES VERSION 0.2.5.8:
+    <PackageReleaseNotes>RELEASE NOTES VERSION 0.2.5.9:
+     * Fixed bug from Issue 8, where a readonly field of unmanaged struct (or enum) in an otherwise vault-safe reference type was being identified as not readonly merely because the unmanaged type itself has writable fields.  This is incorrect because attaching the readonly qualifier to the field will prevent mutation of its writable fields ... or, at worst, cause any mutation to be written to a defensive copy.   This problem manifested itself with a nullable unmanaged enum type.
+     * Two unit tests added that originally failed but now pass after application of fix.
+     * Update example code project to demonstrate.
+ 
+RELEASE NOTES VERSION 0.2.5.8:
       * Update dependencies.
       * Add dependency to High-Precision-Timestamps v0.1.0.0
       * Use monotonic DateTimes from High-Precision-Timestamps to compute durations and timeouts
@@ -81,12 +86,12 @@ RELEASE NOTES VERSION 0.2.5.3:
     <PackageTags>DotNetVault, analyzers, synchronization, thread-safety, threadsafe, deadlock, deadlock-prevention</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <LangVersion>8.0</LangVersion>
-    <Version>0.2.5.8</Version>
+    <Version>0.2.5.9</Version>
     <AssemblyName>DotNetVault</AssemblyName>
     <RootNamespace>DotNetVault</RootNamespace>
     <Company>CJM Screws, LLC</Company>
-    <AssemblyVersion>0.2.5.8</AssemblyVersion>
-    <FileVersion>0.2.5.8</FileVersion>
+    <AssemblyVersion>0.2.5.9</AssemblyVersion>
+    <FileVersion>0.2.5.9</FileVersion>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>

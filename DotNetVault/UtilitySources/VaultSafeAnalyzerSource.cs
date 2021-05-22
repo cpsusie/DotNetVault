@@ -277,6 +277,11 @@ namespace DotNetVault.UtilitySources
                             nts = resolution;
                         }
 
+                        if (isReadOnlyField && nts.IsUnmanagedType)
+                        {
+                            return true;
+                        }
+
                         bool hasVsAttrib = DoesNamedTypeHaveAttribute(nts, attribSymb);
                         bool onFaith = hasVsAttrib && ConstructedWithFirstParamTrue(nts, attribSymb, comp);
                         bool mightBeVsSpecImm = igtl.FindMatch(nts).IsDesignated;
@@ -401,38 +406,43 @@ namespace DotNetVault.UtilitySources
 
                     if (r == null)
                     {
-                        switch (ts.SpecialType)
+                        if (ts.TypeKind == TypeKind.Enum && ts.IsUnmanagedType)
                         {
-
-                            case SpecialType.System_Enum:
-                            case SpecialType.System_Void:
-                            case SpecialType.System_Boolean:
-                            case SpecialType.System_Char:
-                            case SpecialType.System_SByte:
-                            case SpecialType.System_Byte:
-                            case SpecialType.System_Int16:
-                            case SpecialType.System_UInt16:
-                            case SpecialType.System_Int32:
-                            case SpecialType.System_UInt32:
-                            case SpecialType.System_Int64:
-                            case SpecialType.System_UInt64:
-                            case SpecialType.System_Decimal:
-                            case SpecialType.System_Single:
-                            case SpecialType.System_Double:
-                            case SpecialType.System_String:
-                            case SpecialType.System_IntPtr:
-                            case SpecialType.System_UIntPtr:
-                            case SpecialType.System_Array:
-                            case SpecialType.System_DateTime:
-                                r = false;
-                                break;
-                            default:
-                                r = !IsTypeExemptFromFieldScan(ts, c, igtl, token);
-                                break;
+                            r = false;
                         }
+                        else
+                        {
+                            switch (ts.SpecialType)
+                            {
 
+                                case SpecialType.System_Enum:
+                                case SpecialType.System_Void:
+                                case SpecialType.System_Boolean:
+                                case SpecialType.System_Char:
+                                case SpecialType.System_SByte:
+                                case SpecialType.System_Byte:
+                                case SpecialType.System_Int16:
+                                case SpecialType.System_UInt16:
+                                case SpecialType.System_Int32:
+                                case SpecialType.System_UInt32:
+                                case SpecialType.System_Int64:
+                                case SpecialType.System_UInt64:
+                                case SpecialType.System_Decimal:
+                                case SpecialType.System_Single:
+                                case SpecialType.System_Double:
+                                case SpecialType.System_String:
+                                case SpecialType.System_IntPtr:
+                                case SpecialType.System_UIntPtr:
+                                case SpecialType.System_Array:
+                                case SpecialType.System_DateTime:
+                                    r = false;
+                                    break;
+                                default:
+                                    r = !IsTypeExemptFromFieldScan(ts, c, igtl, token);
+                                    break;
+                            }
+                        }
                     }
-
                     return r.Value;
                 }
                 
