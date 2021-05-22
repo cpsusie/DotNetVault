@@ -51,6 +51,7 @@
     <Compile Remove="TestCases\ImmutableCollectionIsVaultSafe.cs" />
     <Compile Remove="TestCases\ImmutableStructIsVaultSafe.cs" />
     <Compile Remove="TestCases\ImmutableStructIsVsUnmanaged.cs" />
+    <Compile Remove="TestCases\Issue8TestCase2Similar.cs" />
     <Compile Remove="TestCases\Issue8_TestCases.cs" />
     <Compile Remove="TestCases\MethodInvokeSyntaxTests.cs" />
     <Compile Remove="TestCases\MethodInvokeSyntaxTests_2.cs" />

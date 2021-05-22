@@ -1,4 +1,22 @@
-﻿RELEASE NOTES VERSION 0.2.5.3:
+﻿RELEASE NOTES VERSION 0.2.5.9:
+     * Fixed bug from Issue 8, where a readonly field of unmanaged struct (or enum) in an otherwise vault-safe reference type was being identified as not readonly merely because the unmanaged type itself has writable fields.  This is incorrect because attaching the readonly qualifier to the field will prevent mutation of its writable fields ... or, at worst, cause any mutation to be written to a defensive copy.   This problem manifested itself with a nullable unmanaged enum type.
+     * Two unit tests added that originally failed but now pass after application of fix.
+     * Update example code project to demonstrate.
+
+RELEASE NOTES VERSION 0.2.5.8:
+      * Update dependencies.
+      * Add dependency to High-Precision-Timestamps v0.1.0.0
+      * Use monotonic DateTimes from High-Precision-Timestamps to compute durations and timeouts
+      * Rename VaultSafeWhiteList.txt to vaultsafe
+      .txt
+
+RELEASE NOTES VERSION 0.2.5.4:
+      * Update dependencies.
+      * Add dependency to High-Precision-Timestamps v0.1.0.0
+      * Use monotonic DateTimes from High-Precision-Timestamps to compute durations and timeouts
+      * Rename VaultSafeWhiteList.txt to vaultsafewhitelist.txt
+
+RELEASE NOTES VERSION 0.2.5.3:
 
       * Fixed problem with SourceLink not working correctly.
       * Fixed bug (Issue #2) that would throw a recursion exception sometimes when, using certain combinations of overloads, acquiring upgradable readonly locks then upgrading them would throw a lock recursion exception.

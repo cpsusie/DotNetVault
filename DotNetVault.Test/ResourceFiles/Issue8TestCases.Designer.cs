@@ -62,12 +62,10 @@ namespace DotNetVault.Test.ResourceFiles {
         
         /// <summary>
         ///   Looks up a localized string similar to using System;
-        ///using System.Collections.Generic;
-        ///using System.Text;
         ///using DotNetVault.Attributes;
         ///using JetBrains.Annotations;
         ///
-        ///namespace ExampleCodePlayground
+        ///namespace DotNetVault.Test.TestCases
         ///{
         ///    public enum TestCaseMode
         ///    {
@@ -84,11 +82,47 @@ namespace DotNetVault.Test.ResourceFiles {
         ///
         ///        public TestCaseMode? Mode { get; }
         ///
-        ///        public Issue8TestCase([NotNul [rest of string was truncated]&quot;;.
+        ///        public Issue8TestCase([NotNull] string firstName, string lastName)
+        ///        {
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Issue8_TestCases {
             get {
                 return ResourceManager.GetString("Issue8_TestCases", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using DotNetVault.Attributes;
+        ///
+        ///namespace DotNetVault.Test.TestCases
+        ///{
+        ///    [VaultSafe]
+        ///    struct Issue8TestCase2Similar
+        ///    {
+        ///        public int X;
+        ///        public int Y;
+        ///        public int Z;
+        ///
+        ///        public Issue8TestCase2Similar(int x, int y, int z)
+        ///        {
+        ///            X = x;
+        ///            Y = y;
+        ///            Z = z;
+        ///        }
+        ///    }
+        ///
+        ///    [VaultSafe]
+        ///    public sealed class TestMe
+        ///    {
+        ///        public TestMe(int x, in [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Issue8TestCase2Similar {
+            get {
+                return ResourceManager.GetString("Issue8TestCase2Similar", resourceCulture);
             }
         }
     }

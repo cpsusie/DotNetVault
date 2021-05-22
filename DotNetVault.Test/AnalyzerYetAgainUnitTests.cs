@@ -592,6 +592,13 @@ namespace DotNetVault.Test
         }
 
         [TestMethod]
+        public void ReadOnlyUnmanagedFieldWithWritableMembersOk()
+        {
+            var test = ResourceFiles.Issue8TestCases.Issue8TestCase2Similar;
+            VerifyCSharpDiagnostic(test);
+        }
+
+        [TestMethod]
         public void EventArgsOkTest()
         {
             var test = ResourceFiles.NullableNotHeldAgainstTests.EventArgsOkTest;
