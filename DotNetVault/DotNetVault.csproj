@@ -10,14 +10,6 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
-   <ItemGroup>
-    <PackageReference Include="HighPrecisionTimeStamps" Version="0.1.1-beta">
-      <GeneratePathProperty>true</GeneratePathProperty>
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
-  </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <IncludeBuildOutput>false</IncludeBuildOutput> 
@@ -26,7 +18,7 @@
 
   <PropertyGroup>
     <PackageId>DotNetVault</PackageId>
-    <PackageVersion>0.2.5.10-beta</PackageVersion>
+    <PackageVersion>0.2.5.12</PackageVersion>
     <Owners>CJM Screws, LLC</Owners>
     <Authors>Christopher Susie</Authors>
     <PackageProjectUrl>https://github.com/cpsusie/DotNetVault</PackageProjectUrl>
@@ -46,57 +38,26 @@
       A guided tour / quick start guide for this project's functionality can be found here: https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/Quick_Start_Functionality_Tour.md 
     </Description>
     <PackageReleaseNotes>
+      RELEASE NOTES VERSION 0.2.5.12:
+        Non-beta release using version 1.0 of High Precision Timestamps.  Originally beta tested via version 0.1.1.0-beta in DotNetVault version 0.2.5.10-beta et seq.  Dependency on HpTimestamps changed from included dll to a dependency on package.
       RELEASE NOTES VERSION 0.2.5.10-beta:
         Beta release using beta verion (0.1.1.0-beta) of High Precision Timestamps.
       RELEASE NOTES VERSION 0.2.5.9:
      * Fixed bug from Issue 8, where a readonly field of unmanaged struct (or enum) in an otherwise vault-safe reference type was being identified as not readonly merely because the unmanaged type itself has writable fields.  This is incorrect because attaching the readonly qualifier to the field will prevent mutation of its writable fields ... or, at worst, cause any mutation to be written to a defensive copy.   This problem manifested itself with a nullable unmanaged enum type.
      * Two unit tests added that originally failed but now pass after application of fix.
      * Update example code project to demonstrate.
- 
-RELEASE NOTES VERSION 0.2.5.8:
-      * Update dependencies.
-      * Add dependency to High-Precision-Timestamps v0.1.0.0
-      * Use monotonic DateTimes from High-Precision-Timestamps to compute durations and timeouts
-      * Rename VaultSafeWhiteList.txt to vaultsafe
-      .txt
-      
-RELEASE NOTES VERSION 0.2.5.3:
-
-      * Fixed problem with SourceLink not working correctly.
-      * Fixed bug (Issue #2) that would throw a recursion exception sometimes when, using certain combinations of overloads, acquiring upgradable readonly locks then upgrading them would throw a lock recursion exception.
-      * Update the quick start functionality tour and installation guides to use pictures reflecting more recent versions.
-      
-      RELEASE NOTES VERSION 0.2.5.0:
-
-      The last official release was version [0.1.5.4](https://github.com/cpsusie/DotNetVault/releases/tag/v0.1.5.4),
-      available as a Nuget package (https://www.nuget.org/packages/DotNetVault/0.1.5.4).  Since then, **many** features have been added to DotNetVault:
-
-      * Upgrading to new versions of Roslyn libraries, immutable collections and other minor dependency upgrades
-      * Changing some of the formatting of analyzer diagnostics to comply with Roslyn authors' recommendations
-      * Adding Monitor Vaults (using Monitor.Enter + sync object) as the synchronization mechanism
-      * Adding ReadWrite Vaults (using ReaderWriterLockSlim) as their synchronization mechanism
-      * Fixing flawed static analyzer rules
-      * Adding new analyzer rules to close encountered loopholes in the ruleset that potentially allowed unsynchronized access to protected resource objects
-      * Unit tests as appropriate for new functionality
-      * Creation of quick start installation guides with test projects
-      * Not including project pdfs in the released package but instead providing an md document and a txt document with links to those documents in the github repository
-      * Significant updates to the formatting and content of project markdown documents
-      * Adding Source Link and releasing a symbol package along with the nuget package for this project
-      * Writing many test projects and demonstration projects to verify functionality, stress test and profile performance of the vaults
-      * Adding a document serving as a guide to using large mutable value types generally and as a repository for shared mutable state
-</PackageReleaseNotes>
-    <Copyright>Copyright © 2019-2020 CJM Screws, LLC</Copyright>
+    </PackageReleaseNotes>
+    <Copyright>Copyright © 2019-2021 CJM Screws, LLC</Copyright>
     <PackageTags>DotNetVault, analyzers, synchronization, thread-safety, threadsafe, deadlock, deadlock-prevention</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <LangVersion>8.0</LangVersion>
-    <Version>0.2.5.10</Version>
+    <Version>0.2.5.12</Version>
     <AssemblyName>DotNetVault</AssemblyName>
     <RootNamespace>DotNetVault</RootNamespace>
     <Company>CJM Screws, LLC</Company>
-    <AssemblyVersion>0.2.5.10</AssemblyVersion>
-    <FileVersion>0.2.5.10</FileVersion>
-    <PackageLicenseFile></PackageLicenseFile>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <AssemblyVersion>0.2.5.12</AssemblyVersion>
+    <FileVersion>0.2.5.12</FileVersion>
+    <PackageLicenseFile>license.txt</PackageLicenseFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -120,15 +81,22 @@ RELEASE NOTES VERSION 0.2.5.3:
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="%24{PkgHighPrecisionTimeStamps}\**" />
     <Compile Remove="bin\**" />
     <Compile Remove="Resources\**" />
+    <EmbeddedResource Remove="%24{PkgHighPrecisionTimeStamps}\**" />
     <EmbeddedResource Remove="bin\**" />
     <EmbeddedResource Remove="Resources\**" />
+    <None Remove="%24{PkgHighPrecisionTimeStamps}\**" />
     <None Remove="bin\**" />
     <None Remove="Resources\**" />
     <Content Remove="C:\Users\Christopher Susie\.nuget\packages\highprecisiontimestamps\0.1.0\contentFiles\any\netstandard2.0\Readme.md" />
     <None Remove="license.txt" />
     <None Remove="README.md" />
+    <None Include="license.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
  
@@ -140,6 +108,14 @@ RELEASE NOTES VERSION 0.2.5.3:
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="HighPrecisionTimeStamps" Version="0.1.1-beta">
+      <GeneratePathProperty>true</GeneratePathProperty>
+      <IncludeAssets>all</IncludeAssets>
+    </PackageReference>
+    <Content Include="C:\Users\Christopher Susie\.nuget\packages\highprecisiontimestamps\0.1.1-beta\lib\netstandard2.0\HighPrecisionTimeStamps.dll">
+      <CopyToOutputDirectory>always</CopyToOutputDirectory>
+    </Content>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
     <PackageReference Include="JetBrains.Annotations" Version="2021.2.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.8.0" PrivateAssets="all" />
@@ -161,6 +137,7 @@ RELEASE NOTES VERSION 0.2.5.3:
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="lib/netstandard2.0/" Visible="true" />
     <None Include="$(OutputPath)\$(AssemblyName).xml" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="true" />
     <None Include="$(OutputPath)\$(AssemblyName).xml" Pack="true" PackagePath="lib/netstandard2.0/" Visible="true" />
+    <None Include="$(OutputPath)\$(AssemblyName).pdb" Pack="true" PackagePath="lib/netstandard2.0/" Visible="true"/>
   </ItemGroup>
   <ItemGroup>
    <None Update="readme.txt">
@@ -172,8 +149,10 @@ RELEASE NOTES VERSION 0.2.5.3:
   <ItemGroup>
     <Folder Include="Include\" />
   </ItemGroup>
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="xcopy  &quot;$(ProjectDir)Include\HighPrecisionTimeStamps.dll&quot; &quot;$(TargetDir)&quot; /Y" />
-  </Target>
+  <ItemGroup>
+    <Content Update="C:\Users\Christopher Susie\.nuget\packages\highprecisiontimestamps\0.1.1-beta\contentFiles\any\netstandard2.0\LICENSE">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
 </Project>

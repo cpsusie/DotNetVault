@@ -5,15 +5,26 @@ using System.Text;
 using DotNetVault.Attributes;
 using DotNetVault.Vaults;
 using DotNetVault.VsWrappers;
+using HpTimeStamps;
 using JetBrains.Annotations;
+using MonotonicContext = HpTimeStamps.MonotonicStampContext;
 
 namespace ExampleCodePlayground
 {
+    using MonotonicStamp = HpTimeStamps.MonotonicTimeStamp<MonotonicContext>;
+    using MonoStampSrc = HpTimeStamps.MonotonicTimeStampUtil<MonotonicContext>;
     class Program
     {
         static void Main()
         {
+
+            MonotonicStamp start = MonoStampSrc.StampNow;
+            Console.WriteLine($"Started at: {start.ToUtcDateTime():O}");
             BigStructVaultExample.RunDemo();
+            MonotonicStamp end = MonoStampSrc.StampNow;
+            Duration elapsed = end - start;
+            Console.WriteLine($"Ended at: {end.ToUtcDateTime():O}.  Elapsed: {elapsed.TotalMicroseconds:N1} microseconds.");
+
             /**
             //bug 92 is fixed code should not be run but exits to demonstrate analyzer operations
             //uncomment designated code to get various correct compiler errors
