@@ -10,6 +10,7 @@ using JetBrains.Annotations;
 
 namespace ConsoleStressTest
 {
+    //[ReportWhiteListLocations]
     class Program
     {
         static Program() => TheResultText = new LocklessWriteOnce<string>();

@@ -71,6 +71,7 @@
     <Compile Remove="TestCases\QueryTestCases.cs" />
     <Compile Remove="TestCases\RefStructAttributeTestsOk.cs" />
     <Compile Remove="TestCases\RefStructAttrNotOkCase1.cs" />
+    <Compile Remove="TestCases\ReportOnWhiteListsTestCase.cs" />
     <Compile Remove="TestCases\RoRegularNotARefStructCase2.cs" />
     <Compile Remove="TestCases\SbAndUriBNotVaultSafe.cs" />
     <Compile Remove="TestCases\ShouldTriggerDiagnosticBecauseNoUsing.cs" />
@@ -164,6 +165,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>RefStructAttributeTestCases.resx</DependentUpon>
     </Compile>
+    <Compile Update="ResourceFiles\ReportWhiteListTestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ReportWhiteListTestCases.resx</DependentUpon>
+    </Compile>
     <Compile Update="ResourceFiles\UsingMandatoryTestCases.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -255,6 +261,10 @@
     <EmbeddedResource Update="ResourceFiles\RefStructAttributeTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>RefStructAttributeTestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ResourceFiles\ReportWhiteListTestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ReportWhiteListTestCases.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="ResourceFiles\UsingMandatoryTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>

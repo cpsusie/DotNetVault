@@ -56,13 +56,13 @@ namespace DotNetVault.Logging
             return (loggerExisted, loggerDestroyedThisCall);
         }
 
-        private static LocklessLazySetOnce _destroyed;
+        private static LocklessSetOnce _destroyed;
         private static volatile ILogProvider _provider;
     }
 
-    internal struct LocklessLazySetOnce
+    internal struct LocklessSetOnce
     {
-        public static implicit operator bool(in LocklessLazySetOnce convert) => convert.IsSet;
+        public static implicit operator bool(in LocklessSetOnce convert) => convert.IsSet;
         public readonly bool IsSet
         {
             get

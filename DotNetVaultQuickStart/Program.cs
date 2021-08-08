@@ -28,6 +28,7 @@ using BasicDogVault = DotNetVault.Vaults.BasicMonitorVault<DotNetVaultQuickStart
 using MutableResDogVault = DotNetVault.Vaults.MutableResourceMonitorVault<System.Collections.Generic.SortedSet<DotNetVaultQuickStart.DogActionRecord>>;
 namespace DotNetVaultQuickStart
 {
+    //[ReportWhiteListLocations]
     class Program
     {
         private const string ReadWriteDemoVaultOutputFilePath = "ReadWriteDemoVaultDemoOutput.txt";
