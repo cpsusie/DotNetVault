@@ -18,7 +18,7 @@
 
   <PropertyGroup>
     <PackageId>DotNetVault</PackageId>
-    <PackageVersion>0.2.5.15-beta</PackageVersion>
+    <PackageVersion>0.2.5.16</PackageVersion>
     <Owners>CJM Screws, LLC</Owners>
     <Authors>Christopher Susie</Authors>
     <PackageProjectUrl>https://github.com/cpsusie/DotNetVault</PackageProjectUrl>
@@ -38,7 +38,7 @@
       A guided tour / quick start guide for this project's functionality can be found here: https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/Quick_Start_Functionality_Tour.md 
     </Description>
     <PackageReleaseNotes>
-      RELEASE NOTES VERSION 0.2.5.15-beta:
+      RELEASE NOTES VERSION 0.2.5.16:
         Non-beta release using version 1.0 of High Precision Timestamps.  Originally beta tested via version 0.1.1.0-beta in DotNetVault version 0.2.5.10-beta et seq.  Dependency on HpTimestamps changed from included dll to a dependency on package.
       RELEASE NOTES VERSION 0.2.5.10-beta:
         Beta release using beta verion (0.1.1.0-beta) of High Precision Timestamps.
@@ -51,12 +51,12 @@
     <PackageTags>DotNetVault, analyzers, synchronization, thread-safety, threadsafe, deadlock, deadlock-prevention</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <LangVersion>8.0</LangVersion>
-    <Version>0.2.5.15</Version>
+    <Version>0.2.5.16</Version>
     <AssemblyName>DotNetVault</AssemblyName>
     <RootNamespace>DotNetVault</RootNamespace>
     <Company>CJM Screws, LLC</Company>
-    <AssemblyVersion>0.2.5.15</AssemblyVersion>
-    <FileVersion>0.2.5.15</FileVersion>
+    <AssemblyVersion>0.2.5.16</AssemblyVersion>
+    <FileVersion>0.2.5.16</FileVersion>
     <PackageLicenseFile>license.txt</PackageLicenseFile>
   </PropertyGroup>
 
