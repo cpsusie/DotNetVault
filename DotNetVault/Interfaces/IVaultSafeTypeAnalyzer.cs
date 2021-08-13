@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -8,6 +9,8 @@ namespace DotNetVault.Interfaces
 {
     internal interface IVaultSafeTypeAnalyzer
     {
+        (FileInfo WhiteListFile, FileInfo ConditionalWhiteListFile) WhiteListFilePaths { get; }
+
         Task<(bool Result, Exception Error)> IsTypeVaultSafeAsync([NotNull] INamedTypeSymbol nts,
             [NotNull] Compilation comp, CancellationToken token);
 

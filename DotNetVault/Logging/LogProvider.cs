@@ -5,6 +5,8 @@ using System.IO;
 using System.Reflection;
 using System.Security;
 using System.Threading;
+using DotNetVault.TimeStamps;
+using HpTimeStamps;
 using JetBrains.Annotations;
 
 namespace DotNetVault.Logging
@@ -19,7 +21,7 @@ namespace DotNetVault.Logging
         public bool IsDisposed => _disposed.IsSet;
 
         public bool IsRunning => !IsDisposed && !_threadDone.IsSet && _started.IsSet;
-
+        internal Duration MaxWaitDequeue => Duration.FromSeconds(30);
         private LogProvider() : this(Assembly.GetExecutingAssembly().GetName().Name) { }
 
         private LogProvider([NotNull] string fileName)
@@ -31,10 +33,9 @@ namespace DotNetVault.Logging
             _cts = new CancellationTokenSource();
             _logCollection = new BlockingCollection<LogAction>(new ConcurrentQueue<LogAction>());
             _starting.TrySet();
-            string logPath = BuildLogPath(fileName);
             _fileAccessMutex = new Mutex(false, Guid);
             _fileName = new FileInfo(BuildLogPath(fileName));
-            _thread = new Thread(ThreadLoop);
+            _thread = new Thread(ThreadLoop){IsBackground = true};
             _threadId = _thread.ManagedThreadId;
             _thread.Start(_cts.Token);
             while (!_started.IsSet)
@@ -69,7 +70,7 @@ namespace DotNetVault.Logging
         }
         private void Dispose(bool disposing)
         {
-            if (disposing)
+            if (_disposed.TrySet() && disposing)
             {
                 if (!_threadDone.IsSet)
                 {
@@ -123,17 +124,25 @@ namespace DotNetVault.Logging
                     throw new InvalidOperationException("Cannot start thread more than once.");
                 }
 
+                //initialize value here so first dequeue has something to compare against:
+                _lastActionDequeuedAt = DnvTimeStampProvider.MonoNow;
                 while (true)
                 {
                     token.ThrowIfCancellationRequested();
-                    var action = _logCollection.Take(token);
+                    var action = TakeActionFromQueue(token, TimeSpan.FromMilliseconds(250));
                     WriteLogAction(action, token);
                 }
 
             }
             catch (OperationCanceledException)
             {
-                throw;
+                
+            }
+            catch (TimeoutException ex)
+            {
+                string msg = @$"Logger terminating due to timeout.  Msg: {ex}.";
+                Console.WriteLine(msg);
+                Debug.WriteLine(msg);
             }
             catch (Exception e)
             {
@@ -144,6 +153,29 @@ namespace DotNetVault.Logging
             {
                 _threadDone.TrySet();
             }
+        }
+
+        LogAction TakeActionFromQueue(CancellationToken token, TimeSpan timeout)
+        {
+            while (true)
+            {
+                bool gotAction = _logCollection.TryTake(out LogAction action, (int)Math.Truncate(timeout.TotalMilliseconds), token) && action != default;
+                if (gotAction)
+                {
+                    _lastActionDequeuedAt = DnvTimeStampProvider.MonoNow;
+                    return action;
+                }
+
+                Duration timeSinceLastDequeue = DnvTimeStampProvider.MonoNow - _lastActionDequeuedAt;
+                if (timeSinceLastDequeue > MaxWaitDequeue)
+                {
+                    throw new TimeoutException(
+                        $"It has been more than {timeSinceLastDequeue.TotalSeconds:N3} since the last log was dequeued.  Shutting down.");
+                }
+            }
+            
+            
+
         }
 
         private void WriteLogAction(in LogAction action, CancellationToken token)
@@ -204,7 +236,8 @@ namespace DotNetVault.Logging
             return temp;
         }
 
-       
+        ///<summary>access ONLY from thread loop!</summary>
+        private MonotonicTimeStamp<MonotonicStampContext> _lastActionDequeuedAt;
         private const string Guid = ConfigurationDetails.IsDebugBuild
             ? "585a10ca-815d-449c-a3e9-b8ef0eb7baa7"
             // ReSharper disable once UnreachableCode

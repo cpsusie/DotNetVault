@@ -28,8 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNetVault" Version="0.2.5.9" />
-    <PackageReference Include="HighPrecisionTimeStamps" Version="0.1.0" />
+    <PackageReference Include="DotNetVault" Version="0.2.5.18" />
     <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
   </ItemGroup>
 

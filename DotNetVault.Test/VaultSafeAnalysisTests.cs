@@ -98,7 +98,7 @@ namespace DotNetVault.Test
         [TestMethod]
         public void LoadDiagnosticDescriptorsText()
         {
-            const int numDescriptors = 19;
+            const int numDescriptors = 20;
             var descriptors = DotNetVaultAnalyzer.DiagnosticDescriptors;
             Assert.IsTrue(numDescriptors == descriptors.Length);
             foreach (var descriptor in descriptors)

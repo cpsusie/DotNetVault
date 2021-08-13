@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -29,6 +30,7 @@ namespace DotNetVault
     {
         #region Public Fields, Properties and Constants
         // ReSharper disable InconsistentNaming
+        internal const string DotNetVault_ReportWhiteLists = "DotNetVault_ReportWhiteLists";
         internal const string DiagnosticId_VaultSafeTypes = "DotNetVault_VaultSafe";
         internal const string DiagnosticId_UsingMandatory = "DotNetVault_UsingMandatory";
         internal const string DiagnosticId_UsingMandatory_Inline = "DotNetVault_UsingMandatory_DeclaredInline";
@@ -76,6 +78,7 @@ namespace DotNetVault
                 EntryExitLog.CreateEntryExitLog(true, typeof(DotNetVaultAnalyzer), nameof(Initialize), context);
             try
             {
+                context.RegisterSymbolAction(AnalyzeForWhiteListPaths, SymbolKind.NamedType);
                 context.RegisterSyntaxNodeAction(AnalyzeRefExpressionForProtectedResource, SyntaxKind.RefExpression);
                 context.RegisterSymbolAction(AnalyzeTypeSymbolForVsTypeParams, SymbolKind.NamedType);
                 context.RegisterSymbolAction(AnalyzeNamedTypeSymbolForVaultSafety, SymbolKind.NamedType);
@@ -106,6 +109,54 @@ namespace DotNetVault
         #endregion
 
         #region Primary Analysis Operations
+
+        private void AnalyzeForWhiteListPaths(SymbolAnalysisContext context)
+        {
+            const string methodName = nameof(AnalyzeForWhiteListPaths);
+            using var _ = EntryExitLog.CreateEntryExitLog(EnableEntryExitLogging, typeof(DotNetVaultAnalyzer),
+                methodName, context);
+            var token = context.CancellationToken;
+            INamedTypeSymbol reportWhiteListFilesNts = context.Compilation.FindReportWhiteListLocationsAttribute();
+            if (reportWhiteListFilesNts != null && context.Symbol is INamedTypeSymbol nts)
+            {
+                try
+                {
+                    if (DoesNamedTypeHaveAttribute(nts, reportWhiteListFilesNts))
+                    {
+                        var analyzer = VaultSafeAnalyzerFactorySource.CreateDefaultAnalyzer();
+                        
+                            (FileInfo whiteListFile, FileInfo conditWhiteListFile) = analyzer.WhiteListFilePaths;
+                            whiteListFile.Refresh();
+                            token.ThrowIfCancellationRequested();
+                            conditWhiteListFile.Refresh();
+                            token.ThrowIfCancellationRequested();
+                            var diagnostic = Diagnostic.Create(ReportWhiteListFilePathsOnRequest,
+                                nts.Locations.FirstOrDefault(), DiagnosticSeverity.Warning, nts.Locations.Skip(1),  null, whiteListFile.FullName,
+                                ExistenceString(whiteListFile.Exists), conditWhiteListFile.FullName,
+                                ExistenceString(conditWhiteListFile.Exists));
+                            context.ReportDiagnostic(diagnostic);
+                    }
+                }
+                catch (IOException ex)
+                {
+                    TraceLog.Log(ex);
+                    throw;
+                }
+                catch (OperationCanceledException)
+                {
+                    DebugLog.Log($"{methodName} operation was cancelled.");
+                }
+                catch (Exception e)
+                {
+                    TraceLog.Log(e);
+                    throw;
+                }
+                
+            }
+
+            static string ExistenceString(bool exists) => exists ? "exists" : "does not exist";
+        }
+
         private void AnalyzeTypeDeclarationForIllegalUsageOfRefStructAttribute(SymbolAnalysisContext obj)
         {
             const string methodName = nameof(AnalyzeTypeDeclarationForIllegalUsageOfRefStructAttribute);
@@ -1852,7 +1903,8 @@ namespace DotNetVault
                     .Add(UsingMandatoryIllegalPassExtMeth)
                     .Add(NoRefStructAttrExceptOnRefStruct)
                     .Add(UsingMandatoryNoLockedResourceWrappersAllowedInScope)
-                    .Add(NoIrregularLockedResourcesAllowedInScope);
+                    .Add(NoIrregularLockedResourcesAllowedInScope)
+                    .Add(ReportWhiteListFilePathsOnRequest);
             }
             catch (Exception ex)
             {
@@ -1867,6 +1919,12 @@ namespace DotNetVault
         private static readonly LocalizableString Vst_MessageFormat = new LocalizableResourceString(nameof(Resources.AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Vst_Description = new LocalizableResourceString(nameof(Resources.AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
         private const string Category = "VaultSafety";
+
+        private const string ReportWhiteLists_Title = "Report on location of Whitelist files";
+        private const string ReportWhiteLists_MessageFormat =
+            "The vault-safe whitelist is found at [{0}] and {1}.  The conditionally vault-safe generic whitelist is found at [{2}] and {3}.";
+        private const string ReportWhiteLists_Description =
+            "Optionally report on the location of the whitelist files used by the analyzer.";
 
         private const string OnlyOnRefStruct_Title =
             "The " + nameof(RefStructAttribute) + " may only be applied to ref structs";
@@ -2008,6 +2066,9 @@ namespace DotNetVault
             "Generic delegates with type parameters annotated with the VaultSafeTypeParam attribute require that all arguments corresponding to those parameters be vault-safe.";
         // ReSharper restore InconsistentNaming
 
+        private static readonly DiagnosticDescriptor ReportWhiteListFilePathsOnRequest =
+            new DiagnosticDescriptor(DotNetVault_ReportWhiteLists, ReportWhiteLists_Title,
+                ReportWhiteLists_MessageFormat, Category, DiagnosticSeverity.Warning, true, ReportWhiteLists_Description);
         private static readonly DiagnosticDescriptor NoIrregularLockedResourcesAllowedInScope =
             new DiagnosticDescriptor(DotNetVault_UsingMandatory_IrregularLockedResourceObjects_NotAllowedInScope,
                 UsingMandatory_IrregularLockedResourceObjects_NotAllowedInScope_Title,
@@ -2077,7 +2138,6 @@ namespace DotNetVault
         private static readonly WriteOnce<ImmutableArray<DiagnosticDescriptor>> TheDiagnosticDescriptors = new WriteOnce<ImmutableArray<DiagnosticDescriptor>>(CreateDiagnosticDescriptors);
         private volatile VaultSafeTypeAnalyzer _analyzer;
         private const bool EnableEntryExitLogging = false;
-
         #endregion
     }
 
@@ -2127,4 +2187,6 @@ namespace DotNetVault
             yield return val;
         }
     }
+
+  
 }

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Text;
+using DotNetVault.Attributes;
 using DotNetVault.LockedResources;
 using DotNetVault.Vaults;
 
 namespace ExampleCodePlayground
 {
+    //[ReportWhiteListLocations]
     sealed class Bug76Demo
     {
         //should not work

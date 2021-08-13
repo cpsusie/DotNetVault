@@ -39,7 +39,11 @@ namespace DotNetVault.UtilitySources
 
             internal ImmutableHashSet<string> ConditionalGenericWhiteList => _conditionalGenericWhiteList;
             internal DirectoryInfo DataFolder => TheDataFileDir;
-         
+
+
+            /// <inheritdoc />
+            public (FileInfo WhiteListFile, FileInfo ConditionalWhiteListFile) WhiteListFilePaths =>
+                (TheWhiteListFileInfo.Value, TheConditionalWhiteListFileInfo.Value);
 
             public Task<(bool Result, Exception Error)> IsTypeVaultSafeAsync(INamedTypeSymbol nts,
                 Compilation comp, CancellationToken token)
@@ -220,7 +224,7 @@ namespace DotNetVault.UtilitySources
                         switch (ts)
                         {
                             case INamedTypeSymbol nts:
-                                parents.Add(nts);
+                                parents = parents.Add(nts);
                                 foreach (var child in nts.GetFieldSymbolMembersIncludingBaseTypesExclObject().Where(fs => !fs.IsStatic))
                                 {
                                     bool isThisChildReadOnly = child.IsReadOnly || child.IsConst;
@@ -393,7 +397,7 @@ namespace DotNetVault.UtilitySources
                         if (firstArg != null)
                         {
                             Debug.Assert(firstParam != null);
-                            if (firstParam.HasUnmanagedTypeConstraint)
+                            if (firstParam?.HasUnmanagedTypeConstraint == true)
                             {
                                 r = false;
                             }
@@ -873,7 +877,7 @@ namespace DotNetVault.UtilitySources
                 var queryRes = FindFirstMatchingVaultSafeAttribData(querySymbol, vaultSafeAttrib);
                 if (queryRes == default) return false;
 
-                bool ret;
+                bool ret = false;
 
                 var matchingData = queryRes.AttribData;
                 var matchingAttrbClass = queryRes.MatchingAttribDataClass;
@@ -884,7 +888,7 @@ namespace DotNetVault.UtilitySources
                 }
                 else if (matchingData != null && matchingAttrbClass != null)
                 {
-                    var syntaxTree = matchingData.ApplicationSyntaxReference.SyntaxTree;
+                    var syntaxTree = matchingData.ApplicationSyntaxReference?.SyntaxTree;
                     if (syntaxTree != null)
                     {
                         var nodes = syntaxTree.GetRoot().DescendantNodes().OfType<TypeDeclarationSyntax>()
@@ -901,9 +905,8 @@ namespace DotNetVault.UtilitySources
                         bool hasArguments = attribInQuestion?.ArgumentList?.Arguments.Count == 1;
                         if (hasArguments)
                         {
-                            var firstArgument = attribInQuestion.ArgumentList?.Arguments[0];
-                            var firstArgumentExpression = firstArgument?.Expression;
-                            if (firstArgumentExpression != null)
+
+                            if (attribInQuestion.ArgumentList?.Arguments[0].Expression is { } firstArgumentExpression)
                             {
                                 switch (firstArgumentExpression.Kind())
                                 {
@@ -911,7 +914,6 @@ namespace DotNetVault.UtilitySources
                                         ret = true;
                                         break;
                                     case SyntaxKind.FalseLiteralExpression:
-                                        ret = false;
                                         break;
                                     default:
                                         var semanticModel = model.GetSemanticModel(syntaxTree);
@@ -920,28 +922,10 @@ namespace DotNetVault.UtilitySources
                                         break;
                                 }
                             }
-                            else //firstArgumentExpression == null
-                            {
-                                ret = false;
-                            }
                         }
-                        else //!hasArguments
-                        {
-                            ret = false;
-                        }
-
                     }
-                    else //syntaxTree == null
-                    {
-                        ret = false;
-                    }
-
                 }
-                else //matchingData == null || matchingAttrbClass == null
-                {
-                    ret = false;
-                }
-
+                
                 return ret;
 
                 static (AttributeData AttribData, INamedTypeSymbol MatchingAttribDataClass)
@@ -1052,7 +1036,7 @@ namespace DotNetVault.UtilitySources
                     TheImmutableCollectionsConditionalWhiteList, comp);
 
             private static INamedTypeSymbol FindVaultSafeAttribute(Compilation compilation) =>
-                compilation?.GetTypeByMetadataName(typeof(VaultSafeAttribute).FullName);
+                compilation?.GetTypeByMetadataName(typeof(VaultSafeAttribute).FullName ?? nameof(VaultSafeAttribute));
 
 
             internal ImmutableHashSet<string> WhiteList
@@ -1117,7 +1101,7 @@ namespace DotNetVault.UtilitySources
             private static ImmutableHashSet<string> InitImmutableCollectionsConditionalWhiteList()
             {
                 bool fileIsMissing;
-                string contents=string.Empty;
+                string contents = string.Empty;
                 ImmutableHashSet<string> ret = ImmutableHashSet<string>.Empty;
                 try
                 {
@@ -1402,7 +1386,7 @@ namespace DotNetVault.UtilitySources
         #endregion
 
         private static INamedTypeSymbol FindVaultSafeTypeParamAttribute(Compilation compilation) =>
-            compilation?.GetTypeByMetadataName(typeof(VaultSafeTypeParamAttribute).FullName);
+            compilation?.GetTypeByMetadataName(typeof(VaultSafeTypeParamAttribute).FullName ?? nameof(VaultSafeTypeParamAttribute));
         private static VaultSafeAnalyzerFactory FactoryInstance => TheDefaultFactory;
         
         private static readonly LocklessWriteOnce<VaultSafeAnalyzerFactory> TheDefaultFactory = new LocklessWriteOnce<VaultSafeAnalyzerFactory>(() => CreateDefaultAnalyzer);
@@ -1627,10 +1611,10 @@ namespace DotNetVault.UtilitySources
         {
             if (ts == null) throw new ArgumentNullException(nameof(ts));
             if (c == null) throw new ArgumentNullException(nameof(c));
-            ITypeSymbol nullableT = c.GetTypeByMetadataName(typeof(Nullable<>).FullName);
-            if (nullableT != null && ts.IsValueType && ts is INamedTypeSymbol nt && nt.IsValueType)
+            ITypeSymbol nullableT = c.GetTypeByMetadataName(typeof(Nullable<>).FullName ?? "Nullable<T>");
+            if (nullableT != null && ts.IsValueType && ts is INamedTypeSymbol { IsValueType: true } nt)
             {
-                if (true == nt.ConstructedFrom?.Equals(nullableT, SymbolEqualityComparer.Default))
+                if (nt.ConstructedFrom.Equals(nullableT, SymbolEqualityComparer.Default))
                 {
                     ts = nt.TypeArguments.FirstOrDefault() ?? ts;
                 }

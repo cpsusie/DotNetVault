@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.29920.165
+VisualStudioVersion = 16.0.31515.178
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExampleCodePlayground", "ExampleCodePlayground.csproj", "{8E7BF927-7B31-466B-890E-F12049A45751}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExampleCodePlayground", "ExampleCodePlayground.csproj", "{DA60C91A-AB9F-4570-B881-AACFF9385A87}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,25 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8E7BF927-7B31-466B-890E-F12049A45751}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8E7BF927-7B31-466B-890E-F12049A45751}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8E7BF927-7B31-466B-890E-F12049A45751}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8E7BF927-7B31-466B-890E-F12049A45751}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA60C91A-AB9F-4570-B881-AACFF9385A87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA60C91A-AB9F-4570-B881-AACFF9385A87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA60C91A-AB9F-4570-B881-AACFF9385A87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA60C91A-AB9F-4570-B881-AACFF9385A87}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {FEB0296C-43D4-4015-9CCC-20365F0DD597}
-	EndGlobalSection
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 1
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://cjmscrews.visualstudio.com/
-		SccProjectUniqueName0 = ExampleCodePlayground.csproj
-		SccProjectName0 = .
-		SccAuxPath0 = https://cjmscrews.visualstudio.com
-		SccLocalPath0 = .
-		SccProvider0 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SolutionGuid = {3AECAC3F-3921-4CB7-AEFD-9983C02E52F9}
 	EndGlobalSection
 EndGlobal

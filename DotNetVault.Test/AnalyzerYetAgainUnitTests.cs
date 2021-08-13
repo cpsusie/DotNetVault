@@ -30,9 +30,18 @@ namespace DotNetVault.Test
         public void ValidateEmpty()
         {
             var test = @"";
-
             VerifyCSharpDiagnostic(test);
         }
+
+        [TestMethod]
+        public void ValidateWhiteListsReported()
+        {
+            var test = ResourceFiles.ReportWhiteListTestCases.ReportOnWhiteListsTestCase;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 1,
+                dx => dx.Id == DotNetVaultAnalyzer.DotNetVault_ReportWhiteLists &&
+                      dx.Severity == DiagnosticSeverity.Warning && !dx.IsSuppressed);
+        }
+
         [TestMethod]
         public void Bug76TestCase1()
         {

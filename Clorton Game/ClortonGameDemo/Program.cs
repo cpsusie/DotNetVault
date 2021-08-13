@@ -8,6 +8,7 @@ using HpTimeStamps;
 
 namespace ClortonGameDemo
 {
+    //[ReportWhiteListLocations]
     class Program
     {
         private static IClortonGameFactory GameFactory { get; set; }
