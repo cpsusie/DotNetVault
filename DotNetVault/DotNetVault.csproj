@@ -8,6 +8,7 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -18,7 +19,7 @@
 
   <PropertyGroup>
     <PackageId>DotNetVault</PackageId>
-    <PackageVersion>0.2.5.16</PackageVersion>
+    <PackageVersion>0.2.5.18</PackageVersion>
     <Owners>CJM Screws, LLC</Owners>
     <Authors>Christopher Susie</Authors>
     <PackageProjectUrl>https://github.com/cpsusie/DotNetVault</PackageProjectUrl>
@@ -38,25 +39,26 @@
       A guided tour / quick start guide for this project's functionality can be found here: https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/Quick_Start_Functionality_Tour.md 
     </Description>
     <PackageReleaseNotes>
-      RELEASE NOTES VERSION 0.2.5.16:
-        Non-beta release using version 1.0 of High Precision Timestamps.  Originally beta tested via version 0.1.1.0-beta in DotNetVault version 0.2.5.10-beta et seq.  Dependency on HpTimestamps changed from included dll to a dependency on package.
+      RELEASE NOTES VERSION 0.2.5.18:
+      Non-beta release using version 1.0 of High Precision Timestamps.  Originally beta tested via version 0.1.1.0-beta in DotNetVault version 0.2.5.10-beta et seq.  Dependency on HpTimestamps changed from included dll to a dependency on package.
+      Also, added a new (minor) feature: the [ReportWhiteListLocationsAttribute], when applied to a struct or class, will emit a compiler warning giving you the path of the vaultsafewhitelist and the conditionally vault safe generic whitelist files.  This enables users on varied systems to locate these files.
       RELEASE NOTES VERSION 0.2.5.10-beta:
-        Beta release using beta verion (0.1.1.0-beta) of High Precision Timestamps.
+      Beta release using beta verion (0.1.1.0-beta) of High Precision Timestamps.
       RELEASE NOTES VERSION 0.2.5.9:
-     * Fixed bug from Issue 8, where a readonly field of unmanaged struct (or enum) in an otherwise vault-safe reference type was being identified as not readonly merely because the unmanaged type itself has writable fields.  This is incorrect because attaching the readonly qualifier to the field will prevent mutation of its writable fields ... or, at worst, cause any mutation to be written to a defensive copy.   This problem manifested itself with a nullable unmanaged enum type.
-     * Two unit tests added that originally failed but now pass after application of fix.
-     * Update example code project to demonstrate.
+      * Fixed bug from Issue 8, where a readonly field of unmanaged struct (or enum) in an otherwise vault-safe reference type was being identified as not readonly merely because the unmanaged type itself has writable fields.  This is incorrect because attaching the readonly qualifier to the field will prevent mutation of its writable fields ... or, at worst, cause any mutation to be written to a defensive copy.   This problem manifested itself with a nullable unmanaged enum type.
+      * Two unit tests added that originally failed but now pass after application of fix.
+      * Update example code project to demonstrate.
     </PackageReleaseNotes>
     <Copyright>Copyright © 2019-2021 CJM Screws, LLC</Copyright>
     <PackageTags>DotNetVault, analyzers, synchronization, thread-safety, threadsafe, deadlock, deadlock-prevention</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <LangVersion>8.0</LangVersion>
-    <Version>0.2.5.16</Version>
+    <Version>0.2.5.18</Version>
     <AssemblyName>DotNetVault</AssemblyName>
     <RootNamespace>DotNetVault</RootNamespace>
     <Company>CJM Screws, LLC</Company>
-    <AssemblyVersion>0.2.5.16</AssemblyVersion>
-    <FileVersion>0.2.5.16</FileVersion>
+    <AssemblyVersion>0.2.5.18</AssemblyVersion>
+    <FileVersion>0.2.5.18</FileVersion>
     <PackageLicenseFile>license.txt</PackageLicenseFile>
   </PropertyGroup>
 
@@ -108,13 +110,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="HighPrecisionTimeStamps" Version="0.1.1-beta">
+    <PackageReference Include="HighPrecisionTimeStamps" Version="1.0.0">
       <GeneratePathProperty>true</GeneratePathProperty>
       <IncludeAssets>all</IncludeAssets>
     </PackageReference>
-    <Content Include="C:\Users\Christopher Susie\.nuget\packages\highprecisiontimestamps\0.1.1-beta\lib\netstandard2.0\HighPrecisionTimeStamps.dll">
+    <None Include="$(PkgHighPrecisionTimeStamps)\lib\netstandard2.0\HighPrecisionTimeStamps.dll">
+      <Link>HighPrecisionTimeStamps.dll</Link>
       <CopyToOutputDirectory>always</CopyToOutputDirectory>
-    </Content>
+    </None>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
     <PackageReference Include="JetBrains.Annotations" Version="2021.2.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" PrivateAssets="all" />
@@ -137,7 +140,7 @@
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="lib/netstandard2.0/" Visible="true" />
     <None Include="$(OutputPath)\$(AssemblyName).xml" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="true" />
     <None Include="$(OutputPath)\$(AssemblyName).xml" Pack="true" PackagePath="lib/netstandard2.0/" Visible="true" />
-    <None Include="$(OutputPath)\$(AssemblyName).pdb" Pack="true" PackagePath="lib/netstandard2.0/" Visible="true"/>
+    <None Include="$(OutputPath)\$(AssemblyName).pdb" Pack="true" PackagePath="lib/netstandard2.0/" Visible="true" />
   </ItemGroup>
   <ItemGroup>
    <None Update="readme.txt">
