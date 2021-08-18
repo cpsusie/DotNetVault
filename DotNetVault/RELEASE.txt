@@ -1,4 +1,7 @@
-﻿RELEASE NOTES VERSION 0.2.5.18:
+﻿RELEASE NOTES VERSION 1.0:
+      Official Release of DotNetVault.  See prior release notes for features.  This release updates the official documentation for this release version.
+
+RELEASE NOTES VERSION 0.2.5.18:
       Non-beta release using version 1.0 of High Precision Timestamps.  Originally beta tested via version 0.1.1.0-beta in DotNetVault version 0.2.5.10-beta et seq.  Dependency on HpTimestamps changed from included dll to a dependency on package.
       Also, added a new (minor) feature: the [ReportWhiteListLocationsAttribute], when applied to a struct or class, will emit a compiler warning giving you the path of the vaultsafewhitelist and the conditionally vault safe generic whitelist files.  T
 
