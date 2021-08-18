@@ -7,8 +7,11 @@ namespace DotNetVault.ExtensionMethods
     internal static class CompilationExtensions
     {
         [CanBeNull]
+        public static INamedTypeSymbol FindReportWhiteListLocationsAttribute(this Compilation c) =>
+            c?.GetTypeByMetadataName(typeof(ReportWhiteListLocationsAttribute).FullName!);
+        [CanBeNull]
         public static INamedTypeSymbol FindVaultSafeAttribute(this Compilation compilation) =>
-            compilation?.GetTypeByMetadataName(typeof(VaultSafeAttribute).FullName);
+            compilation?.GetTypeByMetadataName(typeof(VaultSafeAttribute).FullName!);
         [CanBeNull]
         public static INamedTypeSymbol FindVaultSafeTypeParamAttribute(this Compilation compilation) =>
             compilation?.GetTypeByMetadataName(typeof(VaultSafeTypeParamAttribute).FullName);

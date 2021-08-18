@@ -51,6 +51,8 @@
     <Compile Remove="TestCases\ImmutableCollectionIsVaultSafe.cs" />
     <Compile Remove="TestCases\ImmutableStructIsVaultSafe.cs" />
     <Compile Remove="TestCases\ImmutableStructIsVsUnmanaged.cs" />
+    <Compile Remove="TestCases\Issue8TestCase2Similar.cs" />
+    <Compile Remove="TestCases\Issue8_TestCases.cs" />
     <Compile Remove="TestCases\MethodInvokeSyntaxTests.cs" />
     <Compile Remove="TestCases\MethodInvokeSyntaxTests_2.cs" />
     <Compile Remove="TestCases\NdiMixedWithNotInlineNotOkCaseThree.cs" />
@@ -69,6 +71,7 @@
     <Compile Remove="TestCases\QueryTestCases.cs" />
     <Compile Remove="TestCases\RefStructAttributeTestsOk.cs" />
     <Compile Remove="TestCases\RefStructAttrNotOkCase1.cs" />
+    <Compile Remove="TestCases\ReportOnWhiteListsTestCase.cs" />
     <Compile Remove="TestCases\RoRegularNotARefStructCase2.cs" />
     <Compile Remove="TestCases\SbAndUriBNotVaultSafe.cs" />
     <Compile Remove="TestCases\ShouldTriggerDiagnosticBecauseNoUsing.cs" />
@@ -94,7 +97,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="HighPrecisionTimeStamps" Version="0.1.0" />
+    <PackageReference Include="HighPrecisionTimeStamps" Version="1.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -142,6 +145,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>EarlyReleaseTestCases.resx</DependentUpon>
     </Compile>
+    <Compile Update="ResourceFiles\Issue8TestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Issue8TestCases.resx</DependentUpon>
+    </Compile>
     <Compile Update="ResourceFiles\NdiTestCases.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -156,6 +164,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>RefStructAttributeTestCases.resx</DependentUpon>
+    </Compile>
+    <Compile Update="ResourceFiles\ReportWhiteListTestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ReportWhiteListTestCases.resx</DependentUpon>
     </Compile>
     <Compile Update="ResourceFiles\UsingMandatoryTestCases.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -233,6 +246,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>EarlyReleaseTestCases.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Update="ResourceFiles\Issue8TestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Issue8TestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="ResourceFiles\NdiTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>NdiTestCases.Designer.cs</LastGenOutput>
@@ -244,6 +261,10 @@
     <EmbeddedResource Update="ResourceFiles\RefStructAttributeTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>RefStructAttributeTestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ResourceFiles\ReportWhiteListTestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ReportWhiteListTestCases.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="ResourceFiles\UsingMandatoryTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -4,10 +4,11 @@ using System.IO;
 using System.Threading;
 using DotNetVault.ClortonGame;
 using DotNetVault.Vaults;
-using HpTimesStamps;
+using HpTimeStamps;
 
 namespace ClortonGameDemo
 {
+    //[ReportWhiteListLocations]
     class Program
     {
         private static IClortonGameFactory GameFactory { get; set; }

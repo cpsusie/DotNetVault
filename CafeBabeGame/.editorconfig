@@ -1,0 +1,7 @@
+﻿[*.cs]
+
+# DotNetVault_EarlyDisposeJustification: Justification for early dispose of LockedResourceObject
+dotnet_diagnostic.DotNetVault_EarlyDisposeJustification.severity = error
+
+# DotNetVault_ReportWhiteLists: Report on location of Whitelist files
+dotnet_diagnostic.DotNetVault_ReportWhiteLists.severity = error

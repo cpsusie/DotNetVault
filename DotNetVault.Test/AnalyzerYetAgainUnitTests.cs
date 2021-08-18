@@ -30,9 +30,18 @@ namespace DotNetVault.Test
         public void ValidateEmpty()
         {
             var test = @"";
-
             VerifyCSharpDiagnostic(test);
         }
+
+        [TestMethod]
+        public void ValidateWhiteListsReported()
+        {
+            var test = ResourceFiles.ReportWhiteListTestCases.ReportOnWhiteListsTestCase;
+            VerifyCSharpDiagnostic(test, col => col.Count() == 1,
+                dx => dx.Id == DotNetVaultAnalyzer.DotNetVault_ReportWhiteLists &&
+                      dx.Severity == DiagnosticSeverity.Warning && !dx.IsSuppressed);
+        }
+
         [TestMethod]
         public void Bug76TestCase1()
         {
@@ -581,6 +590,20 @@ namespace DotNetVault.Test
         public void AnalyzerNotHeldAgainstUnitTests()
         {
             var test = ResourceFiles.NullableNotHeldAgainstTests.NullableNotHeldAgainstTest;
+            VerifyCSharpDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void NullableEnumNotHeldAgainstTest_1()
+        {
+            var test = ResourceFiles.Issue8TestCases.Issue8_TestCases;
+            VerifyCSharpDiagnostic(test);
+        }
+
+        [TestMethod]
+        public void ReadOnlyUnmanagedFieldWithWritableMembersOk()
+        {
+            var test = ResourceFiles.Issue8TestCases.Issue8TestCase2Similar;
             VerifyCSharpDiagnostic(test);
         }
 

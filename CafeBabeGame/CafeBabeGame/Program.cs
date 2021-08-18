@@ -15,6 +15,8 @@ using JetBrains.Annotations;
 
 namespace CafeBabeGame
 {
+    //Hi mom
+    //[ReportWhiteListLocations]
     class Program
     {
         private static readonly IDeadBeefCafeGameFactory GameFactory = new DeadBeefCafeGameFactorySource().FactoryInstance;

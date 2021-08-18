@@ -136,7 +136,7 @@ Essentially, when we have an immutable or **mutable** value type that we accessi
 
 #### *Release History*
 
-The last official release was version [0.1.5.4](https://github.com/cpsusie/DotNetVault/releases/tag/v0.1.5.4), available as a Nuget package [here](https://www.nuget.org/packages/DotNetVault/0.1.5.4).  Since then, **many** features have been added to DotNetVault.  All of these features were included in the feature-complete beta version  [0.2.2.12-beta](https://github.com/cpsusie/DotNetVault/releases/tag/v0.2.2.12-beta), available as a Nuget package [here](https://www.nuget.org/packages/DotNetVault/0.2.2.12-beta).   The following list is a non-exhaustive summary of these new features:  
+The last major official release was version [0.1.5.4](https://github.com/cpsusie/DotNetVault/releases/tag/v0.1.5.4), available as a Nuget package [here](https://www.nuget.org/packages/DotNetVault/0.1.5.4).  Since then, **many** features have been added to DotNetVault.  All of these features were included in the feature-complete beta version  [0.2.2.12-beta](https://github.com/cpsusie/DotNetVault/releases/tag/v0.2.2.12-beta), available as a Nuget package [here](https://www.nuget.org/packages/DotNetVault/0.2.2.12-beta).   The following list is a non-exhaustive summary of these new features:  
 * Upgrading to new versions of Roslyn libraries, immutable collections and other minor dependency upgrades
 * Changing some of the formatting of analyzer diagnostics to comply with Roslyn authors' recommendations
 * Adding Monitor Vaults (using Monitor.Enter + sync object) as the synchronization mechanism

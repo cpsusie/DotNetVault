@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -29,6 +30,7 @@ namespace DotNetVault
     {
         #region Public Fields, Properties and Constants
         // ReSharper disable InconsistentNaming
+        internal const string DotNetVault_ReportWhiteLists = "DotNetVault_ReportWhiteLists";
         internal const string DiagnosticId_VaultSafeTypes = "DotNetVault_VaultSafe";
         internal const string DiagnosticId_UsingMandatory = "DotNetVault_UsingMandatory";
         internal const string DiagnosticId_UsingMandatory_Inline = "DotNetVault_UsingMandatory_DeclaredInline";
@@ -76,6 +78,7 @@ namespace DotNetVault
                 EntryExitLog.CreateEntryExitLog(true, typeof(DotNetVaultAnalyzer), nameof(Initialize), context);
             try
             {
+                context.RegisterSymbolAction(AnalyzeForWhiteListPaths, SymbolKind.NamedType);
                 context.RegisterSyntaxNodeAction(AnalyzeRefExpressionForProtectedResource, SyntaxKind.RefExpression);
                 context.RegisterSymbolAction(AnalyzeTypeSymbolForVsTypeParams, SymbolKind.NamedType);
                 context.RegisterSymbolAction(AnalyzeNamedTypeSymbolForVaultSafety, SymbolKind.NamedType);
@@ -106,6 +109,54 @@ namespace DotNetVault
         #endregion
 
         #region Primary Analysis Operations
+
+        private void AnalyzeForWhiteListPaths(SymbolAnalysisContext context)
+        {
+            const string methodName = nameof(AnalyzeForWhiteListPaths);
+            using var _ = EntryExitLog.CreateEntryExitLog(EnableEntryExitLogging, typeof(DotNetVaultAnalyzer),
+                methodName, context);
+            var token = context.CancellationToken;
+            INamedTypeSymbol reportWhiteListFilesNts = context.Compilation.FindReportWhiteListLocationsAttribute();
+            if (reportWhiteListFilesNts != null && context.Symbol is INamedTypeSymbol nts)
+            {
+                try
+                {
+                    if (DoesNamedTypeHaveAttribute(nts, reportWhiteListFilesNts))
+                    {
+                        var analyzer = VaultSafeAnalyzerFactorySource.CreateDefaultAnalyzer();
+                        
+                            (FileInfo whiteListFile, FileInfo conditWhiteListFile) = analyzer.WhiteListFilePaths;
+                            whiteListFile.Refresh();
+                            token.ThrowIfCancellationRequested();
+                            conditWhiteListFile.Refresh();
+                            token.ThrowIfCancellationRequested();
+                            var diagnostic = Diagnostic.Create(ReportWhiteListFilePathsOnRequest,
+                                nts.Locations.FirstOrDefault(), DiagnosticSeverity.Warning, nts.Locations.Skip(1),  null, whiteListFile.FullName,
+                                ExistenceString(whiteListFile.Exists), conditWhiteListFile.FullName,
+                                ExistenceString(conditWhiteListFile.Exists));
+                            context.ReportDiagnostic(diagnostic);
+                    }
+                }
+                catch (IOException ex)
+                {
+                    TraceLog.Log(ex);
+                    throw;
+                }
+                catch (OperationCanceledException)
+                {
+                    DebugLog.Log($"{methodName} operation was cancelled.");
+                }
+                catch (Exception e)
+                {
+                    TraceLog.Log(e);
+                    throw;
+                }
+                
+            }
+
+            static string ExistenceString(bool exists) => exists ? "exists" : "does not exist";
+        }
+
         private void AnalyzeTypeDeclarationForIllegalUsageOfRefStructAttribute(SymbolAnalysisContext obj)
         {
             const string methodName = nameof(AnalyzeTypeDeclarationForIllegalUsageOfRefStructAttribute);
@@ -149,11 +200,6 @@ namespace DotNetVault
             try
             {
                 CSharpCompilation compilation = (CSharpCompilation) context.Compilation;
-                if (compilation == null)
-                {
-                    TraceLog.Log($"In {methodName}, analysis context object supplied a null compilation.");
-                    return;
-                }
                 if (context.Node is InvocationExpressionSyntax ies)
                 {
                     EarlyReleaseReason? justification;
@@ -354,11 +400,7 @@ namespace DotNetVault
             {
                 var syntax = (RefExpressionSyntax)obj.Node;
                 var compilation = obj.Compilation;
-                if (compilation == null)
-                {
-                    TraceLog.Log($"In {methodName}, analysis context object supplied a null compilation.");
-                    return;
-                }
+                
                 BvProtResAnalyzer analyzerUtil = BvProtResAnalyzerFactorySource.DefaultFactoryInstance();
                 obj.CancellationToken.ThrowIfCancellationRequested();
 
@@ -388,11 +430,6 @@ namespace DotNetVault
             try
             {
                 var compilation = context.Compilation;
-                if (compilation == null)
-                {
-                    TraceLog.Log($"In {methodName}, received a null compilation in analysis context.");
-                    return;
-                }
                 if (context.Node.Kind() == SyntaxKind.ObjectCreationExpression)
                 {
                     INamedTypeSymbol nts;
@@ -601,15 +638,15 @@ namespace DotNetVault
                                                 : illegalLhsCopyAssignments.ToImmutable();
 
                                         foreach ((IdentifierNameSyntax assignmentTarget,
-                                            ExpressionSyntax assignmentSource) in badAssignments)
+                                            ExpressionSyntax _) in badAssignments)
                                         {
                                             var diagnostic = Diagnostic.Create(UsingMandatoryNoCopyAssignment,
                                                 assignmentTarget.GetLocation(), ts.Name);
                                             context.ReportDiagnostic(diagnostic);
                                         }
 
-//search for standard method invocations other than by constant reference
-var invocationsWhereProtectedInArgumentList =
+                                        //search for standard method invocations other than by constant reference
+                                        var invocationsWhereProtectedInArgumentList =
                                             (from n in searchMe.DescendantNodes()
                                                 where n is InvocationExpressionSyntax
                                                 let ies = (InvocationExpressionSyntax) n
@@ -663,7 +700,7 @@ var invocationsWhereProtectedInArgumentList =
                                                 let reduced = methSymb.ReducedFrom
                                                 where reduced != null
                                                 let methId = val.accessedMethod
-                                                let firstParam = reduced.Parameters.FirstOrDefault()
+                                                let firstParam = reduced?.Parameters.FirstOrDefault()
                                                 where firstParam != null && firstParam.RefKind != RefKind.In
                                                 select (methSymb, reduced, methId)).ToImmutableArray();
                                         //emit diagnostic for such illegal by-value or by-non-const reference extension method invocation
@@ -824,10 +861,10 @@ var invocationsWhereProtectedInArgumentList =
                                                     let typeInfo =
                                                         model.GetTypeInfo(typeSyntax).ConvertedType as INamedTypeSymbol
                                                     where SymbolEqualityComparer.Default.Equals(protectedType, typeInfo)
-                                                    let vDeclarator = variableDeclaration.Variables.FirstOrDefault()
+                                                    let vDeclarator = variableDeclaration?.Variables.FirstOrDefault()
                                                     where vDeclarator != null && ThrowIfCanc(context.CancellationToken)
                                                     let identifierToken = vDeclarator.Identifier
-                                                    let eqVClause = vDeclarator.Initializer
+                                                    let eqVClause = vDeclarator?.Initializer
                                                     where eqVClause != null && ThrowIfCanc(context.CancellationToken)
                                                     select (someNode, identifierToken, eqVClause));
 
@@ -1042,7 +1079,10 @@ var invocationsWhereProtectedInArgumentList =
             #endregion
         }
 
-        private IEnumerable<(SyntaxNodeOrToken Identifier, ILocalSymbol LocalSymbol, INamedTypeSymbol LocalSymbolType)> Merge(IEnumerable<(SyntaxToken Identifier, ILocalSymbol LocalSymbol, INamedTypeSymbol LocalSymbolType)> identifierTokens, IEnumerable<(IdentifierNameSyntax IdentifierSyntax, ILocalSymbol LocalSymbol, INamedTypeSymbol LocalSymbolType)> identifierNameSyntax, CancellationToken token)
+        private IEnumerable<(SyntaxNodeOrToken Identifier, ILocalSymbol LocalSymbol, INamedTypeSymbol LocalSymbolType)> 
+            Merge(IEnumerable<(SyntaxToken Identifier, ILocalSymbol LocalSymbol, INamedTypeSymbol LocalSymbolType)> identifierTokens, 
+                IEnumerable<(IdentifierNameSyntax IdentifierSyntax, ILocalSymbol LocalSymbol, INamedTypeSymbol LocalSymbolType)> 
+                    identifierNameSyntax, CancellationToken token)
         {
 #pragma warning disable RS1024 // Compare symbols correctly
             HashSet<ILocalSymbol> symbols = new HashSet<ILocalSymbol>(SymbolEqualityComparer.Default);
@@ -1053,7 +1093,7 @@ var invocationsWhereProtectedInArgumentList =
                 token.ThrowIfCancellationRequested();
                 if (item.LocalSymbol != null && item.Identifier != default && symbols.Add(item.LocalSymbol))
                 {
-                    yield return ((SyntaxNodeOrToken) item.Identifier, item.LocalSymbol, item.LocalSymbolType);
+                    yield return (item.Identifier, item.LocalSymbol, item.LocalSymbolType);
                 }
             }
 
@@ -1062,7 +1102,7 @@ var invocationsWhereProtectedInArgumentList =
                 token.ThrowIfCancellationRequested();
                 if (item.LocalSymbol != null && item.IdentifierSyntax != null && symbols.Add(item.LocalSymbol))
                 {
-                    yield return ((SyntaxNodeOrToken)item.IdentifierSyntax, item.LocalSymbol, item.LocalSymbolType);
+                    yield return (item.IdentifierSyntax, item.LocalSymbol, item.LocalSymbolType);
                 }
             }
         }
@@ -1074,7 +1114,6 @@ var invocationsWhereProtectedInArgumentList =
             try
             {
                 CSharpCompilation compilation = (CSharpCompilation) context.Compilation;
-                if (compilation != null)
                 {
                     INamedTypeSymbol vaultSafeTpAttribSymbol = FindVaultSafeTypeParamAttribute(compilation);
                     var node = context.Node;
@@ -1139,10 +1178,6 @@ var invocationsWhereProtectedInArgumentList =
                             }
                         }
                     }
-                }
-                else
-                {
-                    TraceLog.Log($"{methodName} received a null compilation argument.");
                 }
             }
             catch (OperationCanceledException)
@@ -1257,7 +1292,7 @@ var invocationsWhereProtectedInArgumentList =
                     INamedTypeSymbol returnedOrCreatedType;
 
                     //for reals:
-                    var vaultSymbol = context.Compilation?.GetTypeByMetadataName("DotNetVault.Vaults.Vault`1");
+                    var vaultSymbol = context.Compilation.GetTypeByMetadataName("DotNetVault.Vaults.Vault`1");
                     //for testing:
                     //var vaultSymbol =
                     //    context.Compilation.GetTypeByMetadataName("DotNetVault.Test.TestCases.FakeVault`1");
@@ -1852,7 +1887,8 @@ var invocationsWhereProtectedInArgumentList =
                     .Add(UsingMandatoryIllegalPassExtMeth)
                     .Add(NoRefStructAttrExceptOnRefStruct)
                     .Add(UsingMandatoryNoLockedResourceWrappersAllowedInScope)
-                    .Add(NoIrregularLockedResourcesAllowedInScope);
+                    .Add(NoIrregularLockedResourcesAllowedInScope)
+                    .Add(ReportWhiteListFilePathsOnRequest);
             }
             catch (Exception ex)
             {
@@ -1867,6 +1903,12 @@ var invocationsWhereProtectedInArgumentList =
         private static readonly LocalizableString Vst_MessageFormat = new LocalizableResourceString(nameof(Resources.AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Vst_Description = new LocalizableResourceString(nameof(Resources.AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
         private const string Category = "VaultSafety";
+
+        private const string ReportWhiteLists_Title = "Report on location of Whitelist files";
+        private const string ReportWhiteLists_MessageFormat =
+            "The vault-safe whitelist is found at [{0}] and {1}.  The conditionally vault-safe generic whitelist is found at [{2}] and {3}.";
+        private const string ReportWhiteLists_Description =
+            "Optionally report on the location of the whitelist files used by the analyzer.";
 
         private const string OnlyOnRefStruct_Title =
             "The " + nameof(RefStructAttribute) + " may only be applied to ref structs";
@@ -2008,6 +2050,9 @@ var invocationsWhereProtectedInArgumentList =
             "Generic delegates with type parameters annotated with the VaultSafeTypeParam attribute require that all arguments corresponding to those parameters be vault-safe.";
         // ReSharper restore InconsistentNaming
 
+        private static readonly DiagnosticDescriptor ReportWhiteListFilePathsOnRequest =
+            new DiagnosticDescriptor(DotNetVault_ReportWhiteLists, ReportWhiteLists_Title,
+                ReportWhiteLists_MessageFormat, Category, DiagnosticSeverity.Warning, true, ReportWhiteLists_Description);
         private static readonly DiagnosticDescriptor NoIrregularLockedResourcesAllowedInScope =
             new DiagnosticDescriptor(DotNetVault_UsingMandatory_IrregularLockedResourceObjects_NotAllowedInScope,
                 UsingMandatory_IrregularLockedResourceObjects_NotAllowedInScope_Title,
@@ -2077,7 +2122,6 @@ var invocationsWhereProtectedInArgumentList =
         private static readonly WriteOnce<ImmutableArray<DiagnosticDescriptor>> TheDiagnosticDescriptors = new WriteOnce<ImmutableArray<DiagnosticDescriptor>>(CreateDiagnosticDescriptors);
         private volatile VaultSafeTypeAnalyzer _analyzer;
         private const bool EnableEntryExitLogging = false;
-
         #endregion
     }
 
@@ -2127,4 +2171,6 @@ var invocationsWhereProtectedInArgumentList =
             yield return val;
         }
     }
+
+  
 }
