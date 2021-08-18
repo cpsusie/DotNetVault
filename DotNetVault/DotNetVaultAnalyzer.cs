@@ -200,11 +200,6 @@ namespace DotNetVault
             try
             {
                 CSharpCompilation compilation = (CSharpCompilation) context.Compilation;
-                if (compilation == null)
-                {
-                    TraceLog.Log($"In {methodName}, analysis context object supplied a null compilation.");
-                    return;
-                }
                 if (context.Node is InvocationExpressionSyntax ies)
                 {
                     EarlyReleaseReason? justification;
@@ -405,11 +400,7 @@ namespace DotNetVault
             {
                 var syntax = (RefExpressionSyntax)obj.Node;
                 var compilation = obj.Compilation;
-                if (compilation == null)
-                {
-                    TraceLog.Log($"In {methodName}, analysis context object supplied a null compilation.");
-                    return;
-                }
+                
                 BvProtResAnalyzer analyzerUtil = BvProtResAnalyzerFactorySource.DefaultFactoryInstance();
                 obj.CancellationToken.ThrowIfCancellationRequested();
 
@@ -439,11 +430,6 @@ namespace DotNetVault
             try
             {
                 var compilation = context.Compilation;
-                if (compilation == null)
-                {
-                    TraceLog.Log($"In {methodName}, received a null compilation in analysis context.");
-                    return;
-                }
                 if (context.Node.Kind() == SyntaxKind.ObjectCreationExpression)
                 {
                     INamedTypeSymbol nts;
@@ -652,7 +638,7 @@ namespace DotNetVault
                                                 : illegalLhsCopyAssignments.ToImmutable();
 
                                         foreach ((IdentifierNameSyntax assignmentTarget,
-                                            ExpressionSyntax assignmentSource) in badAssignments)
+                                            ExpressionSyntax _) in badAssignments)
                                         {
                                             var diagnostic = Diagnostic.Create(UsingMandatoryNoCopyAssignment,
                                                 assignmentTarget.GetLocation(), ts.Name);
@@ -714,7 +700,7 @@ namespace DotNetVault
                                                 let reduced = methSymb.ReducedFrom
                                                 where reduced != null
                                                 let methId = val.accessedMethod
-                                                let firstParam = reduced.Parameters.FirstOrDefault()
+                                                let firstParam = reduced?.Parameters.FirstOrDefault()
                                                 where firstParam != null && firstParam.RefKind != RefKind.In
                                                 select (methSymb, reduced, methId)).ToImmutableArray();
                                         //emit diagnostic for such illegal by-value or by-non-const reference extension method invocation
@@ -875,10 +861,10 @@ namespace DotNetVault
                                                     let typeInfo =
                                                         model.GetTypeInfo(typeSyntax).ConvertedType as INamedTypeSymbol
                                                     where SymbolEqualityComparer.Default.Equals(protectedType, typeInfo)
-                                                    let vDeclarator = variableDeclaration.Variables.FirstOrDefault()
+                                                    let vDeclarator = variableDeclaration?.Variables.FirstOrDefault()
                                                     where vDeclarator != null && ThrowIfCanc(context.CancellationToken)
                                                     let identifierToken = vDeclarator.Identifier
-                                                    let eqVClause = vDeclarator.Initializer
+                                                    let eqVClause = vDeclarator?.Initializer
                                                     where eqVClause != null && ThrowIfCanc(context.CancellationToken)
                                                     select (someNode, identifierToken, eqVClause));
 
@@ -1093,7 +1079,10 @@ namespace DotNetVault
             #endregion
         }
 
-        private IEnumerable<(SyntaxNodeOrToken Identifier, ILocalSymbol LocalSymbol, INamedTypeSymbol LocalSymbolType)> Merge(IEnumerable<(SyntaxToken Identifier, ILocalSymbol LocalSymbol, INamedTypeSymbol LocalSymbolType)> identifierTokens, IEnumerable<(IdentifierNameSyntax IdentifierSyntax, ILocalSymbol LocalSymbol, INamedTypeSymbol LocalSymbolType)> identifierNameSyntax, CancellationToken token)
+        private IEnumerable<(SyntaxNodeOrToken Identifier, ILocalSymbol LocalSymbol, INamedTypeSymbol LocalSymbolType)> 
+            Merge(IEnumerable<(SyntaxToken Identifier, ILocalSymbol LocalSymbol, INamedTypeSymbol LocalSymbolType)> identifierTokens, 
+                IEnumerable<(IdentifierNameSyntax IdentifierSyntax, ILocalSymbol LocalSymbol, INamedTypeSymbol LocalSymbolType)> 
+                    identifierNameSyntax, CancellationToken token)
         {
 #pragma warning disable RS1024 // Compare symbols correctly
             HashSet<ILocalSymbol> symbols = new HashSet<ILocalSymbol>(SymbolEqualityComparer.Default);
@@ -1104,7 +1093,7 @@ namespace DotNetVault
                 token.ThrowIfCancellationRequested();
                 if (item.LocalSymbol != null && item.Identifier != default && symbols.Add(item.LocalSymbol))
                 {
-                    yield return ((SyntaxNodeOrToken) item.Identifier, item.LocalSymbol, item.LocalSymbolType);
+                    yield return (item.Identifier, item.LocalSymbol, item.LocalSymbolType);
                 }
             }
 
@@ -1113,7 +1102,7 @@ namespace DotNetVault
                 token.ThrowIfCancellationRequested();
                 if (item.LocalSymbol != null && item.IdentifierSyntax != null && symbols.Add(item.LocalSymbol))
                 {
-                    yield return ((SyntaxNodeOrToken)item.IdentifierSyntax, item.LocalSymbol, item.LocalSymbolType);
+                    yield return (item.IdentifierSyntax, item.LocalSymbol, item.LocalSymbolType);
                 }
             }
         }
@@ -1125,7 +1114,6 @@ namespace DotNetVault
             try
             {
                 CSharpCompilation compilation = (CSharpCompilation) context.Compilation;
-                if (compilation != null)
                 {
                     INamedTypeSymbol vaultSafeTpAttribSymbol = FindVaultSafeTypeParamAttribute(compilation);
                     var node = context.Node;
@@ -1190,10 +1178,6 @@ namespace DotNetVault
                             }
                         }
                     }
-                }
-                else
-                {
-                    TraceLog.Log($"{methodName} received a null compilation argument.");
                 }
             }
             catch (OperationCanceledException)
@@ -1308,7 +1292,7 @@ namespace DotNetVault
                     INamedTypeSymbol returnedOrCreatedType;
 
                     //for reals:
-                    var vaultSymbol = context.Compilation?.GetTypeByMetadataName("DotNetVault.Vaults.Vault`1");
+                    var vaultSymbol = context.Compilation.GetTypeByMetadataName("DotNetVault.Vaults.Vault`1");
                     //for testing:
                     //var vaultSymbol =
                     //    context.Compilation.GetTypeByMetadataName("DotNetVault.Test.TestCases.FakeVault`1");
