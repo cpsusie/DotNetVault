@@ -9,6 +9,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -19,25 +20,25 @@
 
   <PropertyGroup>
     <PackageId>DotNetVault</PackageId>
-    <PackageVersion>0.9.9.0-alpha</PackageVersion>
+    <PackageVersion>1.0.0.0</PackageVersion>
     <Owners>CJM Screws, LLC</Owners>
     <Authors>Christopher Susie</Authors>
     <PackageProjectUrl>https://github.com/cpsusie/DotNetVault</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/cpsusie/DotNetVault</RepositoryUrl>
+    <RepositoryUrl>https://github.com/cpsusie/DotNetVault.git</RepositoryUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>
       Synchronization Library and Static Analysis Tool for C# 8
 
       DotNetVault is a library and static code analysis tool that makes managing shared mutable state in multi-threaded applications more manageable and less error prone.  It also provides a common abstraction over several commonly used synchronization mechanisms, allowing you to change from one underlying type to another (such as from lock free synchronization to mutex/monitor lock based) without needing to refactor your code. Where errors do still occur, they are easier to locate and identify.
 
-      The project description (a detailed design document) can be read here: https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/DotNetVault_Description_Latest_Draft.pdf.
+      The project description (a detailed design document) can be read here: https://github.com/cpsusie/DotNetVault/blob/master/DotNetVault_Description_v1.0.pdf.
 
       A quick start guide for installation (Windows, Vs 2019+) can be found here: https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/QuickStart_Install_VS2019_Windows.md.
 
       A quick start guide for installation (Tested on Amazon Linux, Rider 2019.3.1+) can be found here: https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/Quick_Start_Install_Rider_Amazon_Linux.md.
 
       A guided tour / quick start guide for this project's functionality can be found here: https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/Quick_Start_Functionality_Tour.md 
-    </Description>
+</Description>
     <PackageReleaseNotes>
       RELEASE NOTES VERSION 1.0:
       Official Release of DotNetVault.  See prior release notes for features.  This release updates the official documentation for this release version.
@@ -52,16 +53,17 @@
       * Update example code project to demonstrate.
     </PackageReleaseNotes>
     <Copyright>Copyright © 2019-2021 CJM Screws, LLC</Copyright>
-    <PackageTags>DotNetVault, analyzers, synchronization, thread-safety, threadsafe, deadlock, deadlock-prevention</PackageTags>
+    <PackageTags>DotNetVault, analyzers, synchronization, thread-safety, threadsafe, deadlock, deadlock-prevention, threads, raii, multi-threaded</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <LangVersion>8.0</LangVersion>
-    <Version>0.9.9.0</Version>
+    <Version>1.0.0.0</Version>
     <AssemblyName>DotNetVault</AssemblyName>
     <RootNamespace>DotNetVault</RootNamespace>
     <Company>CJM Screws, LLC</Company>
-    <AssemblyVersion>0.9.9.0</AssemblyVersion>
-    <FileVersion>0.9.9.0</FileVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
     <PackageLicenseFile>license.txt</PackageLicenseFile>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -132,14 +134,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="HighPrecisionTimeStamps" Version="1.0.0">
+    <PackageReference Include="HighPrecisionTimeStamps" Version="1.0.0.1">
       <GeneratePathProperty>true</GeneratePathProperty>
       <IncludeAssets>all</IncludeAssets>
+      <IncludeInPackage>true</IncludeInPackage>
     </PackageReference>
-    <None Include="$(PkgHighPrecisionTimeStamps)\lib\netstandard2.0\HighPrecisionTimeStamps.dll">
-      <Link>HighPrecisionTimeStamps.dll</Link>
-      <CopyToOutputDirectory>always</CopyToOutputDirectory>
-    </None>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
     <PackageReference Include="JetBrains.Annotations" Version="2021.2.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" PrivateAssets="all" />
@@ -160,7 +159,7 @@
 
   <ItemGroup>
     <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
-    <None Include="$(OutputPath)\HighPrecisionTimeStamps.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(PkgHighPrecisionTimeStamps)\lib\netstandard2.0\*.dll"  Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
     <None Include="$(OutputPath)\license.txt" Pack="true" PackagePath="Docs" Visible="false" />
     <None Include="$(OutputPath)\Quick_Start_Functionality_Tour.md" Pack="true" PackagePath="Docs" Visible="false" />
     <None Include="$(OutputPath)\Quick_Start_Install_Rider_Amazon_Linux.md" Pack="true" PackagePath="Docs" Visible="false" />
