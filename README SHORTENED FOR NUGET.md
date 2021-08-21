@@ -1,7 +1,7 @@
 # DotNetVault
 
 ## Synchronization Library and Static Analyzer for C\# 8.0+  
-**MAJOR NEW RELEASE (version 0.2.5.x)**
+**MAJOR NEW RELEASE Version 1.0**
 
 DotNetVault takes its inspiration from the synchronization mechanisms provided
 by Rust language and the Facebook Folly C++ synchronization library. These
@@ -45,22 +45,37 @@ Static enforcement prevents unsynchronized access to protected resources.
 
 #### **Quick Start Guides**
 
-1. [A quick-start installation guide for installing the DotNetVault library and analyzer for use in Visual Studio 2019+ on Windows.](https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/DotNetVaultQuickStart/DotNetVault%20Quick%20Start%20Installation%20Guide%20Visual%20Studio%202019%20(Windows%2010).md#dotnetvault-quick-start-installation-guide-visual-studio-2019-windows-10)
-2. [A quick start installation guide for installing the DotNetVault library and analyzer for use in JetBrains Rider 2019.3.1+](https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/DotNetVaultQuickStart/DotNetVault%20Quick%20Start%20Installation%20Guide%20%E2%80%93%20JetBrains%20Rider%20(Tested%20on%20Amazon%20Linux).md#dotnetvault-quick-start-installation-guide--jetbrains-rider-201931-tested-on-amazon-linux) (created on an Amazon Linux environment, presumably applicable to any platform supporting JetBrains Rider 2019.3.1+).
-3. [A guided overview of the functionality of DotNetVault](https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/DotNetVaultQuickStart/DotNetVault%20Quick%20Start%20Functionality%20Tour%20%E2%80%93%20JetBrains%20Rider%20(Amazon%20Linux).md#dotnetvault-quick-start-functionality-tour--jetbrains-rider-201931-amazon-linux) along with a [test project](https://github.com/cpsusie/DotNetVault/tree/v0.2.5.x/DotNetVaultQuickStart) available on Github in both source and compiled code.  
+1. [A quick-start installation guide for installing the DotNetVault library and analyzer for use in Visual Studio 2019+ on Windows.](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVaultQuickStart/DotNetVault%20Quick%20Start%20Installation%20Guide%20Visual%20Studio%202019%20(Windows%2010).md#dotnetvault-quick-start-installation-guide-visual-studio-2019-windows-10)
+2. [A quick start installation guide for installing the DotNetVault library and analyzer for use in JetBrains Rider 2019.3.1+](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVaultQuickStart/DotNetVault%20Quick%20Start%20Installation%20Guide%20%E2%80%93%20JetBrains%20Rider%20(Tested%20on%20Amazon%20Linux).md#dotnetvault-quick-start-installation-guide--jetbrains-rider-201931-tested-on-amazon-linux) (created on an Amazon Linux environment, presumably applicable to any platform supporting JetBrains Rider 2019.3.1+).
+3. [A guided overview of the functionality of DotNetVault](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVaultQuickStart/DotNetVault%20Quick%20Start%20Functionality%20Tour%20%E2%80%93%20JetBrains%20Rider%20(Amazon%20Linux).md#dotnetvault-quick-start-functionality-tour--jetbrains-rider-201931-amazon-linux) along with a [test project](https://github.com/cpsusie/DotNetVault/tree/master/DotNetVaultQuickStart) available on Github in both source and compiled code.  
 
 ### **Development Roadmap** 
 
-#### *Release History*
+#### *Version 1.0*
 
-#### *Version 0.2.5.18*
-
-Non-beta release using version 1.0 of High Precision Timestamps.  Originally beta tested via version 0.1.1.0-beta in DotNetVault version 0.2.5.10-beta et seq.  Dependency on HpTimestamps changed from included dll to a dependency on package.
-
-Also, added a new (minor) feature: the [ReportWhiteListLocationsAttribute], when applied to a struct or class, will emit a compiler warning giving you the path of the vaultsafewhitelist and the conditionally vault safe generic whitelist files.
+This version represents the finalization of the work done in versions 0.2.5.x.  Versions 1.0+ will remain usable (assuming C# 8 manually enabled) from a .NET Framework 4.8 or NetStandard 2.0 environment (as well as .NET Core 3.1 and .NET 5). No major new features will be added to this version.  Development will remain open in the [1.0 branch](https://github.com/cpsusie/DotNetVault/tree/v1.0) primarily for refinements, bug fixes and documentation updates.  If you are not upgrading your projects to .NET 5, continue to use releases numbered 1.0.  Analyzer behavior will be updated only to close any encountered loopholes (or minor textual or formatting changes).
 
 #### *Version 0.2.5.x*
 
-No major new features will be added to version 0.2.5.  Development will remain open in the [0.2.5 branch](https://github.com/cpsusie/DotNetVault/tree/v0.2.5.x) primarily for refinements, bug fixes and documentation updates.  Versions 0.2.5+ will continue to support .NET Framework 4.8, .NET Standard 2.0+ and .NET Core 3.1+ but will not make use of any features from the upcoming Version 5 of the unified DotNet framework.  If you are not upgrading your projects to .NET 5, continue to use releases numbered 0.2 but make no upgrade to any package versioned 0.3+.  
+  * Upgrading to new versions of Roslyn libraries, immutable collections and other minor dependency upgrades  
+  * Changing some of the formatting of analyzer diagnostics to comply with Roslyn authors' recommendations  
+  * Adding Monitor Vaults (using Monitor.Enter + sync object) as the synchronization mechanism  
+  * Adding ReadWrite Vaults (using ReaderWriterLockSlim) as their synchronization mechanism  
+  * Fixing flawed static analyzer rules  
+  * Adding new analyzer rules to close encountered loopholes in the ruleset that potentially allowed unsynchronized access to protected resource objects  
+  * Unit tests as appropriate for new functionality  
+  * Creation of quick start installation guides with test projects  
+  * Not including project PDF in the released package but instead providing an md document and a txt document with links to those documents in the GitHub repository  
+  * Significant updates to the formatting and content of project markdown documents  
+  * Adding Source Link and releasing a symbol package along with the nuget package for this project  
+  * Writing many test projects and demonstration projects to verify functionality, stress test and profile performance of the vaults  
+  * Adding a document serving as a guide to using large mutable value types generally and as a repository for shared mutable state  
+  
+#### 
 
-See **[DotNetVault Description.pdf](https://github.com/cpsusie/DotNetVault/blob/v0.2.5.x/DotNetVault%20Description.pdf)** which serves as the most complete design document for this project.
+#### Future Features
+
+They will be released starting at version 2.0.  It is likely that the next version of DotNetVault will be targeting the upcoming unified framework version 5.0+ and not support prior versions of DotNet.  The primary focus of development will be the code generation capabilities of the Roslyn platform planned for release with .NET version 5.0+.  It is hoped to allow development and (to some extent) automated generation of customized vaults and their locked resource objects for users of this library.
+
+
+See **[DotNetVault Description_v1.0.pdf](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVault_Description_v1.0.pdf)** which serves as the most complete design document for this project.  Its latest draft version can be found [here](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVault_Description_Latest_Draft.pdf).
