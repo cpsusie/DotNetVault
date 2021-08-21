@@ -15,7 +15,7 @@ namespace ExampleCodePlayground
     using MonoStampSrc = HpTimeStamps.MonotonicTimeStampUtil<MonotonicContext>;
     //The following attribute will cause the compiler to emit a warning telling you the locations of the two configurable 
     //vault-safe whitelist files.
-    [ReportWhiteListLocations]
+    //[ReportWhiteListLocations]
     class Program
     {
         static void Main()
