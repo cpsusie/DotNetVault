@@ -1,26 +1,26 @@
 # DotNetVault Version 1.0 Quick Start Functionality Tour – JetBrains Rider 2019.3.1+ (Amazon Linux)  
   
-1.  This tutorial gives a brief tour of DotNetVault's functionality using JetBrains Rider on Amazon Linux.  If you have not installed DotNetVault yet on Rider, see the [Installation Quick Start guide](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVaultQuickStart/DotNetVault%20Quick%20Start%20Installation%20Guide%20%E2%80%93%20JetBrains%20Rider%20(Tested%20on%20Amazon%20Linux).md#dotnetvault-quick-start-installation-guide--jetbrains-rider-201931-tested-on-amazon-linux) first. After you have completed the installation process and ensured that Roslyn analyzers are enabled and working in Rider, return here. If you are using Visual Studio, use the [Windows Installation Quick Start Guide](https://github.com/cpsusie/DotNetVault/blob/master/QuickStart_Install_VS2019_Windows.md) here, but simply open the solution as shown below in Visual Studio rather than Rider. 
+1.  This tutorial gives a brief tour of DotNetVault's functionality using JetBrains Rider on Amazon Linux.  If you have not installed DotNetVault yet on Rider, see the [Installation Quick Start guide](https://github.com/cpsusie/DotNetVault/blob/v1.0_master/DotNetVaultQuickStart/DotNetVault%20Quick%20Start%20Installation%20Guide%20%E2%80%93%20JetBrains%20Rider%20(Tested%20on%20Amazon%20Linux).md#dotnetvault-quick-start-installation-guide--jetbrains-rider-201931-tested-on-amazon-linux) first. After you have completed the installation process and ensured that Roslyn analyzers are enabled and working in Rider, return here. If you are using Visual Studio, use the [Windows Installation Quick Start Guide](https://github.com/cpsusie/DotNetVault/blob/v1.0_master/QuickStart_Install_VS2019_Windows.md) here, but simply open the solution as shown below in Visual Studio rather than Rider. 
   
-2. Download this project's source code [here](https://github.com/cpsusie/DotNetVault/releases/download/v0.2.5.18/Version.0.2.5.18.release.binaries.7z).  Alternatively, go to this project's source repository on GitHub and download the source code for DotNetVault as shown (you will not need the source code to use DotNetVault, but it contains many useful test and demonstration projects and will be needed for this tour):  
+2. Download this project's source code [here](https://github.com/cpsusie/DotNetVault/releases/download/v1.0.0/Version_1.0_release_binaries.7z).  Alternatively, go to this project's source repository on GitHub and download the source code for DotNetVault as shown (you will not need the source code to use DotNetVault, but it contains many useful test and demonstration projects and will be needed for this tour):  
   
-    ![](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_1.png?raw=true)  
+    ![](https://github.com/cpsusie/DotNetVault/blob/v1.0_master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_1.png?raw=true)  
       
     * Extract the contents of the zip file to a convenient location  
     
-    ![](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_2.png?raw=true)
+    ![](https://github.com/cpsusie/DotNetVault/blob/v1.0_master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_2.png?raw=true)
           
     * Go into the folder structure and open the file “DotNetVaultQuickStart.sln” using Rider 2019.3.1+:  
     
-        ![](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_3.png?raw=true)    
+        ![](https://github.com/cpsusie/DotNetVault/blob/v1.0_master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_3.png?raw=true)    
           
     * Build the solution:  
     
-      ![](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_4.png?raw=true)    
+      ![](https://github.com/cpsusie/DotNetVault/blob/v1.0_master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_4.png?raw=true)    
         
     * Run the solution:  
       
-      ![](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_5.png?raw=true)  
+      ![](https://github.com/cpsusie/DotNetVault/blob/v1.0_master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_5.png?raw=true)  
       
 3.  This quick start projects demonstrates the use of Vaults and LockedResources.  A vault is an object that guards an object for thread synchronization purposes.  It prevents you from accessing the guarded object except for brief periods where you "obtain a lock" on the object.  You "obtain a lock" by calling one of the Lock, Spinlock and specialized locking method overloads.  If you successfully obtain the lock, you are presented with a **Locked Resource** which allows you to temporarily access the guarded object.  This **locked resource** object is a ref struct that can only be present in a single stack frame (cannot be copied to the heap (via boxing or otherwise) or to static  memory. Static analyzer rules are activated to prevent you from using the **locked resource** in a way that would allow the lock to remain open for longer than its scope or to copy its mutable contents (if any) to an unprotected context:  
   
@@ -45,7 +45,7 @@
 
 8.  BasicVaults protected only **vault-safe** resources and may be monitor-lock based or based on lock-free atomics.  The basic vault shown in this demonstration protects the **vault-safe** resource DogActionRecord and is configured, by default to be monitor-lock-based.  As shown, it is easy to re-configure it to be based on lock-free atomics by editing the type aliases defined at the top of Program.cs and Dog.cs:
 
-    ![](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_6.png?raw=true)  
+    ![](https://github.com/cpsusie/DotNetVault/blob/v1.0_master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_6.png?raw=true)  
     
 9.  DogActionRecord is an example of a **vault-safe** type.  These types can be stored in BasicVaults and ReadWriteVaults and are easier to work with than **locked resources** that protect reference types with mutable state.  A type is vault-safe if:  
   
@@ -55,24 +55,24 @@
     
 10.  DogActionRecord is shown below with commentary embedded in the image:  
     
-        ![](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_7.png?raw=true)    
+        ![](https://github.com/cpsusie/DotNetVault/blob/v1.0_master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_7.png?raw=true)    
           
 11. Although DogActionRecord is a value type, it is not an unmanaged value type.  For it to be VaultSafe, it must not contain any reference types with mutable state and it must be annotated with the VaultSafe attribute.  Since it is annotated with VaultSafe attribute and since its only unmanaged field is a string, which is a sealed class with no mutable state, it is VaultSafe.  When you apply the VaultSafe attribute to a type, the static analyzer verifies **vault-safety** and refuses to compile if it cannot prove at compile time that the field is VaultSafe.  For example, if you were to change the type of the field "_action"
 to a StringBuilder, it would cause compilation errors:
 
-      ![](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_8.png?raw=true)  
+      ![](https://github.com/cpsusie/DotNetVault/blob/v1.0_master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_8.png?raw=true)  
       
 12.  As a **vault-safe** type, DogActionRecord can be stored in a BasicVault.  The call to DemonstrateBasicVault() in Program.cs's Main method shows how this works.    
   
-     ![](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_9.png?raw=true)  
+     ![](https://github.com/cpsusie/DotNetVault/blob/v1.0_master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_9.png?raw=true)  
        
 13. This demonstration is rather straight forward.  Dogs are created which obtain a name, a number of actions to perform when called upon and a reference to the vault guarding a dog action record.  When they are told to perform their actions, they spawn a thread and for each of their number of actions to perform, obtain a lock and update the guarded resource to contain a record of their action.  They then release the lock, wait a bit, and repeat for any remaining actions depending on how many they are configured to perform.  In this demo, the dogs are called upon to do their actions twice, causing them to contend for access multiple times to the vault.  The main thread then waits for them all to get done then itself obtains the lock and prints out the dog action record of the last dog to obtain a lock:  
 
-     ![](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_10.png?raw=true)      
+     ![](https://github.com/cpsusie/DotNetVault/blob/v1.0_master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_10.png?raw=true)      
        
 14. The second demonstration is similar to the first one except the protected resource is a SortedSet of DogActionRecords rather than a singular DogActionRecord.  Since a SortedSet is a mutable reference type, a mutable resource vault, rather than a Basic Vault needs to be used.  As shown below, in this demonstration, the Dogs add their actions to the SortedSet rather than overwriting a single DogActionRecord:  
   
-    ![](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_11.png?raw=true)  
+    ![](https://github.com/cpsusie/DotNetVault/blob/v1.0_master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_11.png?raw=true)  
       
 15. The output of both demonstrations is found below:  
 > Beginning quick start demo.  This demonstration has HIGH PRECISION timestamps.  
@@ -464,7 +464,7 @@ concurrently (except, see below, an *upgradable* read-only lock can be converted
 
 23. The ReadWriteVault demonstration spawns a master thread.  The master thread then creates the reader threads, the writer thread, and the upgradable read-only thread.  It then waits until timeout or all threads complete.  Then the main thread returns the log produced by the reader threads.  Because the log is typically large (several megabytes), it is written to file rather than displayed.  
 
-     ![](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_12.png?raw=true)  
+     ![](https://github.com/cpsusie/DotNetVault/blob/v1.0_master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_12.png?raw=true)  
 
 
 24.  The SharedFlag's CurrentAction property is mutated via one of its several mutator methods.  It may only be changed from:  
@@ -480,12 +480,12 @@ concurrently (except, see below, an *upgradable* read-only lock can be converted
 
 27. The reader threads simply examine the state if the Shared Flags, get its string representation **(#1)** and CurrentAction property value **(#2)**.  The readers then release their read-only lock **(#3)**, log (along with their reader thread number -- 1 or 2) **(#4)** the results of the query.  Finally, they yield to another **(#5)** thread and repeat until a termination condition **(#6)** is detected. 
 
-     ![](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_13.png?raw=true)  
+     ![](https://github.com/cpsusie/DotNetVault/blob/v1.0_master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_13.png?raw=true)  
 
 
 28.  The writer continues looping until a termination condition is reached.  First, it generates random ulong between 0 and 102 **(#1)**, inclusive.  Then, it obtains a writable lock **(#2)** and calls the SharedFlags *Increment(ulong)* **(#3)** mutator method passing the generated random number as a parameter.  If *Increment(ulong)* returns false **(#4)**, it considers it a termination condition, releases its lock **(#5)** and returns.  Otherwise, it releases its lock **(#5)** and continues looping.  
 
-     ![](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_14.png?raw=true)  
+     ![](https://github.com/cpsusie/DotNetVault/blob/v1.0_master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_14.png?raw=true)  
        
 29.   
     
@@ -500,12 +500,12 @@ concurrently (except, see below, an *upgradable* read-only lock can be converted
     * Check whether we changed to a new state this iteration and, if we have, log it to the Console **(#11)**.  
     * If we have not changed this iteration and we are not in the 'Done' state (and thus about to end the loop), yield to another thread if the Operating System thinks that it is a good idea **(#13)**.  
       
-     ![](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_15.png?raw=true)  
+     ![](https://github.com/cpsusie/DotNetVault/blob/v1.0_master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_15.png?raw=true)  
        
 30. Executing the code shows the Upgradable Read Only thread logging state changes to the console (#3).
 Because the log file is too large to display in the console as is done for the prior two demonstrations, the ReadWriteVault Demo outputs the ReadOnly threads to a text file as shown (##1-2).  
   
-![](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_16.png?raw=true)  
+![](https://github.com/cpsusie/DotNetVault/blob/v1.0_master/DotNetVaultQuickStart/dotnetvault_func_tour_pics/pic_16.png?raw=true)  
   
 31. An excerpt from the output log file is included below.  The first timestamp is the time the message reached the logger.  The second timestamp is the time of the last update / change that happened to the SharedFlags as of the time the ReadOnly thread made that query.  Notice that the state changes occur shortly after ItemCount reaches the appropriate threshold.  "..." denotes skipped entries.
     
@@ -541,12 +541,12 @@ At [2020-09-23T08:36:33.6600732-04:00]:		 From reader #2: Current action: [Done]
   
 32. This is the end of the Quick Start tutorial.  There are far more resources available to help you make the best possible use of DotNetVault:
 
-    * **["Project Description.pdf"](https://github.com/cpsusie/DotNetVault/blob/master/DotNetVault%20Description.pdf)** is a large PDF document with a detailed table of contents and table of figures.  You should be able to find most, if not all, of the information you need there
+    * **["Project Description.pdf"](https://github.com/cpsusie/DotNetVault/blob/v1.0_master/DotNetVault_Description_v1.0.pdf)** is a large PDF document with a detailed table of contents and table of figures.  You should be able to find most, if not all, of the information you need there
 
-    * **"[Example Code Playground](https://github.com/cpsusie/DotNetVault/tree/master/ExampleCodePlayground)"** project is a project with plenty of code to allow you to learn about DotNetVault and its static analyzer in a hands-on fashion.  There is plenty of commented-out code that will trigger the analyzer's compilation errors along with notes as to why it is an error along with the rationale.
+    * **"[Example Code Playground](https://github.com/cpsusie/DotNetVault/tree/v1.0_master/ExampleCodePlayground)"** project is a project with plenty of code to allow you to learn about DotNetVault and its static analyzer in a hands-on fashion.  There is plenty of commented-out code that will trigger the analyzer's compilation errors along with notes as to why it is an error along with the rationale.
     
-    * **"[Clorton Game](https://github.com/cpsusie/DotNetVault/tree/master/Clorton%20Game/ClortonGameDemo)"** is both a test project and unit test that shows the customized StringBuilder read-write vault being used in an environment of very high thread-contention.
+    * **"[Clorton Game](https://github.com/cpsusie/DotNetVault/tree/v1.0_master/Clorton%20Game/ClortonGameDemo)"** is both a test project and unit test that shows the customized StringBuilder read-write vault being used in an environment of very high thread-contention.
     
-    * **"[Cafe Babe Game](https://github.com/cpsusie/DotNetVault/tree/master/CafeBabeGame/CafeBabeGame)"** is both a test project and unit test that shows the customized ReadWrite ValueListVault being used in an environment of very high thread-contention.  The ValueList vault guards a `List<T>`-like collection optimized for the efficient storage and retrieval of large value-types.
+    * **"[Cafe Babe Game](https://github.com/cpsusie/DotNetVault/tree/v1.0_master/CafeBabeGame/CafeBabeGame)"** is both a test project and unit test that shows the customized ReadWrite ValueListVault being used in an environment of very high thread-contention.  The ValueList vault guards a `List<T>`-like collection optimized for the efficient storage and retrieval of large value-types.
     
-    * **"[Laundry Stress Test](https://github.com/cpsusie/DotNetVault/tree/master/ExampleLaundryMachine)"** is a WPF (and thus, unfortunately, a Windows-only) demonstration and stress test of a laundry service.  There are multiple laundry machines (each with with its own state machine and threads) and loader and unloader robot-agents (also each with its own thread) who contend with the laundry machines' threads and with each other for access to the laundry and laundry machines. 
+    * **"[Laundry Stress Test](https://github.com/cpsusie/DotNetVault/tree/v1.0_master/ExampleLaundryMachine)"** is a WPF (and thus, unfortunately, a Windows-only) demonstration and stress test of a laundry service.  There are multiple laundry machines (each with with its own state machine and threads) and loader and unloader robot-agents (also each with its own thread) who contend with the laundry machines' threads and with each other for access to the laundry and laundry machines. 
