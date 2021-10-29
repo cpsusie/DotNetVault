@@ -14,10 +14,10 @@ namespace VaultUnitTests
     using VaultType = DotNetVault.Vaults.BasicMonitorVault<ResourceType>;
     using NullVtVault = DotNetVault.Vaults.BasicMonitorVault<NullVtType>;
     using VtVault = DotNetVault.Vaults.BasicMonitorVault<VtType>;
-    public class VaultNullableStrctAcqTests  : NullableAcqTests
+    public class Issue22Tests  : NullableAcqTests
     {
         /// <inheritdoc />
-        public VaultNullableStrctAcqTests([NotNull] ITestOutputHelper helper,
+        public Issue22Tests([NotNull] ITestOutputHelper helper,
             [NotNull] NullableVtVaultFactoryFixture fixture) : base(helper, fixture) {}
 
         [Fact]
@@ -88,6 +88,54 @@ namespace VaultUnitTests
         {
             const ulong targetVal = 66;
             using (var vault = Fixture.CreateSetVtVault(targetVal))
+            {
+                using var lck = vault.Lock();
+                Assert.True(lck.Value == targetVal);
+            }
+        }
+
+        [Fact]
+        public void TestGetLockUnsetRt()
+        {
+            using (var vault = Fixture.CreateUnsetVault())
+            {
+                {
+                    using var lck = vault.Lock();
+                    Helper.WriteLine($"Value now: {lck.Value ?? "NULL"}.");
+                }
+            }
+        }
+
+        [Fact]
+        public void TestGetLockPreset()
+        {
+            const string targetVal = "FooBar";
+            using (var vault = Fixture.CreateUnsetVault())
+            {
+                vault.SetCurrentValue(TimeSpan.FromMilliseconds(250), targetVal);
+                {
+                    using var lck = vault.Lock();
+                    Assert.True(lck.Value == targetVal);
+                }
+            }
+        }
+
+        [Fact]
+        public void TestGetLockConstructedNullRt()
+        {
+            const string targetVal = null;
+            using (var vault = Fixture.CreateSetVault(targetVal))
+            {
+                using var lck = vault.Lock();
+                Assert.True(lck.Value == targetVal);
+            }
+        }
+
+        [Fact]
+        public void TestGetLockConstructedNotNullRtVault()
+        {
+            const string targetVal = "frobnication";
+            using (var vault = Fixture.CreateSetVault(targetVal))
             {
                 using var lck = vault.Lock();
                 Assert.True(lck.Value == targetVal);
