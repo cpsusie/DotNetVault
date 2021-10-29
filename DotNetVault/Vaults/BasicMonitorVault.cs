@@ -30,25 +30,21 @@ namespace DotNetVault.Vaults
         #region CTORS
         /// <inheritdoc />
         public BasicMonitorVault(TimeSpan defaultTimeout)
-            : base(defaultTimeout) { }
+            : this(defaultTimeout, default) { }
 
         /// <summary>
         /// Creates a vault.  The value of <see cref="FallbackTimeout"/> will be used as default timeout.
         ///  </summary>
         /// <param name="initialValue">initial value of protected resource</param>
-        public BasicMonitorVault(T initialValue) : this(initialValue, FallbackTimeout)
-        {
-
-        }
+        public BasicMonitorVault(T initialValue) 
+            : this(initialValue, FallbackTimeout) {}
 
         /// <summary>
         /// Creates a vault using the default value of the protected resource and the value
         /// specified by <see cref="FallbackTimeout"/> as the default wait period.
         /// </summary>
-        public BasicMonitorVault() : this(default, FallbackTimeout)
-        {
-
-        }
+        public BasicMonitorVault() 
+            : this(default, FallbackTimeout) { }
 
         /// <summary>
         /// CTOR -- vault with specified value and timeout
@@ -56,11 +52,15 @@ namespace DotNetVault.Vaults
         /// <param name="initialValue">initial value of protected resource</param>
         /// <param name="defaultTimeout">default timeout period</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="defaultTimeout"/> was null</exception>
-        public BasicMonitorVault(T initialValue, TimeSpan defaultTimeout) : base(defaultTimeout)
+        public BasicMonitorVault(T initialValue, TimeSpan defaultTimeout) 
+            : this(defaultTimeout, initialValue) {}
+
+        private BasicMonitorVault(TimeSpan defaultTimeout, T initialValue) 
+            : base(defaultTimeout)
         {
             Init(initialValue);
             Debug.Assert(BoxPtr != null);
-        } 
+        }
         #endregion
 
         #region Lock acquisition methods
