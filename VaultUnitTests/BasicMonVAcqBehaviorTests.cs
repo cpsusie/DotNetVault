@@ -6,10 +6,13 @@ using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 using ResourceType = System.String;
-
+using NullVtType = System.Nullable<System.UInt64>;
+using VtType = System.UInt64;
 namespace VaultUnitTests
 {
     using VaultType = DotNetVault.Vaults.BasicMonitorVault<ResourceType>;
+    using NullVtVault = DotNetVault.Vaults.BasicMonitorVault<NullVtType>;
+    using VtVault = DotNetVault.Vaults.BasicMonitorVault<VtType>;
 
     public delegate VaultType MonVaultCreationMethod(TimeSpan timeout, Func<ResourceType> ctor = null);
     public sealed class BasicMonVaultAcqBehaviorTests : VaultAcqBehaviorTest
@@ -20,7 +23,8 @@ namespace VaultUnitTests
             _meth = (ts, ctor) => Fixture.CreateBasicMonitorVault<ResourceType>();
         }
 
-        
+    
+
         [Fact]
         public void TestThrowsAlready()
         {
@@ -229,7 +233,7 @@ namespace VaultUnitTests
         public void TestSeqBlockAcqs()
         {
             string finalResult;
-            using (var vault = _meth(TimeSpan.FromMilliseconds(250)))
+            using (VaultType vault = _meth(TimeSpan.FromMilliseconds(250)))
             {
                 vault.SetCurrentValue(TimeSpan.FromMilliseconds(10), string.Empty);
 
@@ -254,8 +258,8 @@ namespace VaultUnitTests
                 }
                 Assert.True(finalResult == vault.CopyCurrentValue(TimeSpan.FromMilliseconds(10)));
             }
-            Helper.WriteLine(finalResult);
-        }
+            Helper.WriteLine(finalResult); 
+            }
 
         [Fact]
         public void TestThrowsOperationCancelledWhenCancelBeforeTimeout()
