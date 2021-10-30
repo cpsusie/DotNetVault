@@ -265,7 +265,7 @@ namespace DotNetVault
                 // ReSharper disable once ConditionIsAlwaysTrueOrFalse -- DEBUG vs RELEASE
                 if (noInvAttrib != null)
                 {
-                    if (context.Node.Kind() == SyntaxKind.InvocationExpression &&
+                    if (context.Node.IsKind(SyntaxKind.InvocationExpression) &&
                         context.Node is InvocationExpressionSyntax ies)
                     {
                         var model = context.SemanticModel;
@@ -430,7 +430,7 @@ namespace DotNetVault
             try
             {
                 var compilation = context.Compilation;
-                if (context.Node.Kind() == SyntaxKind.ObjectCreationExpression)
+                if (context.Node.IsKind(SyntaxKind.ObjectCreationExpression))
                 {
                     INamedTypeSymbol nts;
 
@@ -662,7 +662,7 @@ namespace DotNetVault
                                                 select (arg, symbolIn.Symbol));
 
                                         var illegalBcNotByConstRef = invocationsWhereProtectedInArgumentList
-                                            .Where(inv => inv.arg.RefKindKeyword.Kind() != SyntaxKind.InKeyword)
+                                            .Where(inv => !inv.arg.RefKindKeyword.IsKind(SyntaxKind.InKeyword))
                                             .ToImmutableArray();
 
 
