@@ -134,7 +134,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="HighPrecisionTimeStamps" Version="1.0.0.1">
+    <PackageReference Include="HighPrecisionTimeStamps" Version="1.0.0.6">
       <GeneratePathProperty>true</GeneratePathProperty>
       <IncludeAssets>all</IncludeAssets>
       <IncludeInPackage>true</IncludeInPackage>
@@ -159,7 +159,7 @@
 
   <ItemGroup>
     <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
-    <None Include="$(PkgHighPrecisionTimeStamps)\lib\netstandard2.0\*.dll"  Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
+    <None Include="$(PkgHighPrecisionTimeStamps)\lib\netstandard2.0\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="$(OutputPath)\license.txt" Pack="true" PackagePath="Docs" Visible="false" />
     <None Include="$(OutputPath)\Quick_Start_Functionality_Tour.md" Pack="true" PackagePath="Docs" Visible="false" />
     <None Include="$(OutputPath)\Quick_Start_Install_Rider_Amazon_Linux.md" Pack="true" PackagePath="Docs" Visible="false" />
