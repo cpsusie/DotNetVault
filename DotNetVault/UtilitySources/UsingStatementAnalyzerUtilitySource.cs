@@ -185,7 +185,7 @@ namespace DotNetVault.UtilitySources
                             isTerminal = true;
                             break;
                         case SyntaxKind.LocalDeclarationStatement:
-                            isOk = parent.DescendantTokens().Any(token => token.Kind() == SyntaxKind.UsingKeyword);
+                            isOk = parent.DescendantTokens().Any(token => token.IsKind(SyntaxKind.UsingKeyword));
                             isTerminal = true;
                             break;
                         default:
