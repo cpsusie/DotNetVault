@@ -128,7 +128,11 @@ Essentially, when we have an immutable or **mutable** value type that we accessi
 ### **Development Roadmap** 
 
 #### *Release History*
-
+  
+#### *Version 1.0.0.1*
+  
+This version supplies fixes for issues [22](https://github.com/cpsusie/DotNetVault/issues/22) and [23](https://github.com/cpsusie/DotNetVault/issues/23) as merged in pull requests [24](https://github.com/cpsusie/DotNetVault/pull/24) and [26](https://github.com/cpsusie/DotNetVault/pull/26), respectively. Issue 22, was a problem where if a BasicMonitorVault was constructed without supplying an initial value, a LockAlreadyHeldThreadException would be thrown every time an attempt to acquire the lock was made.  Issue 24 was a bug in the version of HighPrecisionTimeStamps used by DotNetVault's static analyzer on some frameworks on some systems.  It was fixed by upgrading the version requirements for HighPrecisionTimeStamps (which can be downloaded in package form [here](https://www.nuget.org/packages/HighPrecisionTimeStamps) and whose repository is [here](https://github.com/cpsusie/High-Precision-Time-Stamps)) to version 1.0.0.6+ from 1.0.0.1+. The pull request from the relevant bug fixed in HighPrecisionTimeStamps can be found [here](https://github.com/cpsusie/High-Precision-Time-Stamps/pull/23).
+  
 #### *Version 1.0*
 
 This version represents the finalization of the work done in versions 0.2.5.x.  Versions 1.0+ will remain usable (assuming C# 8 manually enabled) from a .NET Framework 4.8 or NetStandard 2.0 environment (as well as .NET Core 3.1 and .NET 5). No major new features will be added to this version.  Development will remain open in the [1.0 branch](https://github.com/cpsusie/DotNetVault/tree/v1.0) primarily for refinements, bug fixes and documentation updates.  If you are not upgrading your projects to .NET 5, continue to use releases numbered 1.0.  Analyzer behavior will be updated only to close any encountered loopholes (or minor textual or formatting changes).
