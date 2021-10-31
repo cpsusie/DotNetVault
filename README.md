@@ -12,7 +12,21 @@ exception is thrown or early return taken. DotNetVault provides mechanisms for
 RAII-based thread synchronization and uses Roslyn analyzer to *add new rules to the
 C\# language* to actively prevent resources protected by its vaults from being used 
 in a thread-unsafe or non-synchronized way. You need not rely on convention or programmer
-discipline to ensure compliance: DotNetVault enforces compliance **at compile-time**.
+discipline to ensure compliance: DotNetVault enforces compliance **at compile-time**.  
+
+### **Just using the Software**
+
+If you just want to use the software software, it is intended to be used as a nuget package and is available on nuget.org.  You can visit its Nuget.org page [here](https://www.nuget.org/packages/DotNetVault).  
+  
+### **Version Directory**  
+
+**TLDR**: If you want a usable version of the software, for the foreseeable future, refer to the [*v1.0_master branch*](https://github.com/cpsusie/DotNetVault/tree/v1.0_master) and [releases](https://github.com/cpsusie/DotNetVault/releases) with a leading version number of 1.  The master branch (where you are now) is for development of future versions of this library and is unlikely to see a production-ready release anytime soon.
+  
+The current stable release is version v1.0.0.1 and can be found [here](https://github.com/cpsusie/DotNetVault/releases/tag/v1.0.0.1) and [here](https://www.nuget.org/packages/DotNetVault/1.0.0.1).  
+  
+Releases beginning with the number 1 (the latest of which is v1.0.0.1) are the current stable releases and will continue to support .NET Framework v4.8. If you wish the repository for further development of version 1, **please use the [*v1.0_master branch*](https://github.com/cpsusie/DotNetVault/tree/v1.0_master)**.  
+
+By contrast, this branch (i.e. the master branch) will be used for development of version 2 of .NET Vault, which *will not support .NET 4.8*.  While critical fixes from version 1.0+ will be merged into the master branch selectively and as appropriate, development between v1.0_master and master are now deemed separate concerns.  Development for versions 1.0+ is now limited to bug and documentation fixes and minor enhancements.
 
 ### **Requirements**
   
