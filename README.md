@@ -1,7 +1,7 @@
-# DotNetVault Version 1.0
+# DotNetVault Version 1.0.0.1
 
 ## Synchronization Library and Static Analyzer for C\# 8.0+  
-**Version 1.0**
+**Version 1.0.0.1** 
 
 DotNetVault takes its inspiration from the synchronization mechanisms provided
 by Rust language and the Facebook Folly C++ synchronization library. These
