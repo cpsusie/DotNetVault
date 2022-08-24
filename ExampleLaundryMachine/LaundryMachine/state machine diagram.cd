@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Interface Name="LaundryMachine.LaundryCode.IStateMachine&lt;TFlags, TFlagVault, TStateCode&gt;">
+    <Position X="0.75" Y="0.5" Width="4.25" />
+    <TypeIdentifier>
+      <HashCode>MEAAAAAAAAAAAAEAAAAAABgAAAEAABAAAAACAAEGACA=</HashCode>
+      <FileName>LaundryCode\IStateMachine.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="LaundryMachine.LaundryCode.LaundryMachineStateCode">
+    <Position X="13" Y="3.5" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAACAEAQAAAAIAAAAAAAAAAAAAAgAAAAAAAAg=</HashCode>
+      <FileName>LaundryCode\LaundryMachineStateCode.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="LaundryMachine.LaundryCode.StateMachineStateType">
+    <Position X="14.75" Y="0.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAUAA=</HashCode>
+      <FileName>LaundryCode\LaundryMachineStateCode.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="LaundryMachine.LaundryCode.TaskResultCode">
+    <Position X="10.5" Y="0.5" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIgAAAAAAABAAAAAAAAAAIAAABAAAAIAAA=</HashCode>
+      <FileName>LaundryCode\LaundryMachineStateCode.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
